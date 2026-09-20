@@ -1,8 +1,7 @@
 // assets/js/pages/pcs.page.js
 /* ─────────────────────────────────────────────────────────
    PCs & Monitors page.
-   Fetches /data/pcs.json (desktops, tiny, monitors),
-   flattens, adds a category tag, filters, renders.
+   Category tabs + sort + view toggle.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -18,40 +17,57 @@
 
   let allItems = [];
 
-  /* ── Flatten the nested JSON into one array ───────────── */
   function flatten(data) {
     const out = [];
-
-    (data.desktops || []).forEach(function (item) {
-      out.push(Object.assign({}, item, { _category: 'desktop' }));
-    });
-    (data.tiny || []).forEach(function (item) {
-      out.push(Object.assign({}, item, { _category: 'tiny' }));
-    });
-    (data.monitors || []).forEach(function (item) {
-      out.push(Object.assign({}, item, { _category: 'monitor' }));
-    });
-
+    (data.desktops || []).forEach(i => out.push(Object.assign({}, i, { _category: 'desktop' })));
+    (data.tiny || []).forEach(i => out.push(Object.assign({}, i, { _category: 'tiny' })));
+    (data.monitors || []).forEach(i => out.push(Object.assign({}, i, { _category: 'monitor' })));
     return out;
   }
 
-  /* ── Filter by category ───────────────────────────────── */
-  function applyFilters(state) {
-    const cat = state.category || 'all';
-    if (cat === 'all') return allItems;
-    return allItems.filter(function (item) { return item._category === cat; });
+  function readParams() {
+    const p = new URLSearchParams(window.location.search);
+    return {
+      cat:  (p.get('cat')  || 'all').trim(),
+      sort: (p.get('sort') || 'featured').trim(),
+      view: (p.get('view') || 'grid').trim(),
+    };
   }
 
-  /* ── Count display ────────────────────────────────────── */
+  function writeParams(params) {
+    const url = new URL(window.location.href);
+    ['cat','sort','view'].forEach(k => {
+      if (params[k] && params[k] !== 'grid' && params[k] !== 'featured' && params[k] !== 'all') {
+        url.searchParams.set(k, params[k]);
+      } else {
+        url.searchParams.delete(k);
+      }
+    });
+    window.history.replaceState({}, '', url);
+  }
+
+  function applySort(items, sort) {
+    const copy = items.slice();
+    switch (sort) {
+      case 'price-asc':  return copy.sort((a,b) => a.price - b.price);
+      case 'price-desc': return copy.sort((a,b) => b.price - a.price);
+      case 'model-asc':  return copy.sort((a,b) => (a.model || '').localeCompare(b.model || ''));
+      case 'ram-desc':   return copy.sort((a,b) => (b.ram || 0) - (a.ram || 0));
+      case 'featured':
+      default:           return copy;
+    }
+  }
+
   function updateCount(visible, total) {
     const el = document.getElementById('pcs-count');
-    if (!el) return;
-    el.textContent = visible === total
-      ? total + ' machines · tested, warranted, priced fairly'
-      : visible + ' of ' + total + ' machines shown';
+    if (el) {
+      el.textContent = visible === total
+        ? total + ' machines · tested, warranted, priced fairly'
+        : visible + ' of ' + total + ' machines shown';
+    }
+    NS.SortBar?.setCount?.(visible);
   }
 
-  /* ── Category tabs ────────────────────────────────────── */
   function renderTabs(host, state, onChange) {
     host.innerHTML = CATEGORIES.map(function (c) {
       const active = state.category === c.id;
@@ -59,8 +75,7 @@
         '<button type="button" class="filter-btn' + (active ? ' is-active' : '') + '"' +
         ' data-filter="' + c.id + '"' +
         ' aria-pressed="' + (active ? 'true' : 'false') + '">' +
-        c.label +
-        '</button>'
+        c.label + '</button>'
       );
     }).join('');
 
@@ -77,22 +92,18 @@
     });
   }
 
-  /* ── Init ─────────────────────────────────────────────── */
   async function init() {
     const gridHost = document.getElementById('pcs-grid');
     const tabsHost = document.getElementById('pcs-tabs');
-
+    const sortHost = document.getElementById('pcs-sort');
     if (!gridHost) return;
 
-    /* Loading state */
     gridHost.innerHTML =
       '<div class="product-loading" role="status" aria-live="polite">' +
-        '<i data-lucide="loader-2"></i>' +
-        '<span>Loading PCs and monitors…</span>' +
+        '<i data-lucide="loader-2"></i><span>Loading PCs and monitors…</span>' +
       '</div>';
     NS.renderIcons?.(gridHost);
 
-    /* Fetch */
     try {
       const data = await NS.Data.pcs();
       allItems = flatten(data);
@@ -107,26 +118,46 @@
       return;
     }
 
-    /* State */
-    const state = { category: 'all' };
+    const urlState = readParams();
 
-    /* Grid + tabs */
+    const state = {
+      category: urlState.cat,
+      sort:     urlState.sort,
+      view:     urlState.view,
+    };
+
     const grid = NS.ProductGrid.mount(gridHost);
 
     function render() {
-      const visible = applyFilters(state);
-      grid.render(visible);
-      updateCount(visible.length, allItems.length);
+      const filtered = state.category === 'all'
+        ? allItems
+        : allItems.filter(i => i._category === state.category);
+      const sorted = applySort(filtered, state.sort);
+      grid.render(sorted);
+      updateCount(sorted.length, allItems.length);
+      gridHost.classList.toggle('is-list', state.view === 'list');
+      writeParams(state);
     }
 
     if (tabsHost) {
-      renderTabs(tabsHost, state, function (cat) {
+      renderTabs(tabsHost, { category: state.category }, function (cat) {
         state.category = cat;
         render();
       });
     }
 
-    /* Add to cart — event delegation */
+    if (sortHost) {
+      NS.SortBar.mount(sortHost);
+      document.addEventListener('sort:change', (e) => {
+        state.sort = e.detail.sort;
+        render();
+      });
+      document.addEventListener('view:change', (e) => {
+        state.view = e.detail.view;
+        render();
+      });
+    }
+
     gridHost.addEventListener('click', function (e) {
       const btn = e.target.closest('[data-action="add-to-cart"]');
       if (!btn) return;
@@ -137,7 +168,6 @@
       }));
     });
 
-    /* First render */
     render();
     console.info('[IT Zone] Loaded ' + allItems.length + ' PCs & monitors.');
   }

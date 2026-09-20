@@ -7,7 +7,7 @@
 
   <title>All Laptops — Dell, HP, Lenovo | IT Zone Electronics</title>
   <meta name="description"
-        content="Browse our full inventory of certified refurbished business laptops: Dell Latitude, HP EliteBook, Lenovo ThinkPad. Filter by brand, spec, and price.">
+        content="Browse our full inventory of certified refurbished business laptops: Dell Latitude, HP EliteBook, Lenovo ThinkPad.">
   <link rel="canonical" href="https://itzone.pk/pages/inventory.html">
 
   <meta property="og:type"        content="website">
@@ -39,15 +39,15 @@
 
         <header class="mb-4">
           <h1 class="section-title">All Laptops</h1>
-          <p class="section-subtitle" id="inventory-count">
-            Loading inventory…
-          </p>
+          <p class="section-subtitle" id="inventory-count">Loading inventory…</p>
         </header>
 
         <div class="inventory-toolbar">
           <div class="product-filters" id="product-filters" role="group" aria-label="Filter by brand"></div>
           <div class="product-search" id="product-search" role="search"></div>
         </div>
+
+        <div id="product-sort"></div>
 
         <div id="product-grid" role="list"></div>
 
@@ -58,25 +58,17 @@
 
   <footer class="site-footer"></footer>
 
-  <!-- Vendors -->
   <script defer src="../assets/js/vendors/bootstrap.bundle.min.js"></script>
   <script defer src="../assets/js/vendors/lucide.min.js"></script>
-
-  <!-- Core -->
   <script defer src="../assets/js/core/data.js"></script>
-
-  <!-- Components -->
   <script defer src="../assets/js/components/Navbar.js"></script>
   <script defer src="../assets/js/components/Footer.js"></script>
   <script defer src="../assets/js/components/ProductCard.js"></script>
   <script defer src="../assets/js/components/ProductGrid.js"></script>
   <script defer src="../assets/js/components/Filters.js"></script>
   <script defer src="../assets/js/components/SearchBar.js"></script>
-
-  <!-- Page module -->
+  <script defer src="../assets/js/components/SortBar.js"></script>
   <script defer src="../assets/js/pages/inventory.page.js"></script>
-
-  <!-- App bootstrap (last) -->
   <script defer src="../assets/js/main.js"></script>
 
 </body>
