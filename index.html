@@ -60,19 +60,45 @@
     <!-- Hero -->
     <section id="hero-slot" class="hero-section" aria-labelledby="hero-title-heading"></section>
 
-    <!-- Inventory preview — filled in Step 8 -->
-    <section id="inventory" class="section" aria-labelledby="inventory-heading">
+    <!-- Featured products -->
+    <section id="featured" class="section" aria-labelledby="featured-heading">
       <div class="container">
-        <h2 id="inventory-heading" class="section-title">Available inventory</h2>
-        <p class="section-subtitle">Browse our full catalog — coming next.</p>
+        <header class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+          <div>
+            <h2 id="featured-heading" class="section-title mb-1">Featured laptops</h2>
+            <p class="section-subtitle mb-0">Hand-picked machines from our latest stock.</p>
+          </div>
+          <a href="pages/inventory.html" class="btn btn-outline-brand">
+            <i data-lucide="arrow-right"></i>
+            <span>Browse all</span>
+          </a>
+        </header>
+
+        <div id="featured-grid" role="list"></div>
       </div>
     </section>
 
-    <!-- Reviews — filled in Step 10 -->
+    <!-- Inventory preview (link-out) -->
+    <section id="inventory" class="section-tight" aria-labelledby="inventory-heading">
+      <div class="container">
+        <div class="cta-strip">
+          <div>
+            <h2 id="inventory-heading" class="section-title mb-1">Full inventory</h2>
+            <p class="section-subtitle mb-0">30 laptops · 11 desktops · 6 tiny PCs · 5 monitors.</p>
+          </div>
+          <div class="d-flex gap-3 flex-wrap">
+            <a href="pages/inventory.html" class="btn btn-brand">All Laptops</a>
+            <a href="pages/pcs.html" class="btn btn-outline-brand">PCs &amp; Monitors</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reviews placeholder -->
     <section id="reviews" class="section-tight" aria-labelledby="reviews-heading">
       <div class="container">
         <h2 id="reviews-heading" class="section-title">What our customers say</h2>
-        <p class="section-subtitle">Customer reviews coming next.</p>
+        <p class="section-subtitle">Reviews section arrives in a later step.</p>
       </div>
     </section>
 
@@ -91,9 +117,11 @@
   <script defer src="assets/js/components/Navbar.js"></script>
   <script defer src="assets/js/components/Footer.js"></script>
   <script defer src="assets/js/components/Hero.js"></script>
+  <script defer src="assets/js/components/ProductCard.js"></script>
+  <script defer src="assets/js/components/ProductGrid.js"></script>
 
-  <!-- Page modules -->
-  <script defer src="assets/js/pages/pcs.page.js"></script>
+  <!-- Page module -->
+  <script defer src="assets/js/pages/home.js"></script>
 
   <!-- App bootstrap (last) -->
   <script defer src="assets/js/main.js"></script>

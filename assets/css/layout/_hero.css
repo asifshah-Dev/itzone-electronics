@@ -216,3 +216,20 @@
   .hero-art { max-width: 320px; }
   .hero-trust { gap: var(--space-3) var(--space-4); font-size: var(--fs-xs); }
 }
+
+/* ── CTA strip on the home page ───────────────────────── */
+.cta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 6px solid var(--brand-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.cta-strip .section-title { font-size: var(--fs-2xl); margin: 0; }
+.cta-strip .section-subtitle { margin: 0; font-size: var(--fs-sm); }

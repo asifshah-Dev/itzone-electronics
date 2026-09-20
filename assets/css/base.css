@@ -2,8 +2,6 @@
    ─────────────────────────────────────────────────────────
    Element-level styles only. NO global component classes.
    Bootstrap owns .container, .row, .col-*, .card, .btn-base.
-   We only touch :root, html, body, headings, links, focus,
-   media, and accessibility helpers.
    ───────────────────────────────────────────────────────── */
 
 /* ── Root / reset ─────────────────────────────────────── */
@@ -12,6 +10,9 @@ html {
   scroll-padding-top: calc(var(--header-height) + var(--space-4));
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* 🔑 absolute guard against horizontal overflow */
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -32,7 +33,21 @@ body {
   background-color: var(--bg-page);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 🔑 absolute guard */
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+/* Any block element must never exceed its parent */
+main, section, header, footer, nav, article, aside {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Any flex/grid child must be able to shrink */
+.flex-child, [class*="col-"] {
+  min-width: 0;
 }
 
 /* ── Headings ─────────────────────────────────────────── */
@@ -43,6 +58,8 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
   margin: 0 0 var(--space-3);
   text-wrap: balance;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 h1 { font-size: var(--fs-4xl); font-weight: var(--fw-black); }
@@ -55,6 +72,7 @@ h6 { font-size: var(--fs-base); }
 p {
   margin: 0 0 var(--space-4);
   text-wrap: pretty;
+  overflow-wrap: break-word;
 }
 
 /* ── Links ────────────────────────────────────────────── */
@@ -67,7 +85,6 @@ a:hover { color: var(--brand-primary-hover); }
 
 /* ── Focus (a11y) ─────────────────────────────────────── */
 :focus { outline: none; }
-
 :focus-visible {
   outline: 3px solid var(--brand-primary);
   outline-offset: 3px;
@@ -75,7 +92,7 @@ a:hover { color: var(--brand-primary-hover); }
 }
 
 /* ── Media defaults ───────────────────────────────────── */
-img, svg, video, canvas {
+img, svg, video, canvas, picture {
   max-width: 100%;
   height: auto;
   display: block;
@@ -93,10 +110,9 @@ img, svg, video, canvas {
 }
 
 /* ═══════════════════════════════════════════════════════
-   CONTAINER — global side padding
+   CONTAINER
    Bootstrap's .container only sets padding inside media
-   queries. We force a comfortable gutter at every size so
-   text never touches the viewport edge.
+   queries. We force a comfortable gutter at every size.
    ═══════════════════════════════════════════════════════ */
 .container,
 .container-fluid,
@@ -106,9 +122,12 @@ img, svg, video, canvas {
 .container-xl,
 .container-xxl {
   width: 100%;
+  max-width: 100%;
   margin-inline: auto;
-  padding-left: clamp(1.25rem, 4vw, 3rem) !important;
-  padding-right: clamp(1.25rem, 4vw, 3rem) !important;
+  padding-left: clamp(1rem, 3vw, 2rem) !important;
+  padding-right: clamp(1rem, 3vw, 2rem) !important;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 @media (min-width: 1400px) {
@@ -154,7 +173,7 @@ img, svg, video, canvas {
   outline-offset: 2px;
 }
 
-/* ── Section heading helpers ──────────────────────────── */
+/* ── Section headings ─────────────────────────────────── */
 .section-title {
   font-size: var(--fs-3xl);
   font-weight: var(--fw-bold);
@@ -162,14 +181,12 @@ img, svg, video, canvas {
   margin-bottom: var(--space-2);
   color: var(--text-primary);
 }
-
 .section-subtitle {
   font-size: var(--fs-lg);
   color: var(--text-muted);
   margin-bottom: var(--space-6);
   max-width: 60ch;
 }
-
 .text-gradient-brand {
   background: linear-gradient(
     135deg,
@@ -181,10 +198,5 @@ img, svg, video, canvas {
   background-clip: text;
   color: transparent;
 }
-
-.section {
-  padding-block: clamp(3rem, 5vw + 1rem, 5rem);
-}
-.section-tight {
-  padding-block: clamp(2rem, 3vw + 0.5rem, 3rem);
-}
+.section      { padding-block: clamp(3rem, 5vw + 1rem, 5rem); }
+.section-tight { padding-block: clamp(2rem, 3vw + 0.5rem, 3rem); }
