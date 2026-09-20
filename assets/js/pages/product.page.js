@@ -1,8 +1,8 @@
 // assets/js/pages/product.page.js
 /* ─────────────────────────────────────────────────────────
    Product detail page.
-   URL: /pages/product.html?id=<id>&from=laptops|pcs
-   Fallback: sessionStorage (survives query string loss).
+   Renders image, title, price, specs, CTAs, related products.
+   Related cards are built via DOM, not innerHTML.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -24,11 +24,9 @@
 
   function readParams() {
     const p = new URLSearchParams(window.location.search);
-
     let id   = (p.get('id')   || '').trim();
     let from = (p.get('from') || '').trim();
 
-    /* Fallback: recover from sessionStorage if URL has no id */
     if (!id) {
       try {
         const pendingId = sessionStorage.getItem('itz.pendingProductId');
@@ -37,20 +35,16 @@
         if (pendingId && (Date.now() - at) < 15000) {
           id   = pendingId;
           from = from || pendingFrom || 'laptops';
-          console.info('[IT Zone] Recovered product from sessionStorage:', id, '|', from);
-          /* Restore into URL */
           const url = new URL(window.location.href);
           url.searchParams.set('id', id);
           url.searchParams.set('from', from);
           window.history.replaceState({}, '', url);
+          console.info('[IT Zone] Recovered product from sessionStorage:', id, '|', from);
         }
       } catch (e) { /* ignore */ }
     }
 
-    return {
-      id,
-      from: from || 'laptops',
-    };
+    return { id, from: from || 'laptops' };
   }
 
   function findItem(id, from, laptops, pcs) {
@@ -67,7 +61,7 @@
 
   function findRelated(item, laptops, pcs) {
     if (!item) return [];
-    const fromPC = item.id.startsWith('pc-') || item.id.startsWith('mon-');
+    const fromPC = /^(pc-|mon-)/.test(item.id);
     const pool = fromPC
       ? [].concat(pcs?.desktops || [], pcs?.tiny || [], pcs?.monitors || [])
       : (laptops || []).slice();
@@ -96,22 +90,24 @@
     return '<i data-lucide="' + icon + '"></i>';
   }
 
+  /* ── Spec rows as a clean two-column list ─────────────── */
   function specRows(item) {
     const rows = [];
-    if (item.brand)       rows.push(['Brand', item.brand]);
-    if (item.model)       rows.push(['Model', item.model]);
-    if (item.cpu)         rows.push(['Processor', item.cpu + (item.gen ? ' ' + item.gen + ' Gen' : '')]);
-    else if (item.gen)    rows.push(['Generation', item.gen]);
-    if (item.ram)         rows.push(['RAM', item.ram + ' GB']);
-    if (item.ssd)         rows.push(['Storage (SSD)', item.ssd + ' GB SSD']);
-    if (item.hdd)         rows.push(['Storage', item.hdd]);
-    if (item.gpu)         rows.push(['Graphics', item.gpu]);
-    if (item.resolution)  rows.push(['Resolution', item.resolution]);
-    if (item.size)        rows.push(['Size', item.size]);
-    if (item.extras)      rows.push(['Notes', item.extras]);
+    if (item.brand)      rows.push(['Brand', item.brand]);
+    if (item.model)      rows.push(['Model', item.model]);
+    if (item.cpu)        rows.push(['Processor', item.cpu + (item.gen ? ' ' + item.gen + ' Gen' : '')]);
+    else if (item.gen)   rows.push(['Generation', item.gen]);
+    if (item.ram)        rows.push(['RAM', item.ram + ' GB']);
+    if (item.ssd)        rows.push(['Storage (SSD)', item.ssd + ' GB SSD']);
+    if (item.hdd)        rows.push(['Storage', item.hdd]);
+    if (item.gpu)        rows.push(['Graphics', item.gpu]);
+    if (item.resolution) rows.push(['Resolution', item.resolution]);
+    if (item.size)       rows.push(['Size', item.size]);
+    if (item.extras)     rows.push(['Notes', item.extras]);
     rows.push(['Condition', 'Certified refurbished · Tested']);
     rows.push(['Warranty', '1 year']);
     rows.push(['Delivery', 'Nationwide (2–4 business days)']);
+
     return rows.map(r =>
       '<div class="spec-row">' +
         '<span class="spec-key">' + r[0] + '</span>' +
@@ -149,66 +145,88 @@
     );
   }
 
-  function template(item, related, from) {
+  /* ── Build the whole page as DOM (no innerHTML for related) ── */
+  function buildPage(item, related, from) {
+    const fragment = document.createDocumentFragment();
+
+    /* Breadcrumb */
+    const bc = document.createElement('div');
+    bc.innerHTML = breadcrumb(item, from);
+    fragment.appendChild(bc.firstElementChild);
+
+    /* Top grid: image + info */
     const priceFormatted = new Intl.NumberFormat('en-PK').format(item.price);
-    const relatedCards = related.map(r => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'col-12 col-sm-6 col-lg-4 col-xl-3';
-      wrapper.innerHTML = NS.ProductCard.render(r);
-      return wrapper.outerHTML;
-    }).join('');
 
-    return (
-      breadcrumb(item, from) +
-
-      '<div class="product-detail-grid">' +
-
-        '<div class="product-detail-image">' + imageBlock(item) + '</div>' +
-
-        '<div class="product-detail-info">' +
-          '<span class="product-detail-brand">' + item.brand + '</span>' +
-          '<h1 class="product-detail-title">' + item.model + '</h1>' +
-
-          '<div class="product-detail-price">' +
-            '<span class="product-detail-price-label">PKR</span>' +
-            '<span class="product-detail-price-value">' + priceFormatted + '</span>' +
-          '</div>' +
-
-          '<div class="product-detail-quick">' + quickPills(item) + '</div>' +
-
-          '<div class="product-detail-ctas">' +
-            '<button type="button" class="btn btn-brand" id="detail-add-to-cart" ' +
-                    'data-id="' + item.id + '">' +
-              '<i data-lucide="shopping-bag"></i><span>Add to cart</span>' +
-            '</button>' +
-            '<a href="' + PHONE_TEL + '" class="btn btn-accent">' +
-              '<i data-lucide="phone"></i><span>Call ' + PHONE_DISPLAY + '</span>' +
-            '</a>' +
-            '<a href="' + WHATSAPP_TEL + '" target="_blank" rel="noopener noreferrer" class="btn btn-outline-brand">' +
-              '<i data-lucide="message-circle"></i><span>WhatsApp</span>' +
-            '</a>' +
-          '</div>' +
-
-          '<ul class="product-detail-trust">' +
-            '<li><i data-lucide="shield-check"></i><span>1-year warranty</span></li>' +
-            '<li><i data-lucide="truck"></i><span>Nationwide delivery</span></li>' +
-            '<li><i data-lucide="badge-check"></i><span>Tested before shipping</span></li>' +
-          '</ul>' +
+    const grid = document.createElement('div');
+    grid.className = 'product-detail-grid';
+    grid.innerHTML =
+      '<div class="product-detail-image">' + imageBlock(item) + '</div>' +
+      '<div class="product-detail-info">' +
+        '<span class="product-detail-brand">' + item.brand + '</span>' +
+        '<h1 class="product-detail-title">' + item.model + '</h1>' +
+        '<div class="product-detail-price">' +
+          '<span class="product-detail-price-label">PKR</span>' +
+          '<span class="product-detail-price-value">' + priceFormatted + '</span>' +
         '</div>' +
-      '</div>' +
+        '<div class="product-detail-quick">' + quickPills(item) + '</div>' +
+        '<div class="product-detail-ctas">' +
+          '<button type="button" class="btn btn-brand" id="detail-add-to-cart" ' +
+                  'data-id="' + item.id + '">' +
+            '<i data-lucide="shopping-bag"></i><span>Add to cart</span>' +
+          '</button>' +
+          '<a href="' + PHONE_TEL + '" class="btn btn-accent">' +
+            '<i data-lucide="phone"></i><span>Call ' + PHONE_DISPLAY + '</span>' +
+          '</a>' +
+          '<a href="' + WHATSAPP_TEL + '" target="_blank" rel="noopener noreferrer" ' +
+             'class="btn btn-outline-brand">' +
+            '<i data-lucide="message-circle"></i><span>WhatsApp</span>' +
+          '</a>' +
+        '</div>' +
+        '<ul class="product-detail-trust">' +
+          '<li><i data-lucide="shield-check"></i><span>1-year warranty</span></li>' +
+          '<li><i data-lucide="truck"></i><span>Nationwide delivery</span></li>' +
+          '<li><i data-lucide="badge-check"></i><span>Tested before shipping</span></li>' +
+        '</ul>' +
+      '</div>';
+    fragment.appendChild(grid);
 
-      '<section class="product-detail-specs" aria-labelledby="specs-heading">' +
-        '<h2 id="specs-heading">Full specification</h2>' +
-        '<div class="spec-table">' + specRows(item) + '</div>' +
-      '</section>' +
+    /* Full specs section */
+    const specs = document.createElement('section');
+    specs.className = 'product-detail-specs';
+    specs.setAttribute('aria-labelledby', 'specs-heading');
+    specs.innerHTML =
+      '<h2 id="specs-heading">Full specification</h2>' +
+      '<div class="spec-table">' + specRows(item) + '</div>';
+    fragment.appendChild(specs);
 
-      (related.length
-        ? '<section class="related-section" aria-labelledby="related-heading">' +
-            '<h2 class="related-title" id="related-heading">Related products</h2>' +
-            '<div class="row g-4" role="list">' + relatedCards + '</div>' +
-          '</section>'
-        : '')
-    );
+    /* Related section — built via DOM, NOT innerHTML */
+    if (related.length) {
+      const relSection = document.createElement('section');
+      relSection.className = 'related-section';
+      relSection.setAttribute('aria-labelledby', 'related-heading');
+
+      const h2 = document.createElement('h2');
+      h2.className = 'related-title';
+      h2.id = 'related-heading';
+      h2.textContent = 'Related products';
+      relSection.appendChild(h2);
+
+      const row = document.createElement('div');
+      row.className = 'row g-4';
+      row.setAttribute('role', 'list');
+
+      related.forEach(function (rel) {
+        const col = document.createElement('div');
+        col.className = 'col-12 col-sm-6 col-lg-4 col-xl-3';
+        col.appendChild(NS.ProductCard.render(rel));
+        row.appendChild(col);
+      });
+
+      relSection.appendChild(row);
+      fragment.appendChild(relSection);
+    }
+
+    return fragment;
   }
 
   function notFound() {
@@ -236,13 +254,7 @@
 
     const { id, from } = readParams();
 
-    console.group('[IT Zone] Product page boot');
-    console.log('URL:', window.location.href);
-    console.log('search:', window.location.search);
-    console.log('id:', JSON.stringify(id));
-    console.log('from:', JSON.stringify(from));
-
-    /* Clear pending state so it doesn't leak to next navigation */
+    /* Clear pending state */
     try {
       sessionStorage.removeItem('itz.pendingProductId');
       sessionStorage.removeItem('itz.pendingProductFrom');
@@ -256,19 +268,14 @@
         NS.Data.laptops().catch(() => []),
         NS.Data.pcs().catch(() => ({})),
       ]);
-      console.log('Data loaded — laptops:', laptops.length, '| pcs keys:', Object.keys(pcs));
     } catch (err) {
       console.error('[IT Zone] Failed to load data:', err);
       host.innerHTML = notFound();
       NS.renderIcons?.(host);
-      console.groupEnd();
       return;
     }
 
     const item = findItem(id, from, laptops, pcs);
-    console.log('Item found:', item ? (item.brand + ' ' + item.model) : 'NONE');
-    console.groupEnd();
-
     if (!item) {
       host.innerHTML = notFound();
       NS.renderIcons?.(host);
@@ -279,10 +286,14 @@
     document.title = item.brand + ' ' + item.model + ' — IT Zone Electronics';
 
     const related = findRelated(item, laptops, pcs);
-    host.innerHTML = template(item, related, from);
+
+    /* Wipe host and append the built DOM fragment */
+    host.replaceChildren();
+    host.appendChild(buildPage(item, related, from));
     NS.renderIcons?.(host);
 
-    host.addEventListener('click', e => {
+    /* Add to cart — detail button */
+    host.addEventListener('click', function (e) {
       const btn = e.target.closest('#detail-add-to-cart');
       if (!btn) return;
       document.dispatchEvent(new CustomEvent('cart:add', {
@@ -290,7 +301,8 @@
       }));
     });
 
-    host.addEventListener('click', e => {
+    /* Add to cart — related cards */
+    host.addEventListener('click', function (e) {
       const btn = e.target.closest('[data-action="add-to-cart"]');
       if (!btn) return;
       const card = btn.closest('[data-id]');
@@ -303,5 +315,5 @@
     console.info('[IT Zone] Product loaded:', item.brand, item.model, '| Related:', related.length);
   }
 
-  NS.productPage = { init };
+  NS.productPage = { init: init };
 })();
