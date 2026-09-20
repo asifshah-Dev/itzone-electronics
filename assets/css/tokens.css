@@ -1,0 +1,167 @@
+/* assets/css/tokens.css
+   ─────────────────────────────────────────────────────────
+   Design tokens — the source of truth.
+   Loaded BEFORE Bootstrap so we can map into --bs-* vars.
+   Never hardcode a color/radius/shadow outside this file.
+   ───────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Brand palette ─────────────────────────────────── */
+  --itz-green-900: #0b3d1f;
+  --itz-green-700: #0b5e2e;   /* primary */
+  --itz-green-500: #1a8a4a;
+  --itz-green-100: #e9f3ed;   /* soft tint for badges */
+
+  --itz-red-700:   #8f0c17;
+  --itz-red-500:   #c1121f;   /* accent */
+  --itz-red-400:   #e01e2e;
+  --itz-red-100:   #fdecee;   /* soft tint */
+
+  /* ── Neutrals ──────────────────────────────────────── */
+  --itz-ink-900:   #0f172a;   /* headings, body text */
+  --itz-ink-700:   #334155;   /* secondary text */
+  --itz-ink-500:   #64748b;   /* muted */
+  --itz-ink-400:   #94a3b8;   /* placeholder */
+  --itz-ink-200:   #e2e8f0;   /* borders */
+  --itz-ink-100:   #f1f5f9;   /* subtle bg */
+  --itz-surface:   #f8fafc;   /* page bg */
+  --itz-white:     #ffffff;
+
+  /* ── Semantic aliases (use THESE in components) ────── */
+  --brand-primary:       var(--itz-green-700);
+  --brand-primary-hover: var(--itz-green-900);
+  --brand-primary-soft:  var(--itz-green-100);
+  --brand-accent:        var(--itz-red-500);
+  --brand-accent-hover:  var(--itz-red-700);
+  --brand-accent-soft:   var(--itz-red-100);
+
+  --text-primary:  var(--itz-ink-900);
+  --text-secondary:var(--itz-ink-700);
+  --text-muted:    var(--itz-ink-500);
+  --text-inverse:  var(--itz-white);
+
+  --bg-page:    var(--itz-surface);
+  --bg-card:    var(--itz-white);
+  --bg-subtle:  var(--itz-ink-100);
+  --border-color: var(--itz-ink-200);
+
+  /* ── Typography ────────────────────────────────────── */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Fluid type scale — clamps between mobile & desktop */
+  --fs-xs:   0.75rem;   /* 12px */
+  --fs-sm:   0.875rem;  /* 14px */
+  --fs-base: 1rem;      /* 16px */
+  --fs-lg:   1.125rem;  /* 18px */
+  --fs-xl:   1.25rem;   /* 20px */
+  --fs-2xl:  1.5rem;    /* 24px */
+  --fs-3xl:  clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+  --fs-4xl:  clamp(2rem, 1.6rem + 2vw, 2.75rem);
+  --fs-5xl:  clamp(2.25rem, 1.75rem + 2.5vw, 3.25rem);
+
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semibold:600;
+  --fw-bold:    700;
+  --fw-black:   800;
+
+  --lh-tight: 1.2;
+  --lh-snug:  1.35;
+  --lh-base:  1.55;
+  --lh-loose: 1.75;
+
+  --ls-tight: -0.02em;
+  --ls-normal:0;
+  --ls-wide:  0.04em;
+  --ls-wider: 0.12em;
+
+  /* ── Spacing scale (8pt grid) ──────────────────────── */
+  --space-1: 0.25rem;   /* 4  */
+  --space-2: 0.5rem;    /* 8  */
+  --space-3: 0.75rem;   /* 12 */
+  --space-4: 1rem;      /* 16 */
+  --space-5: 1.5rem;    /* 24 */
+  --space-6: 2rem;      /* 32 */
+  --space-7: 3rem;      /* 48 */
+  --space-8: 4rem;      /* 64 */
+  --space-9: 6rem;      /* 96 */
+
+  /* ── Radii ─────────────────────────────────────────── */
+  --radius-xs:   0.25rem;
+  --radius-sm:   0.5rem;
+  --radius-md:   0.75rem;
+  --radius-lg:   1rem;
+  --radius-xl:   1.25rem;
+  --radius-2xl:  1.5rem;
+  --radius-pill: 999px;
+
+  /* ── Shadows ───────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08),
+               0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 24px -8px rgba(15, 23, 42, 0.12),
+               0 2px 6px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 24px 48px -16px rgba(15, 23, 42, 0.18),
+               0 8px 16px -8px rgba(15, 23, 42, 0.08);
+  --shadow-brand: 0 8px 20px -6px rgba(11, 94, 46, 0.35);
+
+  /* ── Layout ────────────────────────────────────────── */
+  --container-max: 1240px;
+  --container-pad: clamp(1rem, 2vw + 0.5rem, 2rem);
+
+  --header-height: 72px;
+
+  /* ── Motion ────────────────────────────────────────── */
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out:cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast:   120ms;
+  --dur-base:   200ms;
+  --dur-slow:   320ms;
+
+  /* ── Z-index scale ─────────────────────────────────── */
+  --z-dropdown: 1000;
+  --z-sticky:   1020;
+  --z-fixed:    1030;
+  --z-modal:    1050;
+  --z-toast:    1080;
+
+  /* ── Focus ring ────────────────────────────────────── */
+  --focus-ring: 0 0 0 3px rgba(11, 94, 46, 0.35);
+  --focus-ring-accent: 0 0 0 3px rgba(193, 18, 31, 0.35);
+}
+
+/* ── Map our tokens into Bootstrap's CSS variables ──────
+   Bootstrap 5.3 reads its theme from --bs-* custom props.
+   Overriding them here (BEFORE bootstrap.min.css loads in
+   the cascade — see index.html) means we don't need Sass.
+   We re-declare after Bootstrap too, in _overrides.css,
+   to beat any later :root declarations from the vendor. */
+:root {
+  --bs-primary:        var(--brand-primary);
+  --bs-primary-rgb:    11, 94, 46;
+  --bs-danger:         var(--brand-accent);
+  --bs-danger-rgb:     193, 18, 31;
+
+  --bs-body-font-family: var(--font-sans);
+  --bs-body-font-size:   var(--fs-base);
+  --bs-body-line-height: var(--lh-base);
+  --bs-body-color:       var(--text-primary);
+  --bs-body-bg:          var(--bg-page);
+
+  --bs-heading-color:    var(--text-primary);
+  --bs-link-color:       var(--brand-primary);
+  --bs-link-hover-color: var(--brand-primary-hover);
+
+  --bs-border-color:     var(--border-color);
+  --bs-border-radius:    var(--radius-md);
+  --bs-border-radius-sm: var(--radius-sm);
+  --bs-border-radius-lg: var(--radius-lg);
+
+  --bs-font-sans-serif:  var(--font-sans);
+
+  /* Bootstrap's default shadow — replace with our token */
+  --bs-box-shadow-sm:    var(--shadow-sm);
+  --bs-box-shadow:       var(--shadow-md);
+  --bs-box-shadow-lg:    var(--shadow-lg);
+} 

@@ -1,0 +1,25 @@
+/* assets/css/main.css
+   ─────────────────────────────────────────────────────────
+   Single entry point. Order defines the cascade.
+   Do NOT link any file in this folder directly from HTML.
+   ───────────────────────────────────────────────────────── */
+
+/* 1. Design tokens */
+@import url("tokens.css");
+
+/* 2. Base element styles */
+@import url("base.css");
+
+/* 3. Layout primitives (still placeholders) */
+@import url("layout/_navbar.css");
+@import url("layout/_hero.css");
+@import url("layout/_grid.css");
+@import url("layout/_footer.css");
+
+/* 4. Components — buttons go live now */
+@import url("components/_buttons.css");
+@import url("components/_product-card.css");
+@import url("components/_reviews.css");
+
+/* 5. Bootstrap overrides — MUST be last */
+@import url("utilities/_overrides.css");

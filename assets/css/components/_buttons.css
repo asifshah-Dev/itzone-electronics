@@ -1,0 +1,169 @@
+/* assets/css/components/_buttons.css
+   ─────────────────────────────────────────────────────────
+   Brand button system. Every variant consumes tokens.
+   Extends Bootstrap's .btn base — never replaces it.
+   ───────────────────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════════════
+   1. BASE BUTTON — shared shape for all brand variants
+   ═══════════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-base);
+  line-height: 1;
+  letter-spacing: var(--ls-normal);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-pill);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color     var(--dur-fast) var(--ease-out),
+    color            var(--dur-fast) var(--ease-out),
+    box-shadow       var(--dur-base) var(--ease-out),
+    transform        var(--dur-fast) var(--ease-out);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+/* Lucide icons inside buttons scale with font-size */
+.btn .lucide,
+.btn svg {
+  width: 1.1em;
+  height: 1.1em;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════
+   2. VARIANTS
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Primary (brand green, solid) ─────────────────────── */
+.btn-brand {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+.btn-brand:hover {
+  background-color: var(--brand-primary-hover);
+  border-color: var(--brand-primary-hover);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-brand);
+  transform: translateY(-1px);
+}
+.btn-brand:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Outline (brand green, ghost) ─────────────────────── */
+.btn-outline-brand {
+  background-color: transparent;
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+.btn-outline-brand:hover {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-brand);
+  transform: translateY(-1px);
+}
+.btn-outline-brand:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Accent (brand red, solid) — for "Add to cart" ────── */
+.btn-accent {
+  background-color: var(--brand-accent);
+  border-color: var(--brand-accent);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+.btn-accent:hover {
+  background-color: var(--brand-accent-hover);
+  border-color: var(--brand-accent-hover);
+  color: var(--text-inverse);
+  box-shadow: 0 8px 20px -6px rgba(193, 18, 31, 0.35);
+  transform: translateY(-1px);
+}
+.btn-accent:active { transform: translateY(0); }
+
+/* ── Ghost (no border, subtle hover) ──────────────────── */
+.btn-ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--text-secondary);
+}
+.btn-ghost:hover {
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
+}
+
+/* ── Icon-only button ─────────────────────────────────── */
+.btn-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border-radius: var(--radius-pill);
+}
+.btn-icon.btn-sm { width: 2.25rem; height: 2.25rem; }
+
+/* ═══════════════════════════════════════════════════════
+   3. SIZES
+   ═══════════════════════════════════════════════════════ */
+.btn-sm {
+  font-size: var(--fs-sm);
+  padding: var(--space-2) var(--space-4);
+}
+.btn-lg {
+  font-size: var(--fs-lg);
+  padding: var(--space-4) var(--space-6);
+}
+.btn-xl {
+  font-size: var(--fs-lg);
+  padding: var(--space-4) var(--space-7);
+  font-weight: var(--fw-bold);
+}
+
+/* ═══════════════════════════════════════════════════════
+   4. REDUCED MOTION — disable hover transform
+   ═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn-brand,
+  .btn-outline-brand,
+  .btn-accent {
+    transition: background-color var(--dur-fast) linear,
+                color var(--dur-fast) linear,
+                border-color var(--dur-fast) linear;
+  }
+  .btn:hover,
+  .btn-brand:hover,
+  .btn-outline-brand:hover,
+  .btn-accent:hover {
+    transform: none;
+  }
+} 

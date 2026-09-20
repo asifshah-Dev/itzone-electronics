@@ -1,0 +1,186 @@
+/* assets/css/base.css
+   ─────────────────────────────────────────────────────────
+   Element-level styles only. No component classes.
+   Runs after Bootstrap reboot in the cascade.
+   ───────────────────────────────────────────────────────── */
+
+/* ── Root / reset ─────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-height) + var(--space-4));
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  color: var(--text-primary);
+  background-color: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Headings ─────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-3);
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--fs-4xl); font-weight: var(--fw-black); }
+h2 { font-size: var(--fs-3xl); }
+h3 { font-size: var(--fs-2xl); }
+h4 { font-size: var(--fs-xl); }
+h5 { font-size: var(--fs-lg); }
+h6 { font-size: var(--fs-base); }
+
+p {
+  margin: 0 0 var(--space-4);
+  text-wrap: pretty;
+}
+
+/* ── Links ────────────────────────────────────────────── */
+a {
+  color: var(--brand-primary);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+a:hover { color: var(--brand-primary-hover); }
+
+/* ── Focus (a11y — never remove without replacement) ──── */
+:focus { outline: none; }
+
+:focus-visible {
+  outline: 3px solid var(--brand-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-xs);
+}
+
+.btn:focus-visible,
+a.btn:focus-visible {
+  outline: 3px solid var(--brand-primary);
+  outline-offset: 3px;
+}
+
+/* ── Media defaults ───────────────────────────────────── */
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Selection ────────────────────────────────────────── */
+::selection {
+  background: var(--brand-primary);
+  color: var(--text-inverse);
+}
+
+/* ── Scrollbar (subtle, non-intrusive) ────────────────── */
+@supports (scrollbar-width: thin) {
+  * { scrollbar-width: thin; scrollbar-color: var(--itz-ink-400) transparent; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONTAINER — override Bootstrap default max-width
+   ═══════════════════════════════════════════════════════ */
+.container {
+  width: 100%;
+  padding-inline: var(--container-pad);
+  margin-inline: auto;
+}
+
+@media (min-width: 1400px) {
+  .container { max-width: var(--container-max); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   ACCESSIBILITY HELPERS
+   ═══════════════════════════════════════════════════════ */
+
+/* Visually hidden but readable by screen readers.
+   Use for section headings that only exist for a11y, or
+   for labels next to icon-only buttons. */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link — hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-4);
+  z-index: var(--z-toast);
+  padding: var(--space-3) var(--space-5);
+  background: var(--brand-primary);
+  color: var(--text-inverse);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  transition: top var(--dur-base) var(--ease-out);
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: var(--space-4);
+  color: var(--text-inverse);
+  outline: 3px solid var(--text-inverse);
+  outline-offset: 2px;
+}
+
+/* ── Section headings ────────────────────────────────── */
+.section-title {
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-tight);
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
+}
+
+.section-subtitle {
+  font-size: var(--fs-lg);
+  color: var(--text-muted);
+  margin-bottom: var(--space-6);
+  max-width: 60ch;
+}
+
+/* ── Utility: brand-gradient text (used in logo & hero) ─ */
+.text-gradient-brand {
+  background: linear-gradient(
+    135deg,
+    var(--itz-green-700) 0%,
+    var(--itz-green-500) 55%,
+    var(--itz-red-500) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Utility: section padding rhythm ─────────────────── */
+.section {
+  padding-block: clamp(3rem, 5vw + 1rem, 5rem);
+}
+.section-tight {
+  padding-block: clamp(2rem, 3vw + 0.5rem, 3rem);
+} 
