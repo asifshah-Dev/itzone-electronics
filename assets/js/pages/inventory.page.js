@@ -1,8 +1,7 @@
 // assets/js/pages/inventory.page.js
 /* ─────────────────────────────────────────────────────────
    Inventory page — combines laptops.json + pcs.json.
-   Type tabs: All / Laptops / PCs & Monitors.
-   URL params: tag, q, sort, view, type.
+   Type tabs + tag filter + search + sort + view.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -16,30 +15,26 @@
     '30k-50k':  (i) => { const p = Number(i.price); return p > 30000 && p <= 50000; },
     '50k-70k':  (i) => { const p = Number(i.price); return p > 50000 && p <= 70000; },
     '70k-plus': (i) => Number(i.price) > 70000,
-
-    'i5':    (i) => (i.cpu || '').toLowerCase().includes('i5'),
-    'i7':    (i) => (i.cpu || '').toLowerCase().includes('i7'),
-    'xeon':  (i) => (i.cpu || '').toLowerCase().includes('xeon'),
+    'i5':    (i) => (i.cpu || '').toLowerCase().indexOf('i5') !== -1,
+    'i7':    (i) => (i.cpu || '').toLowerCase().indexOf('i7') !== -1,
+    'xeon':  (i) => (i.cpu || '').toLowerCase().indexOf('xeon') !== -1,
     'ryzen': (i) => /ryzen|r5|r7/i.test(i.cpu || ''),
-
     'dell':   (i) => i.brand === 'DELL',
     'hp':     (i) => i.brand === 'HP',
     'lenovo': (i) => i.brand === 'LENOVO',
-
     'touch': (i) => {
       const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
-      return h.includes('touch') || h.includes('2in1') || h.includes('2-in-1');
+      return h.indexOf('touch') !== -1 || h.indexOf('2in1') !== -1 || h.indexOf('2-in-1') !== -1;
     },
     'gaming': (i) => {
       if (i.gpu && String(i.gpu).trim() !== '') return true;
       const h = ((i.model || '') + ' ' + (i.extras || '') + ' ' + (i.gpu || '')).toLowerCase();
-      return h.includes('p51') || h.includes('p14') ||
-             h.includes('z book') || h.includes('zbook') ||
-             h.includes('z2') || h.includes('xps') ||
-             h.includes('xeon') || h.includes('quadro') ||
-             h.includes('dedicated') || h.includes('graphic');
+      return h.indexOf('p51') !== -1 || h.indexOf('p14') !== -1 ||
+             h.indexOf('z book') !== -1 || h.indexOf('zbook') !== -1 ||
+             h.indexOf('z2') !== -1 || h.indexOf('xps') !== -1 ||
+             h.indexOf('xeon') !== -1 || h.indexOf('quadro') !== -1 ||
+             h.indexOf('dedicated') !== -1 || h.indexOf('graphic') !== -1;
     },
-
     'laptops-only': (i) => i._subtype === 'laptop',
     'desktops':     (i) => i._subtype === 'desktop',
     'tiny-pcs':     (i) => i._subtype === 'tiny',
@@ -51,7 +46,6 @@
     let tag = (p.get('tag') || '').trim();
     let q   = (p.get('q')   || '').trim();
 
-    /* Fallback from sessionStorage (dev server may strip query) */
     if (!tag) {
       try {
         const pending = sessionStorage.getItem('itz.pendingTag');
@@ -69,8 +63,8 @@
 
     return {
       type: (p.get('type') || 'all').trim(),
-      tag,
-      q,
+      tag: tag,
+      q: q,
       sort: (p.get('sort') || 'featured').trim(),
       view: (p.get('view') || 'grid').trim(),
     };
@@ -94,9 +88,9 @@
   function mergeAll(laptops, pcs) {
     const out = [];
     (laptops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'laptop', _subtype: 'laptop' })));
-    (pcs?.desktops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'desktop' })));
-    (pcs?.tiny     || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'tiny' })));
-    (pcs?.monitors || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'monitor' })));
+    (pcs && pcs.desktops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'desktop' })));
+    (pcs && pcs.tiny     || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'tiny' })));
+    (pcs && pcs.monitors || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'monitor' })));
     return out;
   }
 
@@ -117,7 +111,7 @@
         const h = [i.brand, i.model, i.cpu, i.gen, i.extras, i.hdd, i.gpu,
                    i.resolution, i.size, i.ram + 'GB', i.ssd + 'GB']
                   .filter(Boolean).join(' ').toLowerCase();
-        return h.includes(q);
+        return h.indexOf(q) !== -1;
       });
     }
     return items;
@@ -128,7 +122,7 @@
     switch (sort) {
       case 'price-asc':  return copy.sort((a,b) => Number(a.price) - Number(b.price));
       case 'price-desc': return copy.sort((a,b) => Number(b.price) - Number(a.price));
-      case 'model-asc':  return copy.sort((a,b) => (a.model||'').localeCompare(b.model||''));
+      case 'model-asc':  return copy.sort((a,b) => String(a.model||'').localeCompare(String(b.model||'')));
       case 'ram-desc':   return copy.sort((a,b) => (Number(b.ram)||0) - (Number(a.ram)||0));
       case 'ssd-desc':   return copy.sort((a,b) => (Number(b.ssd)||0) - (Number(a.ssd)||0));
       default:           return copy;
@@ -142,7 +136,9 @@
         ? total + ' items \u00b7 laptops, desktops, monitors'
         : visible + ' of ' + total + ' items shown';
     }
-    NS.SortBar?.setCount?.(visible);
+    if (NS.SortBar && typeof NS.SortBar.setCount === 'function') {
+      NS.SortBar.setCount(visible);
+    }
   }
 
   const TABS = [
@@ -153,17 +149,18 @@
 
   function mountTabs(host, state, onChange) {
     if (!host) return;
-    host.innerHTML = TABS.map(t => {
+    host.innerHTML = TABS.map(function (t) {
       const active = state.type === t.id;
-      return `<button type="button" class="filter-btn${active ? ' is-active' : ''}"
-                data-filter="${t.id}"
-                aria-pressed="${active ? 'true' : 'false'}">${t.label}</button>`;
+      return '<button type="button" class="filter-btn' + (active ? ' is-active' : '') + '"' +
+             ' data-filter="' + t.id + '"' +
+             ' aria-pressed="' + (active ? 'true' : 'false') + '">' +
+             t.label + '</button>';
     }).join('');
 
-    host.addEventListener('click', e => {
+    host.addEventListener('click', function (e) {
       const btn = e.target.closest('.filter-btn');
       if (!btn) return;
-      host.querySelectorAll('.filter-btn').forEach(b => {
+      host.querySelectorAll('.filter-btn').forEach(function (b) {
         b.classList.remove('is-active');
         b.setAttribute('aria-pressed', 'false');
       });
@@ -174,10 +171,25 @@
   }
 
   async function init() {
-    const gridHost  = document.getElementById('product-grid');
-    const tabsHost  = document.getElementById('product-filters');
-    const sortHost  = document.getElementById('product-sort');
+    const gridHost = document.getElementById('product-grid');
+    const tabsHost = document.getElementById('product-filters');
+    const sortHost = document.getElementById('product-sort');
     if (!gridHost) return;
+
+    /* ── Module check ──────────────────────────────────── */
+    console.group('[IT Zone] Inventory: module check');
+    console.log('Data:',        typeof NS.Data);
+    console.log('ProductCard:', typeof NS.ProductCard,
+                NS.ProductCard ? ('render: ' + typeof NS.ProductCard.render) : '');
+    console.log('ProductGrid:', typeof NS.ProductGrid);
+    console.log('SortBar:',     typeof NS.SortBar);
+    console.groupEnd();
+
+    if (!NS.ProductCard || typeof NS.ProductCard.render !== 'function') {
+      console.error('[IT Zone] Inventory: ProductCard not loaded — aborting.');
+      gridHost.innerHTML = '<div class="product-empty">Product card module not loaded.</div>';
+      return;
+    }
 
     gridHost.innerHTML =
       '<div class="product-loading" role="status" aria-live="polite">' +
@@ -212,6 +224,7 @@
     };
 
     const grid = NS.ProductGrid.mount(gridHost);
+    if (!grid) { console.error('[IT Zone] Grid mount failed'); return; }
 
     function render() {
       const filtered = applyFilters(state);
@@ -222,22 +235,22 @@
       writeParams(state);
     }
 
-    mountTabs(tabsHost, state, (type) => {
+    mountTabs(tabsHost, state, function (type) {
       state.type = type;
       render();
     });
 
-    if (sortHost) {
+    if (sortHost && NS.SortBar && typeof NS.SortBar.mount === 'function') {
       NS.SortBar.mount(sortHost);
-      document.addEventListener('sort:change', e => { state.sort = e.detail.sort; render(); });
-      document.addEventListener('view:change', e => { state.view = e.detail.view; render(); });
+      document.addEventListener('sort:change', function (e) { state.sort = e.detail.sort; render(); });
+      document.addEventListener('view:change', function (e) { state.view = e.detail.view; render(); });
     }
 
-    gridHost.addEventListener('click', e => {
+    gridHost.addEventListener('click', function (e) {
       if (e.target.closest('#empty-reset')) {
         state.type = 'all'; state.tag = ''; state.q = ''; state.sort = 'featured';
         if (tabsHost) {
-          tabsHost.querySelectorAll('.filter-btn').forEach(b => {
+          tabsHost.querySelectorAll('.filter-btn').forEach(function (b) {
             const isAll = b.dataset.filter === 'all';
             b.classList.toggle('is-active', isAll);
             b.setAttribute('aria-pressed', isAll ? 'true' : 'false');
@@ -251,5 +264,5 @@
     console.info('[IT Zone] Loaded ' + allItems.length + ' items. Tag: "' + (state.tag || '\u2014') + '"');
   }
 
-  NS.inventoryPage = { init };
+  NS.inventoryPage = { init: init };
 })();

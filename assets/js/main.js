@@ -38,7 +38,7 @@
 
     try { ITZone.Navbar?.mount(); } catch (e) { console.error('Navbar:', e); }
     try { ITZone.Footer?.mount(); } catch (e) { console.error('Footer:', e); }
-
+        try { ITZone.Cursor?.init(); } catch (e) { console.error('Cursor:', e); }
     const main = document.getElementById('main');
     if (main && !main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
 

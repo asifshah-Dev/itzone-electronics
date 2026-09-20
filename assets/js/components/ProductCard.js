@@ -1,10 +1,8 @@
 // assets/js/components/ProductCard.js
 /* ─────────────────────────────────────────────────────────
    Product card.
-   Click-through to detail page.
-   "Order" button opens WhatsApp with prefilled message.
-   Defensive: falls back to a plain wa.me link if WhatsApp
-   helper module hasn't loaded.
+   Click-through + WhatsApp "Order" button.
+   Bulletproof: safe template strings, defensive fallbacks.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -12,37 +10,50 @@
 
   const NS = (window.ITZone = window.ITZone || {});
 
-  function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
+  console.info('[IT Zone] ProductCard: booting...');
+
+  function isInPagesDir() {
+    return /\/pages\//.test(window.location.pathname);
+  }
 
   function r(href) {
     if (/^https?:/.test(href)) return href;
-    if (isInPagesDir()) return href.startsWith('pages/') ? href.replace('pages/', '') : `../${href}`;
+    if (isInPagesDir()) {
+      return href.indexOf('pages/') === 0 ? href.replace('pages/', '') : '../' + href;
+    }
     return href;
   }
 
-  /* Fallback WhatsApp URL builder in case whatsapp.js isn't loaded */
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function fallbackWaUrl(item) {
-    const msg = 'Hi IT Zone! I want to order:\n\n' +
-                '\u2022 ' + item.brand + ' ' + item.model + '\n' +
-                '\u2022 Price: PKR ' + new Intl.NumberFormat('en-PK').format(item.price) + '\n\n' +
-                'Please confirm availability and delivery.';
-    return 'https://wa.me/923265974741?text=' + encodeURIComponent(msg);
+    const lines = [
+      'Hi IT Zone! I want to order:',
+      '',
+      '\u2022 ' + item.brand + ' ' + item.model,
+      '\u2022 Price: PKR ' + new Intl.NumberFormat('en-PK').format(item.price),
+      '',
+      'Please confirm availability and delivery.',
+    ];
+    return 'https://wa.me/923265974741?text=' + encodeURIComponent(lines.join('\n'));
   }
 
   function waUrl(item) {
-    if (NS.WhatsApp && typeof NS.WhatsApp.productUrl === 'function') {
-      return NS.WhatsApp.productUrl(item);
-    }
-    if (!NS.__warnedMissingWhatsApp) {
-      console.warn('[IT Zone] ProductCard: WhatsApp helper missing — using fallback URL. ' +
-                   'Add assets/js/core/whatsapp.js before ProductCard.js in your HTML.');
-      NS.__warnedMissingWhatsApp = true;
+    try {
+      if (NS.WhatsApp && typeof NS.WhatsApp.productUrl === 'function') {
+        return NS.WhatsApp.productUrl(item);
+      }
+    } catch (e) {
+      console.warn('[IT Zone] ProductCard: WhatsApp helper threw.', e);
     }
     return fallbackWaUrl(item);
-  }
-
-  function formatPKR(n) {
-    return 'PKR ' + new Intl.NumberFormat('en-PK').format(n);
   }
 
   function specs(item) {
@@ -61,7 +72,7 @@
 
   function categoryIcon(item) {
     if (item._subtype === 'monitor' || item.resolution) return 'monitor';
-    if (item._subtype === 'tiny') return 'box';
+    if (item._subtype === 'tiny')    return 'box';
     if (item._subtype === 'desktop') return 'cpu';
     return 'laptop';
   }
@@ -69,18 +80,14 @@
   function imageBlock(item) {
     const src = item.image || '';
     if (src) {
-      return (
-        '<div class="product-image">' +
-          '<img src="' + src + '" alt="' + item.brand + ' ' + item.model + '" ' +
-               'loading="lazy" decoding="async" width="400" height="300">' +
-        '</div>'
-      );
+      return '<div class="product-image">' +
+        '<img src="' + esc(src) + '" alt="' + esc(item.brand + ' ' + item.model) + '" ' +
+             'loading="lazy" decoding="async" width="400" height="300">' +
+      '</div>';
     }
-    return (
-      '<div class="product-image product-image--placeholder" aria-hidden="true">' +
-        '<i data-lucide="' + categoryIcon(item) + '"></i>' +
-      '</div>'
-    );
+    return '<div class="product-image product-image--placeholder" aria-hidden="true">' +
+      '<i data-lucide="' + categoryIcon(item) + '"></i>' +
+    '</div>';
   }
 
   function productUrl(item) {
@@ -91,27 +98,31 @@
 
   function template(item) {
     const specRows = specs(item).map(function (s) {
-      return '<li><i data-lucide="' + s.icon + '"></i><span>' + s.text + '</span></li>';
+      return '<li><i data-lucide="' + s.icon + '"></i><span>' + esc(s.text) + '</span></li>';
     }).join('');
 
     const url = productUrl(item);
     const wa = waUrl(item);
+    const brandSafe = esc(item.brand);
+    const modelSafe = esc(item.model);
+    const priceFormatted = new Intl.NumberFormat('en-PK').format(item.price);
+    const from = item._subtype === 'laptop' || !item._subtype ? 'laptops' : 'pcs';
 
     return (
-      '<article class="product-card" data-id="' + item.id + '" role="listitem">' +
+      '<article class="product-card" data-id="' + esc(item.id) + '" role="listitem">' +
 
         '<a class="product-link" href="' + url + '" ' +
-           'data-product-id="' + item.id + '" ' +
-           'data-product-from="' +
-             (item._subtype === 'laptop' || !item._subtype ? 'laptops' : 'pcs') + '" ' +
-           'aria-label="View ' + item.brand + ' ' + item.model + '">' +
+           'data-cursor="View" ' +
+           'data-product-id="' + esc(item.id) + '" ' +
+           'data-product-from="' + from + '" ' +
+           'aria-label="View ' + brandSafe + ' ' + modelSafe + '">' +
 
           imageBlock(item) +
 
           '<div class="product-card-body">' +
             '<header class="product-card-head">' +
-              '<span class="product-brand">' + item.brand + '</span>' +
-              '<h3 class="product-model">' + item.model + '</h3>' +
+              '<span class="product-brand">' + brandSafe + '</span>' +
+              '<h3 class="product-model">' + modelSafe + '</h3>' +
             '</header>' +
             '<ul class="product-specs">' + specRows + '</ul>' +
           '</div>' +
@@ -120,15 +131,13 @@
         '<footer class="product-card-foot">' +
           '<div class="product-price">' +
             '<span class="product-price-label">PKR</span>' +
-            '<span class="product-price-value">' +
-              new Intl.NumberFormat('en-PK').format(item.price) +
-            '</span>' +
+            '<span class="product-price-value">' + priceFormatted + '</span>' +
           '</div>' +
           '<a class="product-order-wa" ' +
              'href="' + wa + '" ' +
-             'target="_blank" ' +
-             'rel="noopener noreferrer" ' +
-             'aria-label="Order ' + item.brand + ' ' + item.model + ' on WhatsApp">' +
+             'data-cursor="Order" ' +
+             'target="_blank" rel="noopener noreferrer" ' +
+             'aria-label="Order ' + brandSafe + ' ' + modelSafe + ' on WhatsApp">' +
             '<i data-lucide="message-circle"></i>' +
             '<span>Order</span>' +
           '</a>' +
@@ -144,9 +153,9 @@
     return wrapper.firstElementChild;
   }
 
-  /* Stash id when a `.product-link` is clicked */
+  /* Stash id on click for detail page recovery */
   document.addEventListener('click', function (e) {
-    const link = e.target.closest('.product-link');
+    const link = e.target.closest && e.target.closest('.product-link');
     if (!link) return;
     const id = link.dataset.productId;
     const from = link.dataset.productFrom;
@@ -160,9 +169,9 @@
 
   NS.ProductCard = {
     render: render,
-    formatPKR: formatPKR
+    formatPKR: function (n) { return 'PKR ' + new Intl.NumberFormat('en-PK').format(n); }
   };
 
-  console.info('[IT Zone] ProductCard loaded. WhatsApp helper:',
-    (NS.WhatsApp && typeof NS.WhatsApp.productUrl === 'function') ? '✓' : '✗ (will use fallback)');
+  console.info('[IT Zone] ProductCard: loaded ✓ | WhatsApp helper:',
+    (NS.WhatsApp && typeof NS.WhatsApp.productUrl === 'function') ? '✓' : '✗ (fallback)');
 })();

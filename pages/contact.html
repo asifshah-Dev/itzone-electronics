@@ -3,16 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b5e2e">
+  <meta name="theme-color" content="#0d4a26">
 
-  <title>Contact Us | IT Zone Electronics</title>
-  <meta name="description"
-        content="Get in touch with IT Zone Electronics — Karachi, Pakistan. Call +92 300 1234567 or email hello@itzone.pk.">
+  <title>Contact Us — IT Zone Electronics</title>
+  <meta name="description" content="Get in touch with IT Zone Electronics. Call 03265974741 or message us on WhatsApp.">
   <link rel="canonical" href="https://itzone.pk/pages/contact.html">
 
   <meta property="og:type"        content="website">
-  <meta property="og:title"       content="Contact Us | IT Zone Electronics">
-  <meta property="og:description" content="Call, email, or visit us in Karachi.">
+  <meta property="og:title"       content="Contact Us — IT Zone Electronics">
+  <meta property="og:description" content="Call, email, or WhatsApp us.">
   <meta property="og:url"         content="https://itzone.pk/pages/contact.html">
   <meta property="og:image"       content="https://itzone.pk/assets/img/og/og-default.jpg">
 
@@ -35,31 +34,39 @@
   <main id="main" tabindex="-1">
     <section class="section">
       <div class="container">
-        <h1>Contact</h1>
-        <p class="section-subtitle">
-          We're available 10 AM – 9 PM, Mon–Sat.
-        </p>
+        <h1 class="section-title">Contact</h1>
+        <p class="section-subtitle">Available 10 AM – 9 PM, Mon–Sat.</p>
 
         <div class="row g-4 mt-4">
-          <div class="col-md-4">
-            <div class="card p-4">
-              <i data-lucide="phone" style="color: var(--brand-primary); margin-bottom: 0.75rem;"></i>
-              <h2 class="h5">Call</h2>
-              <a href="tel:+923001234567">+92 300 1234567</a>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card contact-card">
+              <div class="card-body">
+                <i data-lucide="phone" class="contact-card-icon" aria-hidden="true"></i>
+                <h2 class="h5 card-title">Call</h2>
+                <a href="tel:+923265974741" class="card-link">03265974741</a>
+              </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card p-4">
-              <i data-lucide="mail" style="color: var(--brand-primary); margin-bottom: 0.75rem;"></i>
-              <h2 class="h5">Email</h2>
-              <a href="mailto:hello@itzone.pk">hello@itzone.pk</a>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card contact-card">
+              <div class="card-body">
+                <i data-lucide="message-circle" class="contact-card-icon" aria-hidden="true"></i>
+                <h2 class="h5 card-title">WhatsApp</h2>
+                <a href="https://wa.me/923265974741" target="_blank" rel="noopener noreferrer" class="card-link">
+                  Chat with us
+                </a>
+              </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card p-4">
-              <i data-lucide="map-pin" style="color: var(--brand-primary); margin-bottom: 0.75rem;"></i>
-              <h2 class="h5">Visit</h2>
-              <p class="mb-0">Karachi, Pakistan</p>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card contact-card">
+              <div class="card-body">
+                <i data-lucide="map-pin" class="contact-card-icon" aria-hidden="true"></i>
+                <h2 class="h5 card-title">Visit</h2>
+                <p class="card-text mb-0">Karachi, Pakistan</p>
+              </div>
             </div>
           </div>
         </div>
@@ -71,9 +78,15 @@
 
   <script defer src="../assets/js/vendors/bootstrap.bundle.min.js"></script>
   <script defer src="../assets/js/vendors/lucide.min.js"></script>
+
+  <script defer src="../assets/js/core/data.js"></script>
+  <script defer src="../assets/js/core/whatsapp.js"></script>
+  <script defer src="../assets/js/core/cursor.js"></script>
+
   <script defer src="../assets/js/components/Navbar.js"></script>
   <script defer src="../assets/js/components/Footer.js"></script>
+
   <script defer src="../assets/js/main.js"></script>
 
 </body>
-</html> 
+</html>

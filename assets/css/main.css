@@ -4,7 +4,7 @@
    Do NOT link any file in this folder directly from HTML.
    ───────────────────────────────────────────────────────── */
 
-/* 1. Design tokens (before anything else) */
+/* 1. Design tokens */
 @import url("tokens.css");
 
 /* 2. Base element styles */
@@ -20,6 +20,7 @@
 @import url("components/_buttons.css");
 @import url("components/_product-card.css");
 @import url("components/_reviews.css");
+@import url("components/_cursor.css");
 
 /* 5. Bootstrap overrides — MUST be last */
 @import url("utilities/_overrides.css");
