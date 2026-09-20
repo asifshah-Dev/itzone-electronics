@@ -11,30 +11,57 @@
 
   let allItems = [];
 
-  const TAG_FILTERS = {
-    '50k-70k':   (i) => Number(i.price) >= 50000 && Number(i.price) <= 70000,
-    'upto-100k': (i) => Number(i.price) <= 100000,
-    '100k-plus': (i) => Number(i.price) > 100000,
-    'i5':        (i) => (i.cpu || '').toLowerCase().includes('i5'),
-    'i7':        (i) => (i.cpu || '').toLowerCase().includes('i7'),
-    'hp':        (i) => i.brand === 'HP',
-    'dell':      (i) => i.brand === 'DELL',
-    'touch':     (i) => {
-      const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
-      return h.includes('touch');
+    const TAG_FILTERS = {
+    /* ── PRICE ─────────────────────────────────────────── */
+    'upto-30k': (i) => {
+      const p = Number(i.price);
+      return p > 0 && p <= 30000;
     },
-    'numpad':    (i) => {
+    '30k-50k':  (i) => {
+      const p = Number(i.price);
+      return p > 30000 && p <= 50000;
+    },
+    '50k-70k':  (i) => {
+      const p = Number(i.price);
+      return p > 50000 && p <= 70000;
+    },
+    '70k-plus': (i) => Number(i.price) > 70000,
+
+    /* ── CPU ───────────────────────────────────────────── */
+    'i5':    (i) => (i.cpu || '').toLowerCase().includes('i5'),
+    'i7':    (i) => (i.cpu || '').toLowerCase().includes('i7'),
+    'xeon':  (i) => (i.cpu || '').toLowerCase().includes('xeon'),
+    'ryzen': (i) => /ryzen|r5|r7/i.test(i.cpu || ''),
+
+    /* ── BRAND ─────────────────────────────────────────── */
+    'dell':   (i) => i.brand === 'DELL',
+    'hp':     (i) => i.brand === 'HP',
+    'lenovo': (i) => i.brand === 'LENOVO',
+
+    /* ── FEATURES ──────────────────────────────────────── */
+    'touch': (i) => {
+      const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
+      return h.includes('touch') || h.includes('2in1') || h.includes('2-in-1');
+    },
+    'numpad': (i) => {
       const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
       return h.includes('numpad');
     },
-    'gaming':    (i) => {
+    'gaming': (i) => {
       if (i.gpu && String(i.gpu).trim() !== '') return true;
-      const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
+      const h = ((i.model || '') + ' ' + (i.extras || '') + ' ' + (i.gpu || '')).toLowerCase();
       return h.includes('p51') || h.includes('p14') ||
              h.includes('z book') || h.includes('zbook') ||
-             h.includes('xps') || h.includes('xeon') ||
-             h.includes('quadro') || h.includes('dedicated');
+             h.includes('z2') || h.includes('xps') ||
+             h.includes('xeon') || h.includes('quadro') ||
+             h.includes('dedicated') || h.includes('graphic');
     },
+
+       /* ── TYPE ──────────────────────────────────────────── */
+    'laptops-only': (i) => i._subtype === 'laptop',
+    'desktops':     (i) => i._subtype === 'desktop',
+    'tiny-pcs':     (i) => i._subtype === 'tiny',
+    'monitors':     (i) => i._subtype === 'monitor',
   };
 
      function readParams() {
@@ -90,10 +117,22 @@
 
   function mergeAll(laptops, pcs) {
     const out = [];
-    (laptops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'laptop' })));
-    (pcs?.desktops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc' })));
-    (pcs?.tiny     || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc' })));
-    (pcs?.monitors || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc' })));
+    (laptops || []).forEach(i => out.push(Object.assign({}, i, {
+      _type: 'laptop',
+      _subtype: 'laptop',
+    })));
+    (pcs?.desktops || []).forEach(i => out.push(Object.assign({}, i, {
+      _type: 'pc',
+      _subtype: 'desktop',
+    })));
+    (pcs?.tiny || []).forEach(i => out.push(Object.assign({}, i, {
+      _type: 'pc',
+      _subtype: 'tiny',
+    })));
+    (pcs?.monitors || []).forEach(i => out.push(Object.assign({}, i, {
+      _type: 'pc',
+      _subtype: 'monitor',
+    })));
     return out;
   }
 

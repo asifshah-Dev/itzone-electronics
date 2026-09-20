@@ -27,40 +27,81 @@
     { name: 'Twitter',   href: 'https://twitter.com/',       icon: 'twitter' },
   ];
 
-  function buildCategories(data) {
+   function buildCategories(data) {
     const laptops = Array.isArray(data.laptops) ? data.laptops : [];
     const pcs     = data.pcs || {};
-    const allPCs  = []
-      .concat(pcs.desktops || [])
-      .concat(pcs.tiny     || [])
-      .concat(pcs.monitors || []);
+    const desktops = pcs.desktops || [];
+    const tiny     = pcs.tiny     || [];
+    const monitors = pcs.monitors || [];
+    const allPCs   = [].concat(desktops, tiny, monitors);
     const combined = laptops.concat(allPCs);
 
-    const hasModelOrExtra = (item, term) => {
-      const hay = ((item.model || '') + ' ' + (item.extras || '')).toLowerCase();
-      return hay.includes(term);
-    };
+    const hay = (i) => ((i.model || '') + ' ' + (i.extras || '') + ' ' + (i.gpu || '')).toLowerCase();
 
-    return [
-      { id: '50k-70k',   label: '50k to 70k',        test: i => Number(i.price) >= 50000 && Number(i.price) <= 70000 },
-      { id: 'upto-100k', label: 'Upto 100k',         test: i => Number(i.price) <= 100000 },
-      { id: '100k-plus', label: '100k Plus',         test: i => Number(i.price) > 100000 },
-      { id: 'i5',        label: 'Core i5',           test: i => (i.cpu || '').toLowerCase().includes('i5') },
-      { id: 'i7',        label: 'Core i7',           test: i => (i.cpu || '').toLowerCase().includes('i7') },
-      { id: 'hp',        label: 'HP',                test: i => i.brand === 'HP' },
-      { id: 'dell',      label: 'Dell',              test: i => i.brand === 'DELL' },
-      { id: 'touch',     label: 'Touch',             test: i => hasModelOrExtra(i, 'touch') },
-      { id: 'numpad',    label: 'NUMPAD',            test: i => hasModelOrExtra(i, 'numpad') },
-      { id: 'gaming',    label: 'Gaming / Workstation', test: i => {
+    /* Every category is defined here. Empty ones are filtered out
+       automatically by the .filter() at the end. */
+    const candidates = [
+      /* ── PRICE ─────────────────────────────────────────── */
+      { id: 'upto-30k',   label: 'Upto 30k',
+        test: i => Number(i.price) > 0 && Number(i.price) <= 30000 },
+      { id: '30k-50k',    label: '30k to 50k',
+        test: i => Number(i.price) > 30000 && Number(i.price) <= 50000 },
+      { id: '50k-70k',    label: '50k to 70k',
+        test: i => Number(i.price) > 50000 && Number(i.price) <= 70000 },
+      { id: '70k-plus',   label: '70k Plus',
+        test: i => Number(i.price) > 70000 },
+
+      /* ── CPU ───────────────────────────────────────────── */
+      { id: 'i5',         label: 'Core i5',
+        test: i => (i.cpu || '').toLowerCase().includes('i5') },
+      { id: 'i7',         label: 'Core i7',
+        test: i => (i.cpu || '').toLowerCase().includes('i7') },
+      { id: 'xeon',       label: 'Xeon',
+        test: i => (i.cpu || '').toLowerCase().includes('xeon') },
+      { id: 'ryzen',      label: 'Ryzen',
+        test: i => /ryzen|r5|r7/i.test(i.cpu || '') },
+
+      /* ── BRAND ─────────────────────────────────────────── */
+      { id: 'dell',       label: 'Dell',
+        test: i => i.brand === 'DELL' },
+      { id: 'hp',         label: 'HP',
+        test: i => i.brand === 'HP' },
+      { id: 'lenovo',     label: 'Lenovo',
+        test: i => i.brand === 'LENOVO' },
+
+      /* ── FEATURES ──────────────────────────────────────── */
+      { id: 'touch',      label: 'Touch',
+        test: i => hay(i).includes('touch') || hay(i).includes('2in1') || hay(i).includes('2-in-1') },
+      { id: 'numpad',     label: 'NUMPAD',
+        test: i => hay(i).includes('numpad') },
+      { id: 'gaming',     label: 'Gaming / Workstation',
+        test: i => {
           if (i.gpu && String(i.gpu).trim() !== '') return true;
-          const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
+          const h = hay(i);
           return h.includes('p51') || h.includes('p14') ||
                  h.includes('z book') || h.includes('zbook') ||
-                 h.includes('xps') || h.includes('xeon') ||
-                 h.includes('quadro') || h.includes('dedicated');
-        }
-      },
-    ].filter(c => combined.some(c.test));
+                 h.includes('z2') || h.includes('xps') ||
+                 h.includes('xeon') || h.includes('quadro') ||
+                 h.includes('dedicated') || h.includes('graphic');
+        } },
+
+      /* ── TYPE (PCs section) ────────────────────────────── */
+      { id: 'laptops-only',  label: 'Laptops',
+        test: i => laptops.includes(i) },
+      { id: 'desktops',      label: 'Desktops',
+        test: i => desktops.includes(i) },
+      { id: 'tiny-pcs',      label: 'Tiny PCs',
+        test: i => tiny.includes(i) },
+      { id: 'monitors',      label: 'Monitors',
+        test: i => monitors.includes(i) },
+    ];
+
+    /* Keep only categories with at least 1 match in our data,
+       and require a minimum of 2 items to avoid dead-end links. */
+    return candidates
+      .map(c => Object.assign({}, c, { _count: combined.filter(c.test).length }))
+      .filter(c => c._count >= 2)
+      .map(c => { delete c._count; return c; });
   }
 
   let CATEGORIES = [];
