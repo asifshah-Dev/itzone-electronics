@@ -1,11 +1,9 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
-   Navbar v3.
-   Row 1 (non-sticky): socials · tagline
-   Row 2 (sticky):     search · phone · LOGO · call · cart
-   Row 3 (sticky):     white category bar — computed from JSON
-   Mobile: search + phone + logo + cart, then two links.
-   Search opens a left-side drawer with input + categories.
+   Navbar — 3 rows.
+   Row 1 (not sticky): socials · tagline
+   Rows 2+3 (sticky, JS-driven): search · LOGO · call · cart
+   Category buttons navigate via JS so ?tag= never gets lost.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -29,8 +27,6 @@
     { name: 'Twitter',   href: 'https://twitter.com/',       icon: 'twitter' },
   ];
 
-  /* Category definitions — computed at mount from JSON.
-     Each entry: { id, label, test(item) } */
   function buildCategories(data) {
     const laptops = Array.isArray(data.laptops) ? data.laptops : [];
     const pcs     = data.pcs || {};
@@ -38,7 +34,6 @@
       .concat(pcs.desktops || [])
       .concat(pcs.tiny     || [])
       .concat(pcs.monitors || []);
-
     const combined = laptops.concat(allPCs);
 
     const hasModelOrExtra = (item, term) => {
@@ -47,57 +42,28 @@
     };
 
     return [
-      {
-        id: '50k-70k', label: '50k to 70k',
-        test: (i) => i.price >= 50000 && i.price <= 70000,
-      },
-      {
-        id: 'upto-100k', label: 'Upto 100k',
-        test: (i) => i.price <= 100000,
-      },
-      {
-        id: '100k-plus', label: '100k Plus',
-        test: (i) => i.price > 100000,
-      },
-      {
-        id: 'i5', label: 'Core i5',
-        test: (i) => (i.cpu || '').toLowerCase().includes('i5'),
-      },
-      {
-        id: 'i7', label: 'Core i7',
-        test: (i) => (i.cpu || '').toLowerCase().includes('i7'),
-      },
-      {
-        id: 'hp', label: 'HP',
-        test: (i) => i.brand === 'HP',
-      },
-      {
-        id: 'dell', label: 'Dell',
-        test: (i) => i.brand === 'DELL',
-      },
-      {
-        id: 'touch', label: 'Touch',
-        test: (i) => hasModelOrExtra(i, 'touch'),
-      },
-      {
-        id: 'numpad', label: 'NUMPAD',
-        test: (i) => hasModelOrExtra(i, 'numpad'),
-      },
-      {
-        id: 'gaming', label: 'Gaming / Workstation',
-        test: (i) => {
+      { id: '50k-70k',   label: '50k to 70k',        test: i => Number(i.price) >= 50000 && Number(i.price) <= 70000 },
+      { id: 'upto-100k', label: 'Upto 100k',         test: i => Number(i.price) <= 100000 },
+      { id: '100k-plus', label: '100k Plus',         test: i => Number(i.price) > 100000 },
+      { id: 'i5',        label: 'Core i5',           test: i => (i.cpu || '').toLowerCase().includes('i5') },
+      { id: 'i7',        label: 'Core i7',           test: i => (i.cpu || '').toLowerCase().includes('i7') },
+      { id: 'hp',        label: 'HP',                test: i => i.brand === 'HP' },
+      { id: 'dell',      label: 'Dell',              test: i => i.brand === 'DELL' },
+      { id: 'touch',     label: 'Touch',             test: i => hasModelOrExtra(i, 'touch') },
+      { id: 'numpad',    label: 'NUMPAD',            test: i => hasModelOrExtra(i, 'numpad') },
+      { id: 'gaming',    label: 'Gaming / Workstation', test: i => {
           if (i.gpu && String(i.gpu).trim() !== '') return true;
-          const hay = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
-          return hay.includes('p51') || hay.includes('p14') ||
-                 hay.includes('z book') || hay.includes('zbook') ||
-                 hay.includes('xps') || hay.includes('xeon') ||
-                 hay.includes('quadro') || hay.includes('dedicated');
-        },
+          const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
+          return h.includes('p51') || h.includes('p14') ||
+                 h.includes('z book') || h.includes('zbook') ||
+                 h.includes('xps') || h.includes('xeon') ||
+                 h.includes('quadro') || h.includes('dedicated');
+        }
       },
-    ].filter(c => combined.some(c.test));  /* keep only categories with ≥1 item */
+    ].filter(c => combined.some(c.test));
   }
 
-  let CATEGORIES = [];   /* populated on mount */
+  let CATEGORIES = [];
 
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
 
@@ -106,6 +72,25 @@
     if (/^https?:|^tel:|^mailto:/.test(href)) return href;
     if (isInPagesDir()) return href.startsWith('pages/') ? href.replace('pages/', '') : `../${href}`;
     return href;
+  }
+
+  /* Absolute URL to inventory page (works from any folder) */
+  function inventoryUrl() {
+    /* From /pages/… → 'inventory.html'
+       From /        → 'pages/inventory.html' */
+    return isInPagesDir() ? 'inventory.html' : 'pages/inventory.html';
+  }
+
+  /* Navigate with tag — bypasses any server URL rewriting */
+  function gotoTag(slug) {
+    const url = inventoryUrl() + '?tag=' + encodeURIComponent(slug);
+    console.info('[IT Zone] Navigating to:', url);
+    window.location.assign(url);
+  }
+
+  function gotoSearch(q) {
+    const url = inventoryUrl() + '?q=' + encodeURIComponent(q);
+    window.location.assign(url);
   }
 
   function inlineLogoSVG(cls) {
@@ -135,38 +120,37 @@
       `<a href="${s.href}" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="${s.name}"><i data-lucide="${s.icon}"></i></a>`
     ).join('');
 
-    const catLinks = CATEGORIES.map(c =>
-      `<a class="cat-link" href="${r('pages/inventory.html')}?tag=${c.id}">${c.label}</a>`
+    const catButtons = CATEGORIES.map(c =>
+      `<button type="button" class="cat-link" data-cat="${c.id}">${c.label}</button>`
     ).join('');
 
-    const drawerCatLinks = CATEGORIES.map(c =>
-      `<li><a class="drawer-cat" href="${r('pages/inventory.html')}?tag=${c.id}">${c.label}</a></li>`
+    const drawerCatButtons = CATEGORIES.map(c =>
+      `<li><button type="button" class="drawer-cat" data-cat="${c.id}">${c.label}</button></li>`
+    ).join('');
+
+    const mobileCatButtons = CATEGORIES.map(c =>
+      `<li><button type="button" class="mobile-cat" data-cat="${c.id}"><i data-lucide="tag"></i><span>${c.label}</span></button></li>`
     ).join('');
 
     return `
       <nav class="site-nav" aria-label="Primary">
 
-        <!-- ROW 1 — not sticky -->
-        <div class="nav-row nav-row-1" data-row="1">
+        <!-- ROW 1 — NOT sticky -->
+        <div class="nav-row nav-row-1">
           <div class="nav-container">
             <div class="nav-socials">${socialLinks}</div>
             <p class="nav-tagline">${TAGLINE}</p>
           </div>
         </div>
 
-        <!-- ROWS 2 + 3 — sticky block -->
-        <div class="nav-sticky" data-sticky>
+        <!-- ROWS 2 + 3 — sticky (fixed via JS when scrolled past row 1) -->
+        <div class="nav-sticky" id="nav-sticky">
           <div class="nav-container">
 
-            <!-- ROW 2 -->
             <div class="nav-row nav-row-2">
               <div class="nav-left">
-                <button type="button"
-                        class="nav-search-btn"
-                        id="mobile-search-open"
-                        aria-label="Open search"
-                        aria-expanded="false"
-                        aria-controls="mobile-search">
+                <button type="button" class="nav-search-btn" id="mobile-search-open"
+                        aria-label="Open search" aria-expanded="false" aria-controls="mobile-search">
                   <i data-lucide="search"></i>
                 </button>
 
@@ -203,14 +187,12 @@
               </div>
             </div>
 
-            <!-- ROW 3 — white bar, edge to edge -->
             <div class="nav-row nav-row-3">
               <div class="cat-links-scroll">
-                <div class="cat-links">${catLinks}</div>
+                <div class="cat-links">${catButtons}</div>
               </div>
             </div>
 
-            <!-- Mobile-only links row (visible < 992px) -->
             <div class="nav-row nav-row-3-mobile">
               ${NAV_ITEMS.map(item =>
                 `<a class="mobile-link" href="${r(item.href)}">
@@ -221,49 +203,33 @@
 
           </div>
         </div>
+
+        <!-- Placeholder for JS sticky -->
+        <div class="nav-sticky-placeholder" id="nav-sticky-placeholder" hidden></div>
       </nav>
 
-      <!-- ── LEFT-SIDE SEARCH DRAWER (mobile) ──────────── -->
-      <aside class="mobile-search"
-             id="mobile-search"
-             aria-hidden="true"
-             aria-label="Search">
+      <!-- LEFT-SIDE SEARCH DRAWER -->
+      <aside class="mobile-search" id="mobile-search" aria-hidden="true" aria-label="Search">
         <header class="mobile-search-head">
           <form class="mobile-search-form" role="search" onsubmit="return false;">
             <i data-lucide="search" class="mobile-search-icon"></i>
-            <input type="search"
-                   id="mobile-search-input"
-                   class="mobile-search-input"
-                   placeholder="Search laptops…"
-                   autocomplete="off">
-            <button type="button" class="mobile-search-clear"
-                    id="mobile-search-clear" aria-label="Clear search">
+            <input type="search" id="mobile-search-input" class="mobile-search-input"
+                   placeholder="Search laptops…" autocomplete="off">
+            <button type="button" class="mobile-search-clear" id="mobile-search-clear" aria-label="Clear search">
               <i data-lucide="x"></i>
             </button>
           </form>
-          <button type="button"
-                  class="mobile-search-close"
-                  id="mobile-search-close"
-                  aria-label="Close search">
+          <button type="button" class="mobile-search-close" id="mobile-search-close" aria-label="Close search">
             <i data-lucide="x"></i>
           </button>
         </header>
-
         <div class="mobile-search-body">
           <h3 class="mobile-search-title">Quick filters</h3>
-          <ul class="mobile-cats">
-            ${CATEGORIES.map(c =>
-              `<li>
-                 <a class="mobile-cat" href="${r('pages/inventory.html')}?tag=${c.id}">
-                   <i data-lucide="tag"></i><span>${c.label}</span>
-                 </a>
-               </li>`
-            ).join('')}
-          </ul>
+          <ul class="mobile-cats">${mobileCatButtons}</ul>
         </div>
       </aside>
 
-      <!-- ── MOBILE MENU DRAWER (right) ────────────────── -->
+      <!-- RIGHT-SIDE MENU DRAWER -->
       <ul class="nav-links" id="primary-menu">
         <li class="drawer-header">
           <a class="drawer-brand" href="${r('index.html')}" aria-label="Home">
@@ -277,7 +243,7 @@
           `<li><a class="nav-link" href="${r(item.href)}"><i data-lucide="${item.icon}"></i><span>${item.label}</span></a></li>`
         ).join('')}
         <li class="drawer-cats-header">Quick filters</li>
-        ${drawerCatLinks}
+        ${drawerCatButtons}
         <li class="drawer-call-wrap">
           <a href="${PHONE_TEL}" class="btn btn-brand drawer-call">
             <i data-lucide="phone"></i><span>Call ${PHONE_DISPLAY}</span>
@@ -304,7 +270,6 @@
     const menu       = root.querySelector('#primary-menu');
     const backdrop   = root.querySelector('#nav-backdrop');
     const closeBtn   = root.querySelector('#drawer-close');
-    const header     = document.querySelector('.site-header');
 
     const searchOpen  = root.querySelector('#mobile-search-open');
     const searchPanel = root.querySelector('#mobile-search');
@@ -314,7 +279,16 @@
 
     const lockScroll = (on) => { document.documentElement.style.overflow = on ? 'hidden' : ''; };
 
-    /* ── Right drawer (menu) ─────────────────────────────── */
+    /* ── Category buttons navigate with JS (no <a>, no lost ?tag=) ── */
+    root.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-cat]');
+      if (btn) {
+        e.preventDefault();
+        gotoTag(btn.dataset.cat);
+      }
+    });
+
+    /* ── Right drawer ─────────────────────────────────────── */
     if (toggler && menu && backdrop) {
       menu.classList.remove('is-open');
       backdrop.classList.remove('is-open');
@@ -365,7 +339,7 @@
       else if (mq.addListener) mq.addListener(mqHandler);
     }
 
-    /* ── Left search drawer (mobile) ─────────────────────── */
+    /* ── Left search drawer ───────────────────────────────── */
     function openSearch() {
       searchPanel.classList.add('is-open');
       searchPanel.setAttribute('aria-hidden', 'false');
@@ -388,14 +362,12 @@
     }
     if (searchClose) searchClose.addEventListener('click', e => { e.preventDefault(); closeSearch(); });
 
-    /* Click outside the search panel closes it */
     document.addEventListener('click', e => {
       if (!searchPanel.classList.contains('is-open')) return;
       if (searchPanel.contains(e.target)) return;
       if (searchOpen && searchOpen.contains(e.target)) return;
       closeSearch();
     });
-
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && searchPanel.classList.contains('is-open')) {
         closeSearch();
@@ -403,23 +375,19 @@
       }
     });
 
-    /* Live search from the drawer → navigates on Enter, or filters on inventory page */
     if (searchInput) {
       searchInput.addEventListener('keydown', e => {
         if (e.key !== 'Enter') return;
         e.preventDefault();
         const q = searchInput.value.trim();
         if (!q) return;
-
         if (document.body.dataset.page === 'inventory') {
-          const nav = document.getElementById('nav-search-input');
           const page = document.getElementById('page-search');
-          if (nav) nav.value = q;
           if (page) page.value = q;
           document.dispatchEvent(new CustomEvent('search:change', { detail: { query: q } }));
           closeSearch();
         } else {
-          window.location.href = r('pages/inventory.html') + '?q=' + encodeURIComponent(q);
+          gotoSearch(q);
         }
       });
     }
@@ -429,7 +397,6 @@
       });
     }
 
-    /* ── Desktop search ──────────────────────────────────── */
     const desktopSearch = root.querySelector('#nav-search-input');
     if (desktopSearch) {
       desktopSearch.addEventListener('keydown', e => {
@@ -437,33 +404,84 @@
         e.preventDefault();
         const q = desktopSearch.value.trim();
         if (!q) return;
-
         if (document.body.dataset.page === 'inventory') {
           const page = document.getElementById('page-search');
           if (page) page.value = q;
           document.dispatchEvent(new CustomEvent('search:change', { detail: { query: q } }));
         } else {
-          window.location.href = r('pages/inventory.html') + '?q=' + encodeURIComponent(q);
+          gotoSearch(q);
         }
       });
     }
 
-    /* ── Scroll: sticky handled by CSS, only add shadow ──── */
-    if (header) {
-      const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
-      onScroll();
-      window.addEventListener('scroll', onScroll, { passive: true });
-    }
+    /* ── JS-based sticky: measure row 1's height ──────────── */
+    setupSticky();
   }
 
-  /* ── Mount (async: fetch JSON first) ───────────────────── */
+  /* ── JS sticky: when scrolled past row 1, fix the sticky block ── */
+  function setupSticky() {
+    const sticky = document.getElementById('nav-sticky');
+    const placeholder = document.getElementById('nav-sticky-placeholder');
+    const row1 = document.querySelector('.nav-row-1');
+    const header = document.querySelector('.site-header');
+    if (!sticky || !placeholder || !row1 || !header) return;
+
+    let spacerHeight = 0;
+
+    function measure() {
+      /* Set placeholder height to sticky block's height so layout
+         doesn't jump when we switch to fixed */
+      spacerHeight = sticky.offsetHeight;
+      placeholder.style.height = spacerHeight + 'px';
+    }
+
+    function onScroll() {
+      const row1Bottom = row1.getBoundingClientRect().bottom;
+      const shouldStick = row1Bottom <= 0;
+
+      if (shouldStick) {
+        if (sticky.dataset.fixed !== 'true') {
+          measure();
+          placeholder.hidden = false;
+          sticky.style.position = 'fixed';
+          sticky.style.top = '0';
+          sticky.style.left = '0';
+          sticky.style.right = '0';
+          sticky.style.zIndex = 'var(--z-sticky)';
+          sticky.dataset.fixed = 'true';
+          header.classList.add('is-stuck');
+        }
+      } else {
+        if (sticky.dataset.fixed === 'true') {
+          sticky.style.position = '';
+          sticky.style.top = '';
+          sticky.style.left = '';
+          sticky.style.right = '';
+          sticky.style.zIndex = '';
+          placeholder.hidden = true;
+          placeholder.style.height = '';
+          sticky.dataset.fixed = 'false';
+          header.classList.remove('is-stuck');
+        }
+      }
+
+      header.classList.toggle('is-scrolled', window.scrollY > 8);
+    }
+
+    measure();
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', () => {
+      if (sticky.dataset.fixed === 'true') measure();
+    });
+  }
+
   async function mount() {
     const host = document.querySelector('.site-header');
     if (!host) return;
     if (host.dataset.mounted === 'true') return;
     host.dataset.mounted = 'true';
 
-    /* Fetch data for category computation */
     try {
       const [laptops, pcs] = await Promise.all([
         NS.Data?.laptops ? NS.Data.laptops().catch(() => []) : [],
@@ -471,7 +489,7 @@
       ]);
       CATEGORIES = buildCategories({ laptops, pcs });
     } catch (e) {
-      console.warn('[IT Zone] Navbar: category computation failed, using empty list.', e);
+      console.warn('[IT Zone] Navbar: category computation failed.', e);
       CATEGORIES = [];
     }
 

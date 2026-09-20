@@ -1,8 +1,8 @@
 // assets/js/pages/inventory.page.js
 /* ─────────────────────────────────────────────────────────
-   Inventory page — Laptops + PCs merged.
-   Filters: brand buttons, quick tag (from URL), search.
-   Sort + view mode.
+   Inventory page — combines laptops.json + pcs.json.
+   Type tabs: All / Laptops / PCs & Monitors.
+   Reads: ?tag=  ?q=  ?sort=  ?view=  ?type=
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -11,11 +11,10 @@
 
   let allItems = [];
 
-  /* ── Quick tag predicates ─────────────────────────────── */
   const TAG_FILTERS = {
-    '50k-70k':   (i) => i.price >= 50000 && i.price <= 70000,
-    'upto-100k': (i) => i.price <= 100000,
-    '100k-plus': (i) => i.price > 100000,
+    '50k-70k':   (i) => Number(i.price) >= 50000 && Number(i.price) <= 70000,
+    'upto-100k': (i) => Number(i.price) <= 100000,
+    '100k-plus': (i) => Number(i.price) > 100000,
     'i5':        (i) => (i.cpu || '').toLowerCase().includes('i5'),
     'i7':        (i) => (i.cpu || '').toLowerCase().includes('i7'),
     'hp':        (i) => i.brand === 'HP',
@@ -41,6 +40,7 @@
   function readParams() {
     const p = new URLSearchParams(window.location.search);
     return {
+      type: (p.get('type') || 'all').trim(),
       tag:  (p.get('tag')  || '').trim(),
       q:    (p.get('q')    || '').trim(),
       sort: (p.get('sort') || 'featured').trim(),
@@ -48,32 +48,47 @@
     };
   }
 
-  function writeParams(params) {
+  function writeParams(state) {
     const url = new URL(window.location.href);
-    ['tag','q','sort','view'].forEach(k => {
-      if (params[k] && params[k] !== 'grid' && params[k] !== 'featured' && params[k] !== '') {
-        url.searchParams.set(k, params[k]);
-      } else {
-        url.searchParams.delete(k);
-      }
-    });
+    if (state.type && state.type !== 'all')      url.searchParams.set('type', state.type);
+    else                                         url.searchParams.delete('type');
+    if (state.tag)                               url.searchParams.set('tag', state.tag);
+    else                                         url.searchParams.delete('tag');
+    if (state.q)                                 url.searchParams.set('q', state.q);
+    else                                         url.searchParams.delete('q');
+    if (state.sort && state.sort !== 'featured') url.searchParams.set('sort', state.sort);
+    else                                         url.searchParams.delete('sort');
+    if (state.view && state.view !== 'grid')     url.searchParams.set('view', state.view);
+    else                                         url.searchParams.delete('view');
     window.history.replaceState({}, '', url);
   }
 
-  /* ── Merge laptops + desktops + tiny + monitors ───────── */
   function mergeAll(laptops, pcs) {
     const out = [];
     (laptops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'laptop' })));
-    (pcs?.desktops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'desktop' })));
-    (pcs?.tiny     || []).forEach(i => out.push(Object.assign({}, i, { _type: 'tiny' })));
-    (pcs?.monitors || []).forEach(i => out.push(Object.assign({}, i, { _type: 'monitor' })));
+    (pcs?.desktops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc' })));
+    (pcs?.tiny     || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc' })));
+    (pcs?.monitors || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc' })));
     return out;
   }
 
   function applyFilters(state) {
     let items = allItems.slice();
-    if (state.tag && TAG_FILTERS[state.tag]) items = items.filter(TAG_FILTERS[state.tag]);
-    if (state.brand && state.brand !== 'all') items = items.filter(i => i.brand === state.brand);
+
+    if (state.type === 'laptop') items = items.filter(i => i._type === 'laptop');
+    if (state.type === 'pc')     items = items.filter(i => i._type === 'pc');
+
+    if (state.tag) {
+      const fn = TAG_FILTERS[state.tag];
+      if (fn) {
+        const before = items.length;
+        items = items.filter(fn);
+        console.info(`[IT Zone] tag="${state.tag}" → ${items.length}/${before}`);
+      } else {
+        console.warn(`[IT Zone] Unknown tag "${state.tag}" — no filter applied.`);
+      }
+    }
+
     const q = (state.q || '').toLowerCase();
     if (q) {
       items = items.filter(i => {
@@ -89,11 +104,11 @@
   function applySort(items, sort) {
     const copy = items.slice();
     switch (sort) {
-      case 'price-asc':  return copy.sort((a,b) => a.price - b.price);
-      case 'price-desc': return copy.sort((a,b) => b.price - a.price);
+      case 'price-asc':  return copy.sort((a,b) => Number(a.price) - Number(b.price));
+      case 'price-desc': return copy.sort((a,b) => Number(b.price) - Number(a.price));
       case 'model-asc':  return copy.sort((a,b) => (a.model||'').localeCompare(b.model||''));
-      case 'ram-desc':   return copy.sort((a,b) => (b.ram||0) - (a.ram||0));
-      case 'ssd-desc':   return copy.sort((a,b) => (b.ssd||0) - (a.ssd||0));
+      case 'ram-desc':   return copy.sort((a,b) => (Number(b.ram)||0) - (Number(a.ram)||0));
+      case 'ssd-desc':   return copy.sort((a,b) => (Number(b.ssd)||0) - (Number(a.ssd)||0));
       default:           return copy;
     }
   }
@@ -108,11 +123,38 @@
     NS.SortBar?.setCount?.(visible);
   }
 
+  const TABS = [
+    { id: 'all',    label: 'All' },
+    { id: 'laptop', label: 'Laptops' },
+    { id: 'pc',     label: 'PCs & Monitors' },
+  ];
+
+  function mountTabs(host, state, onChange) {
+    if (!host) return;
+    host.innerHTML = TABS.map(t => {
+      const active = state.type === t.id;
+      return `<button type="button" class="filter-btn${active ? ' is-active' : ''}"
+                data-filter="${t.id}"
+                aria-pressed="${active ? 'true' : 'false'}">${t.label}</button>`;
+    }).join('');
+
+    host.addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      host.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('is-active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('is-active');
+      btn.setAttribute('aria-pressed', 'true');
+      onChange(btn.dataset.filter);
+    });
+  }
+
   async function init() {
-    const gridHost   = document.getElementById('product-grid');
-    const filtersHost = document.getElementById('product-filters');
-    const searchHost  = document.getElementById('product-search');
-    const sortHost    = document.getElementById('product-sort');
+    const gridHost  = document.getElementById('product-grid');
+    const tabsHost  = document.getElementById('product-filters');
+    const sortHost  = document.getElementById('product-sort');
     if (!gridHost) return;
 
     gridHost.innerHTML =
@@ -121,13 +163,19 @@
       '</div>';
     NS.renderIcons?.(gridHost);
 
-    /* Fetch both files in parallel */
+    /* ── DEBUG ────────────────────────────────────────────── */
+    console.group('[IT Zone] Inventory page boot');
+    console.log('URL:', window.location.href);
+    console.log('search:', window.location.search);
+    console.log('tag from URL:', new URLSearchParams(window.location.search).get('tag'));
+
     try {
       const [laptops, pcs] = await Promise.all([
         NS.Data.laptops().catch(() => []),
         NS.Data.pcs().catch(() => ({})),
       ]);
       allItems = mergeAll(laptops, pcs);
+      console.log('Total items merged:', allItems.length);
     } catch (err) {
       console.error('[IT Zone] Failed to load inventory:', err);
       gridHost.innerHTML =
@@ -136,16 +184,20 @@
           '<p>Could not load inventory. Please refresh.</p>' +
         '</div>';
       NS.renderIcons?.(gridHost);
+      console.groupEnd();
       return;
     }
 
     const urlState = readParams();
+    console.log('Parsed state:', urlState);
+    console.groupEnd();
+
     const state = {
-      brand: 'all',
-      tag:   urlState.tag,
-      q:     urlState.q,
-      sort:  urlState.sort,
-      view:  urlState.view,
+      type: urlState.type,
+      tag:  urlState.tag,
+      q:    urlState.q,
+      sort: urlState.sort,
+      view: urlState.view,
     };
 
     const grid = NS.ProductGrid.mount(gridHost);
@@ -159,32 +211,27 @@
       writeParams(state);
     }
 
-    NS.Filters.mount(filtersHost);
-    document.addEventListener('filter:change', e => {
-      state.brand = e.detail.brand;
+    mountTabs(tabsHost, state, (type) => {
+      state.type = type;
       render();
     });
 
-    NS.SearchBar.mount(searchHost, state.q);
-    document.addEventListener('search:change', e => {
-      state.q = e.detail.query;
-      render();
-    });
-
-    NS.SortBar.mount(sortHost);
-    document.addEventListener('sort:change', e => { state.sort = e.detail.sort; render(); });
-    document.addEventListener('view:change', e => { state.view = e.detail.view; render(); });
+    if (sortHost) {
+      NS.SortBar.mount(sortHost);
+      document.addEventListener('sort:change', e => { state.sort = e.detail.sort; render(); });
+      document.addEventListener('view:change', e => { state.view = e.detail.view; render(); });
+    }
 
     gridHost.addEventListener('click', e => {
       if (e.target.closest('#empty-reset')) {
-        state.brand = 'all'; state.tag = ''; state.q = ''; state.sort = 'featured';
-        document.querySelectorAll('.filter-btn').forEach(b => {
-          const isAll = b.dataset.filter === 'all';
-          b.classList.toggle('is-active', isAll);
-          b.setAttribute('aria-pressed', isAll ? 'true' : 'false');
-        });
-        const si = document.getElementById('page-search'); if (si) si.value = '';
-        const ni = document.getElementById('nav-search-input'); if (ni) ni.value = '';
+        state.type = 'all'; state.tag = ''; state.q = ''; state.sort = 'featured';
+        if (tabsHost) {
+          tabsHost.querySelectorAll('.filter-btn').forEach(b => {
+            const isAll = b.dataset.filter === 'all';
+            b.classList.toggle('is-active', isAll);
+            b.setAttribute('aria-pressed', isAll ? 'true' : 'false');
+          });
+        }
         render();
         return;
       }
@@ -196,8 +243,7 @@
     });
 
     render();
-    console.info('[IT Zone] Loaded ' + allItems.length + ' items from laptops + pcs.'
-      + (state.tag ? ' (tag=' + state.tag + ')' : ''));
+    console.info('[IT Zone] Loaded ' + allItems.length + ' items. Tag: "' + (state.tag || '—') + '"');
   }
 
   NS.inventoryPage = { init };

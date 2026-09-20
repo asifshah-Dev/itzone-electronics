@@ -1,43 +1,43 @@
 /* assets/css/layout/_navbar.css
    ─────────────────────────────────────────────────────────
-   Navbar v3 — sticky rows 2 & 3.
-   Row 1 scrolls away. Rows 2+3 stick to top.
+   Navbar v3 — sticky handled by JS.
+   Row 1 scrolls away, rows 2+3 become fixed at top.
    ───────────────────────────────────────────────────────── */
 
 .nav-backdrop[hidden] { display: none !important; }
 
-/* ── Header wrapper ────────────────────────────────────── */
 .site-header {
-  position: relative;
-  z-index: var(--z-sticky);
   width: 100%;
   background: transparent;
-  /* 🔑 do NOT set overflow or height — sticky needs a free
-     parent chain */
 }
 
-/* Row 1 sits above sticky */
+/* Row 1 */
 .nav-row-1 {
   background: rgba(13, 74, 38, 0.89);
   backdrop-filter: blur(8px) saturate(140%);
   -webkit-backdrop-filter: blur(8px) saturate(140%);
 }
 
-/* Rows 2 + 3 stick to the top of the viewport */
+/* Rows 2+3 — position is set by JS when needed */
 .nav-sticky {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-sticky);
   background: rgba(13, 74, 38, 0.89);
   backdrop-filter: blur(8px) saturate(140%);
   -webkit-backdrop-filter: blur(8px) saturate(140%);
   transition: background-color var(--dur-base) var(--ease-out),
               box-shadow var(--dur-base) var(--ease-out);
+  z-index: var(--z-sticky);
 }
-.site-header.is-scrolled .nav-sticky {
+.site-header.is-stuck .nav-sticky {
   background: rgba(13, 74, 38, 1);
   box-shadow: 0 8px 24px -8px rgba(10, 15, 13, 0.45);
 }
+
+/* Placeholder keeps layout height when sticky goes fixed */
+.nav-sticky-placeholder {
+  width: 100%;
+  height: 0;
+}
+.nav-sticky-placeholder[hidden] { display: none !important; }
 
 /* ── Container ─────────────────────────────────────────── */
 .nav-container {
@@ -49,7 +49,6 @@
   flex-direction: column;
 }
 
-/* ── Rows ──────────────────────────────────────────────── */
 .nav-row {
   display: flex;
   align-items: center;
@@ -289,7 +288,7 @@
 .nav-toggler .lucide,
 .nav-toggler svg { width: 1.25rem; height: 1.25rem; }
 
-/* ── ROW 3 — WHITE BAR, EDGE TO EDGE ───────────────────── */
+/* ── ROW 3 — WHITE CATEGORY BAR ────────────────────────── */
 .nav-row-3 {
   display: block;
   width: 100vw;
@@ -328,13 +327,14 @@
   border-radius: var(--radius-md);
   white-space: nowrap;
   text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
   transition: color .12s ease, background-color .12s ease;
 }
 .cat-link:hover { color: var(--brand-primary); background: var(--brand-primary-soft); }
-.cat-link.is-active {
-  color: #fff;
-  background: var(--brand-primary);
-}
+.cat-link.is-active { color: #fff; background: var(--brand-primary); }
 
 /* ── Mobile 2-link row ────────────────────────────────── */
 .nav-row-3-mobile {
@@ -485,10 +485,15 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  width: 100%;
   padding: var(--space-3) var(--space-5);
   font-size: var(--fs-base);
   color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
 }
 .mobile-cat:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
 .mobile-cat .lucide,
@@ -652,10 +657,15 @@
   }
   .drawer-cat {
     display: block !important;
+    width: 100%;
     padding: var(--space-2) var(--space-5);
     font-size: var(--fs-base);
     color: rgba(255, 255, 255, 0.85);
-    text-decoration: none;
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
   }
   .drawer-cat:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
 
@@ -704,11 +714,11 @@
   .nav-backdrop:not([hidden]) { display: block; }
 }
 
-/* ── Reduced motion ───────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .site-header, .brand-logo, .nav-links, .nav-backdrop,
   .cart-btn, .nav-toggler, .drawer-close, .nav-call, .brand,
-  .social-link, .nav-phone-icon, .nav-search-btn, .mobile-search {
+  .social-link, .nav-phone-icon, .nav-search-btn, .mobile-search,
+  .nav-sticky {
     transition: none !important;
   }
 }
