@@ -81,16 +81,23 @@
     return isInPagesDir() ? 'inventory.html' : 'pages/inventory.html';
   }
 
-  /* Navigate with tag — bypasses any server URL rewriting */
+    /* Navigate with tag — bulletproof against server rewrites.
+     We stash the tag in sessionStorage as a fallback in case
+     the query string gets dropped by a dev server redirect. */
   function gotoTag(slug) {
-    const url = inventoryUrl() + '?tag=' + encodeURIComponent(slug);
-    console.info('[IT Zone] Navigating to:', url);
-    window.location.assign(url);
+    try { sessionStorage.setItem('itz.pendingTag', slug); } catch (e) {}
+    try { sessionStorage.setItem('itz.pendingAt', String(Date.now())); } catch (e) {}
+    /* Force .html so extensionless-serve can't strip the query */
+    const url = (isInPagesDir() ? '' : 'pages/') + 'inventory.html?tag=' + encodeURIComponent(slug);
+    console.info('[IT Zone] gotoTag →', url);
+    window.location.href = url;
   }
 
   function gotoSearch(q) {
-    const url = inventoryUrl() + '?q=' + encodeURIComponent(q);
-    window.location.assign(url);
+    try { sessionStorage.removeItem('itz.pendingTag'); } catch (e) {}
+    const url = (isInPagesDir() ? '' : 'pages/') + 'inventory.html?q=' + encodeURIComponent(q);
+    console.info('[IT Zone] gotoSearch →', url);
+    window.location.href = url;
   }
 
   function inlineLogoSVG(cls) {

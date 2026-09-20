@@ -37,11 +37,36 @@
     },
   };
 
-  function readParams() {
+     function readParams() {
     const p = new URLSearchParams(window.location.search);
+
+    let tag = (p.get('tag') || '').trim();
+
+    /* Fallback: if the URL had no tag but the navbar stashed one
+       in sessionStorage on click, use it. This survives dev servers
+       that strip query strings on extensionless redirects. */
+    if (!tag) {
+      try {
+        const pending = sessionStorage.getItem('itz.pendingTag');
+        const at = Number(sessionStorage.getItem('itz.pendingAt') || 0);
+        /* Only use if stashed within the last 10 seconds */
+        if (pending && (Date.now() - at) < 10000) {
+          tag = pending;
+          console.info('[IT Zone] Recovered tag from sessionStorage:', tag);
+          /* Put it back into the URL so subsequent reloads work */
+          p.set('tag', tag);
+          const url = new URL(window.location.href);
+          url.searchParams.set('tag', tag);
+          window.history.replaceState({}, '', url);
+        }
+        sessionStorage.removeItem('itz.pendingTag');
+        sessionStorage.removeItem('itz.pendingAt');
+      } catch (e) { /* private mode etc. */ }
+    }
+
     return {
       type: (p.get('type') || 'all').trim(),
-      tag:  (p.get('tag')  || '').trim(),
+      tag,
       q:    (p.get('q')    || '').trim(),
       sort: (p.get('sort') || 'featured').trim(),
       view: (p.get('view') || 'grid').trim(),
@@ -241,6 +266,102 @@
       if (!card) return;
       document.dispatchEvent(new CustomEvent('cart:add', { detail: { id: card.dataset.id } }));
     });
+
+    /* ── Self-test: verify the tag filter logic on the loaded data ── */
+    if (state.tag) {
+      const fn = TAG_FILTERS[state.tag];
+      if (fn) {
+        const matches = allItems.filter(fn);
+        console.info(
+          `[IT Zone] SELF-TEST tag="${state.tag}" → ${matches.length} matches. ` +
+          `Sample: ${matches.slice(0,3).map(m => m.brand + ' ' + m.model + ' @' + m.price).join(' | ') || '(none)'}`
+        );
+        if (matches.length === 0) {
+          console.warn('[IT Zone] SELF-TEST: 0 matches — filter logic or data issue.');
+        }
+        /* Sanity: confirm none of the loaded items that match are outside the range */
+        if (state.tag === '50k-70k') {
+          const bad = matches.filter(m => Number(m.price) < 50000 || Number(m.price) > 70000);
+          if (bad.length > 0) {
+            console.error('[IT Zone] SELF-TEST: filter passed items outside range!', bad);
+          } else {
+            console.info('[IT Zone] SELF-TEST: all 50k-70k matches are within range ✓');
+          }
+        }
+      }
+    }
+
+    /* ── Self-test: verify the tag filter logic on the loaded data ── */
+    if (state.tag) {
+      const fn = TAG_FILTERS[state.tag];
+      if (fn) {
+        const matches = allItems.filter(fn);
+        console.info(
+          `[IT Zone] SELF-TEST tag="${state.tag}" → ${matches.length} matches. ` +
+          `Sample: ${matches.slice(0,3).map(m => m.brand + ' ' + m.model + ' @' + m.price).join(' | ') || '(none)'}`
+        );
+        if (matches.length === 0) {
+          console.warn('[IT Zone] SELF-TEST: 0 matches — filter logic or data issue.');
+        }
+        /* Sanity: confirm none of the loaded items that match are outside the range */
+        if (state.tag === '50k-70k') {
+          const bad = matches.filter(m => Number(m.price) < 50000 || Number(m.price) > 70000);
+          if (bad.length > 0) {
+            console.error('[IT Zone] SELF-TEST: filter passed items outside range!', bad);
+          } else {
+            console.info('[IT Zone] SELF-TEST: all 50k-70k matches are within range ✓');
+          }
+        }
+      }
+    }
+
+    /* ── Self-test: verify the tag filter logic on the loaded data ── */
+    if (state.tag) {
+      const fn = TAG_FILTERS[state.tag];
+      if (fn) {
+        const matches = allItems.filter(fn);
+        console.info(
+          `[IT Zone] SELF-TEST tag="${state.tag}" → ${matches.length} matches. ` +
+          `Sample: ${matches.slice(0,3).map(m => m.brand + ' ' + m.model + ' @' + m.price).join(' | ') || '(none)'}`
+        );
+        if (matches.length === 0) {
+          console.warn('[IT Zone] SELF-TEST: 0 matches — filter logic or data issue.');
+        }
+        /* Sanity: confirm none of the loaded items that match are outside the range */
+        if (state.tag === '50k-70k') {
+          const bad = matches.filter(m => Number(m.price) < 50000 || Number(m.price) > 70000);
+          if (bad.length > 0) {
+            console.error('[IT Zone] SELF-TEST: filter passed items outside range!', bad);
+          } else {
+            console.info('[IT Zone] SELF-TEST: all 50k-70k matches are within range ✓');
+          }
+        }
+      }
+    }
+
+    /* ── Self-test: verify the tag filter logic on the loaded data ── */
+    if (state.tag) {
+      const fn = TAG_FILTERS[state.tag];
+      if (fn) {
+        const matches = allItems.filter(fn);
+        console.info(
+          `[IT Zone] SELF-TEST tag="${state.tag}" → ${matches.length} matches. ` +
+          `Sample: ${matches.slice(0,3).map(m => m.brand + ' ' + m.model + ' @' + m.price).join(' | ') || '(none)'}`
+        );
+        if (matches.length === 0) {
+          console.warn('[IT Zone] SELF-TEST: 0 matches — filter logic or data issue.');
+        }
+        /* Sanity: confirm none of the loaded items that match are outside the range */
+        if (state.tag === '50k-70k') {
+          const bad = matches.filter(m => Number(m.price) < 50000 || Number(m.price) > 70000);
+          if (bad.length > 0) {
+            console.error('[IT Zone] SELF-TEST: filter passed items outside range!', bad);
+          } else {
+            console.info('[IT Zone] SELF-TEST: all 50k-70k matches are within range ✓');
+          }
+        }
+      }
+    }
 
     render();
     console.info('[IT Zone] Loaded ' + allItems.length + ' items. Tag: "' + (state.tag || '—') + '"');
