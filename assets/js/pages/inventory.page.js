@@ -2,7 +2,7 @@
 /* ─────────────────────────────────────────────────────────
    Inventory page — combines laptops.json + pcs.json.
    Type tabs: All / Laptops / PCs & Monitors.
-   Reads: ?tag=  ?q=  ?sort=  ?view=  ?type=
+   URL params: tag, q, sort, view, type.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -11,41 +11,24 @@
 
   let allItems = [];
 
-    const TAG_FILTERS = {
-    /* ── PRICE ─────────────────────────────────────────── */
-    'upto-30k': (i) => {
-      const p = Number(i.price);
-      return p > 0 && p <= 30000;
-    },
-    '30k-50k':  (i) => {
-      const p = Number(i.price);
-      return p > 30000 && p <= 50000;
-    },
-    '50k-70k':  (i) => {
-      const p = Number(i.price);
-      return p > 50000 && p <= 70000;
-    },
+  const TAG_FILTERS = {
+    'upto-30k': (i) => { const p = Number(i.price); return p > 0 && p <= 30000; },
+    '30k-50k':  (i) => { const p = Number(i.price); return p > 30000 && p <= 50000; },
+    '50k-70k':  (i) => { const p = Number(i.price); return p > 50000 && p <= 70000; },
     '70k-plus': (i) => Number(i.price) > 70000,
 
-    /* ── CPU ───────────────────────────────────────────── */
     'i5':    (i) => (i.cpu || '').toLowerCase().includes('i5'),
     'i7':    (i) => (i.cpu || '').toLowerCase().includes('i7'),
     'xeon':  (i) => (i.cpu || '').toLowerCase().includes('xeon'),
     'ryzen': (i) => /ryzen|r5|r7/i.test(i.cpu || ''),
 
-    /* ── BRAND ─────────────────────────────────────────── */
     'dell':   (i) => i.brand === 'DELL',
     'hp':     (i) => i.brand === 'HP',
     'lenovo': (i) => i.brand === 'LENOVO',
 
-    /* ── FEATURES ──────────────────────────────────────── */
     'touch': (i) => {
       const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
       return h.includes('touch') || h.includes('2in1') || h.includes('2-in-1');
-    },
-    'numpad': (i) => {
-      const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
-      return h.includes('numpad');
     },
     'gaming': (i) => {
       if (i.gpu && String(i.gpu).trim() !== '') return true;
@@ -57,44 +40,37 @@
              h.includes('dedicated') || h.includes('graphic');
     },
 
-       /* ── TYPE ──────────────────────────────────────────── */
     'laptops-only': (i) => i._subtype === 'laptop',
     'desktops':     (i) => i._subtype === 'desktop',
     'tiny-pcs':     (i) => i._subtype === 'tiny',
     'monitors':     (i) => i._subtype === 'monitor',
   };
 
-     function readParams() {
+  function readParams() {
     const p = new URLSearchParams(window.location.search);
-
     let tag = (p.get('tag') || '').trim();
+    let q   = (p.get('q')   || '').trim();
 
-    /* Fallback: if the URL had no tag but the navbar stashed one
-       in sessionStorage on click, use it. This survives dev servers
-       that strip query strings on extensionless redirects. */
+    /* Fallback from sessionStorage (dev server may strip query) */
     if (!tag) {
       try {
         const pending = sessionStorage.getItem('itz.pendingTag');
         const at = Number(sessionStorage.getItem('itz.pendingAt') || 0);
-        /* Only use if stashed within the last 10 seconds */
         if (pending && (Date.now() - at) < 10000) {
           tag = pending;
-          console.info('[IT Zone] Recovered tag from sessionStorage:', tag);
-          /* Put it back into the URL so subsequent reloads work */
-          p.set('tag', tag);
           const url = new URL(window.location.href);
           url.searchParams.set('tag', tag);
           window.history.replaceState({}, '', url);
         }
         sessionStorage.removeItem('itz.pendingTag');
         sessionStorage.removeItem('itz.pendingAt');
-      } catch (e) { /* private mode etc. */ }
+      } catch (e) { /* ignore */ }
     }
 
     return {
       type: (p.get('type') || 'all').trim(),
       tag,
-      q:    (p.get('q')    || '').trim(),
+      q,
       sort: (p.get('sort') || 'featured').trim(),
       view: (p.get('view') || 'grid').trim(),
     };
@@ -117,22 +93,10 @@
 
   function mergeAll(laptops, pcs) {
     const out = [];
-    (laptops || []).forEach(i => out.push(Object.assign({}, i, {
-      _type: 'laptop',
-      _subtype: 'laptop',
-    })));
-    (pcs?.desktops || []).forEach(i => out.push(Object.assign({}, i, {
-      _type: 'pc',
-      _subtype: 'desktop',
-    })));
-    (pcs?.tiny || []).forEach(i => out.push(Object.assign({}, i, {
-      _type: 'pc',
-      _subtype: 'tiny',
-    })));
-    (pcs?.monitors || []).forEach(i => out.push(Object.assign({}, i, {
-      _type: 'pc',
-      _subtype: 'monitor',
-    })));
+    (laptops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'laptop', _subtype: 'laptop' })));
+    (pcs?.desktops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'desktop' })));
+    (pcs?.tiny     || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'tiny' })));
+    (pcs?.monitors || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'monitor' })));
     return out;
   }
 
@@ -144,13 +108,7 @@
 
     if (state.tag) {
       const fn = TAG_FILTERS[state.tag];
-      if (fn) {
-        const before = items.length;
-        items = items.filter(fn);
-        console.info(`[IT Zone] tag="${state.tag}" → ${items.length}/${before}`);
-      } else {
-        console.warn(`[IT Zone] Unknown tag "${state.tag}" — no filter applied.`);
-      }
+      if (fn) items = items.filter(fn);
     }
 
     const q = (state.q || '').toLowerCase();
@@ -181,7 +139,7 @@
     const el = document.getElementById('inventory-count');
     if (el) {
       el.textContent = visible === total
-        ? total + ' items · laptops, desktops, monitors'
+        ? total + ' items \u00b7 laptops, desktops, monitors'
         : visible + ' of ' + total + ' items shown';
     }
     NS.SortBar?.setCount?.(visible);
@@ -223,15 +181,9 @@
 
     gridHost.innerHTML =
       '<div class="product-loading" role="status" aria-live="polite">' +
-        '<i data-lucide="loader-2"></i><span>Loading inventory…</span>' +
+        '<i data-lucide="loader-2"></i><span>Loading inventory\u2026</span>' +
       '</div>';
     NS.renderIcons?.(gridHost);
-
-    /* ── DEBUG ────────────────────────────────────────────── */
-    console.group('[IT Zone] Inventory page boot');
-    console.log('URL:', window.location.href);
-    console.log('search:', window.location.search);
-    console.log('tag from URL:', new URLSearchParams(window.location.search).get('tag'));
 
     try {
       const [laptops, pcs] = await Promise.all([
@@ -239,7 +191,6 @@
         NS.Data.pcs().catch(() => ({})),
       ]);
       allItems = mergeAll(laptops, pcs);
-      console.log('Total items merged:', allItems.length);
     } catch (err) {
       console.error('[IT Zone] Failed to load inventory:', err);
       gridHost.innerHTML =
@@ -248,14 +199,10 @@
           '<p>Could not load inventory. Please refresh.</p>' +
         '</div>';
       NS.renderIcons?.(gridHost);
-      console.groupEnd();
       return;
     }
 
     const urlState = readParams();
-    console.log('Parsed state:', urlState);
-    console.groupEnd();
-
     const state = {
       type: urlState.type,
       tag:  urlState.tag,
@@ -297,113 +244,11 @@
           });
         }
         render();
-        return;
       }
-      const btn = e.target.closest('[data-action="add-to-cart"]');
-      if (!btn) return;
-      const card = btn.closest('[data-id]');
-      if (!card) return;
-      document.dispatchEvent(new CustomEvent('cart:add', { detail: { id: card.dataset.id } }));
     });
 
-    /* ── Self-test: verify the tag filter logic on the loaded data ── */
-    if (state.tag) {
-      const fn = TAG_FILTERS[state.tag];
-      if (fn) {
-        const matches = allItems.filter(fn);
-        console.info(
-          `[IT Zone] SELF-TEST tag="${state.tag}" → ${matches.length} matches. ` +
-          `Sample: ${matches.slice(0,3).map(m => m.brand + ' ' + m.model + ' @' + m.price).join(' | ') || '(none)'}`
-        );
-        if (matches.length === 0) {
-          console.warn('[IT Zone] SELF-TEST: 0 matches — filter logic or data issue.');
-        }
-        /* Sanity: confirm none of the loaded items that match are outside the range */
-        if (state.tag === '50k-70k') {
-          const bad = matches.filter(m => Number(m.price) < 50000 || Number(m.price) > 70000);
-          if (bad.length > 0) {
-            console.error('[IT Zone] SELF-TEST: filter passed items outside range!', bad);
-          } else {
-            console.info('[IT Zone] SELF-TEST: all 50k-70k matches are within range ✓');
-          }
-        }
-      }
-    }
-
-    /* ── Self-test: verify the tag filter logic on the loaded data ── */
-    if (state.tag) {
-      const fn = TAG_FILTERS[state.tag];
-      if (fn) {
-        const matches = allItems.filter(fn);
-        console.info(
-          `[IT Zone] SELF-TEST tag="${state.tag}" → ${matches.length} matches. ` +
-          `Sample: ${matches.slice(0,3).map(m => m.brand + ' ' + m.model + ' @' + m.price).join(' | ') || '(none)'}`
-        );
-        if (matches.length === 0) {
-          console.warn('[IT Zone] SELF-TEST: 0 matches — filter logic or data issue.');
-        }
-        /* Sanity: confirm none of the loaded items that match are outside the range */
-        if (state.tag === '50k-70k') {
-          const bad = matches.filter(m => Number(m.price) < 50000 || Number(m.price) > 70000);
-          if (bad.length > 0) {
-            console.error('[IT Zone] SELF-TEST: filter passed items outside range!', bad);
-          } else {
-            console.info('[IT Zone] SELF-TEST: all 50k-70k matches are within range ✓');
-          }
-        }
-      }
-    }
-
-    /* ── Self-test: verify the tag filter logic on the loaded data ── */
-    if (state.tag) {
-      const fn = TAG_FILTERS[state.tag];
-      if (fn) {
-        const matches = allItems.filter(fn);
-        console.info(
-          `[IT Zone] SELF-TEST tag="${state.tag}" → ${matches.length} matches. ` +
-          `Sample: ${matches.slice(0,3).map(m => m.brand + ' ' + m.model + ' @' + m.price).join(' | ') || '(none)'}`
-        );
-        if (matches.length === 0) {
-          console.warn('[IT Zone] SELF-TEST: 0 matches — filter logic or data issue.');
-        }
-        /* Sanity: confirm none of the loaded items that match are outside the range */
-        if (state.tag === '50k-70k') {
-          const bad = matches.filter(m => Number(m.price) < 50000 || Number(m.price) > 70000);
-          if (bad.length > 0) {
-            console.error('[IT Zone] SELF-TEST: filter passed items outside range!', bad);
-          } else {
-            console.info('[IT Zone] SELF-TEST: all 50k-70k matches are within range ✓');
-          }
-        }
-      }
-    }
-
-    /* ── Self-test: verify the tag filter logic on the loaded data ── */
-    if (state.tag) {
-      const fn = TAG_FILTERS[state.tag];
-      if (fn) {
-        const matches = allItems.filter(fn);
-        console.info(
-          `[IT Zone] SELF-TEST tag="${state.tag}" → ${matches.length} matches. ` +
-          `Sample: ${matches.slice(0,3).map(m => m.brand + ' ' + m.model + ' @' + m.price).join(' | ') || '(none)'}`
-        );
-        if (matches.length === 0) {
-          console.warn('[IT Zone] SELF-TEST: 0 matches — filter logic or data issue.');
-        }
-        /* Sanity: confirm none of the loaded items that match are outside the range */
-        if (state.tag === '50k-70k') {
-          const bad = matches.filter(m => Number(m.price) < 50000 || Number(m.price) > 70000);
-          if (bad.length > 0) {
-            console.error('[IT Zone] SELF-TEST: filter passed items outside range!', bad);
-          } else {
-            console.info('[IT Zone] SELF-TEST: all 50k-70k matches are within range ✓');
-          }
-        }
-      }
-    }
-
     render();
-    console.info('[IT Zone] Loaded ' + allItems.length + ' items. Tag: "' + (state.tag || '—') + '"');
+    console.info('[IT Zone] Loaded ' + allItems.length + ' items. Tag: "' + (state.tag || '\u2014') + '"');
   }
 
   NS.inventoryPage = { init };

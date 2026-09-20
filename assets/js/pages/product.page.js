@@ -1,8 +1,8 @@
 // assets/js/pages/product.page.js
 /* ─────────────────────────────────────────────────────────
    Product detail page.
-   Renders image, title, price, specs, CTAs, related products.
-   Related cards are built via DOM, not innerHTML.
+   URL: /pages/product.html?id=<id>&from=laptops|pcs
+   Primary CTA: Order on WhatsApp.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -11,7 +11,6 @@
 
   const PHONE_DISPLAY = '03265974741';
   const PHONE_TEL     = 'tel:+923265974741';
-  const WHATSAPP_TEL  = 'https://wa.me/923265974741';
 
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
 
@@ -90,7 +89,6 @@
     return '<i data-lucide="' + icon + '"></i>';
   }
 
-  /* ── Spec rows as a clean two-column list ─────────────── */
   function specRows(item) {
     const rows = [];
     if (item.brand)      rows.push(['Brand', item.brand]);
@@ -104,9 +102,9 @@
     if (item.resolution) rows.push(['Resolution', item.resolution]);
     if (item.size)       rows.push(['Size', item.size]);
     if (item.extras)     rows.push(['Notes', item.extras]);
-    rows.push(['Condition', 'Certified refurbished · Tested']);
+    rows.push(['Condition', 'Certified refurbished \u00b7 Tested']);
     rows.push(['Warranty', '1 year']);
-    rows.push(['Delivery', 'Nationwide (2–4 business days)']);
+    rows.push(['Delivery', 'Nationwide (2\u20134 business days)']);
 
     return rows.map(r =>
       '<div class="spec-row">' +
@@ -145,7 +143,6 @@
     );
   }
 
-  /* ── Build the whole page as DOM (no innerHTML for related) ── */
   function buildPage(item, related, from) {
     const fragment = document.createDocumentFragment();
 
@@ -156,6 +153,7 @@
 
     /* Top grid: image + info */
     const priceFormatted = new Intl.NumberFormat('en-PK').format(item.price);
+    const waUrl = NS.WhatsApp.productDetailUrl(item);
 
     const grid = document.createElement('div');
     grid.className = 'product-detail-grid';
@@ -170,16 +168,13 @@
         '</div>' +
         '<div class="product-detail-quick">' + quickPills(item) + '</div>' +
         '<div class="product-detail-ctas">' +
-          '<button type="button" class="btn btn-brand" id="detail-add-to-cart" ' +
-                  'data-id="' + item.id + '">' +
-            '<i data-lucide="shopping-bag"></i><span>Add to cart</span>' +
-          '</button>' +
+          '<a href="' + waUrl + '" ' +
+             'target="_blank" rel="noopener noreferrer" ' +
+             'class="btn btn-whatsapp">' +
+            '<i data-lucide="message-circle"></i><span>Order on WhatsApp</span>' +
+          '</a>' +
           '<a href="' + PHONE_TEL + '" class="btn btn-accent">' +
             '<i data-lucide="phone"></i><span>Call ' + PHONE_DISPLAY + '</span>' +
-          '</a>' +
-          '<a href="' + WHATSAPP_TEL + '" target="_blank" rel="noopener noreferrer" ' +
-             'class="btn btn-outline-brand">' +
-            '<i data-lucide="message-circle"></i><span>WhatsApp</span>' +
           '</a>' +
         '</div>' +
         '<ul class="product-detail-trust">' +
@@ -199,7 +194,7 @@
       '<div class="spec-table">' + specRows(item) + '</div>';
     fragment.appendChild(specs);
 
-    /* Related section — built via DOM, NOT innerHTML */
+    /* Related section — DOM-built, not innerHTML */
     if (related.length) {
       const relSection = document.createElement('section');
       relSection.className = 'related-section';
@@ -248,13 +243,12 @@
 
     host.innerHTML =
       '<div class="product-loading" role="status" aria-live="polite">' +
-        '<i data-lucide="loader-2"></i><span>Loading product…</span>' +
+        '<i data-lucide="loader-2"></i><span>Loading product\u2026</span>' +
       '</div>';
     NS.renderIcons?.(host);
 
     const { id, from } = readParams();
 
-    /* Clear pending state */
     try {
       sessionStorage.removeItem('itz.pendingProductId');
       sessionStorage.removeItem('itz.pendingProductFrom');
@@ -279,38 +273,17 @@
     if (!item) {
       host.innerHTML = notFound();
       NS.renderIcons?.(host);
-      document.title = 'Product not found — IT Zone Electronics';
+      document.title = 'Product not found \u2014 IT Zone Electronics';
       return;
     }
 
-    document.title = item.brand + ' ' + item.model + ' — IT Zone Electronics';
+    document.title = item.brand + ' ' + item.model + ' \u2014 IT Zone Electronics';
 
     const related = findRelated(item, laptops, pcs);
 
-    /* Wipe host and append the built DOM fragment */
     host.replaceChildren();
     host.appendChild(buildPage(item, related, from));
     NS.renderIcons?.(host);
-
-    /* Add to cart — detail button */
-    host.addEventListener('click', function (e) {
-      const btn = e.target.closest('#detail-add-to-cart');
-      if (!btn) return;
-      document.dispatchEvent(new CustomEvent('cart:add', {
-        detail: { id: btn.dataset.id }
-      }));
-    });
-
-    /* Add to cart — related cards */
-    host.addEventListener('click', function (e) {
-      const btn = e.target.closest('[data-action="add-to-cart"]');
-      if (!btn) return;
-      const card = btn.closest('[data-id]');
-      if (!card) return;
-      document.dispatchEvent(new CustomEvent('cart:add', {
-        detail: { id: card.dataset.id }
-      }));
-    });
 
     console.info('[IT Zone] Product loaded:', item.brand, item.model, '| Related:', related.length);
   }

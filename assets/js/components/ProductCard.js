@@ -1,9 +1,10 @@
 // assets/js/components/ProductCard.js
 /* ─────────────────────────────────────────────────────────
    Product card.
-   - Wraps image + body in an <a> that links to product.html
-   - Stashes id + from in sessionStorage so the detail page
-     can recover them if the server strips query strings.
+   Click-through to detail page.
+   "Order" button opens WhatsApp with prefilled message.
+   Defensive: falls back to a plain wa.me link if WhatsApp
+   helper module hasn't loaded.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -17,6 +18,25 @@
     if (/^https?:/.test(href)) return href;
     if (isInPagesDir()) return href.startsWith('pages/') ? href.replace('pages/', '') : `../${href}`;
     return href;
+  }
+
+  /* Fallback WhatsApp URL builder in case whatsapp.js isn't loaded */
+  function fallbackWaUrl(item) {
+    const msg = 'Hi IT Zone! I want to order: ' + item.brand + ' ' + item.model +
+                ' (PKR ' + item.price + '). Please confirm availability.';
+    return 'https://wa.me/923265974741?text=' + encodeURIComponent(msg);
+  }
+
+  function waUrl(item) {
+    if (NS.WhatsApp && typeof NS.WhatsApp.productUrl === 'function') {
+      return NS.WhatsApp.productUrl(item);
+    }
+    if (!NS.__warnedMissingWhatsApp) {
+      console.warn('[IT Zone] ProductCard: WhatsApp helper missing — using fallback URL. ' +
+                   'Add assets/js/core/whatsapp.js before ProductCard.js in your HTML.');
+      NS.__warnedMissingWhatsApp = true;
+    }
+    return fallbackWaUrl(item);
   }
 
   function formatPKR(n) {
@@ -67,23 +87,13 @@
     return r('pages/product.html') + '?id=' + id + '&from=' + from;
   }
 
-  /* Stash the target id in sessionStorage right before navigation
-     so the detail page can recover if the server strips the query. */
-  function stashForNavigation(item) {
-    try {
-      sessionStorage.setItem('itz.pendingProductId', String(item.id));
-      sessionStorage.setItem('itz.pendingProductFrom',
-        item._subtype === 'laptop' || !item._subtype ? 'laptops' : 'pcs');
-      sessionStorage.setItem('itz.pendingProductAt', String(Date.now()));
-    } catch (e) { /* private mode */ }
-  }
-
   function template(item) {
     const specRows = specs(item).map(function (s) {
       return '<li><i data-lucide="' + s.icon + '"></i><span>' + s.text + '</span></li>';
     }).join('');
 
     const url = productUrl(item);
+    const wa = waUrl(item);
 
     return (
       '<article class="product-card" data-id="' + item.id + '" role="listitem">' +
@@ -112,10 +122,14 @@
               new Intl.NumberFormat('en-PK').format(item.price) +
             '</span>' +
           '</div>' +
-          '<button type="button" class="product-add" data-action="add-to-cart" ' +
-            'aria-label="Add ' + item.brand + ' ' + item.model + ' to cart">' +
-            '<i data-lucide="shopping-bag"></i><span>Add</span>' +
-          '</button>' +
+          '<a class="product-order-wa" ' +
+             'href="' + wa + '" ' +
+             'target="_blank" ' +
+             'rel="noopener noreferrer" ' +
+             'aria-label="Order ' + item.brand + ' ' + item.model + ' on WhatsApp">' +
+            '<i data-lucide="message-circle"></i>' +
+            '<span>Order</span>' +
+          '</a>' +
         '</footer>' +
 
       '</article>'
@@ -128,8 +142,7 @@
     return wrapper.firstElementChild;
   }
 
-  /* Global listener: whenever a `.product-link` is clicked,
-     stash the id before the browser navigates. */
+  /* Stash id when a `.product-link` is clicked */
   document.addEventListener('click', function (e) {
     const link = e.target.closest('.product-link');
     if (!link) return;
@@ -145,7 +158,9 @@
 
   NS.ProductCard = {
     render: render,
-    formatPKR: formatPKR,
-    stashForNavigation: stashForNavigation
+    formatPKR: formatPKR
   };
+
+  console.info('[IT Zone] ProductCard loaded. WhatsApp helper:',
+    (NS.WhatsApp && typeof NS.WhatsApp.productUrl === 'function') ? '✓' : '✗ (will use fallback)');
 })();

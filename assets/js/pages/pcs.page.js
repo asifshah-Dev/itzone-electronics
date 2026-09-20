@@ -1,7 +1,7 @@
 // assets/js/pages/pcs.page.js
 /* ─────────────────────────────────────────────────────────
    PCs & Monitors page.
-   Category tabs + sort + view toggle.
+   Category tabs + sort + view.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -16,6 +16,7 @@
   ];
 
   let allItems = [];
+
   function flatten(data) {
     const out = [];
     (data.desktops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'desktop' })));
@@ -35,24 +36,22 @@
 
   function writeParams(params) {
     const url = new URL(window.location.href);
-    ['cat','sort','view'].forEach(k => {
-      if (params[k] && params[k] !== 'grid' && params[k] !== 'featured' && params[k] !== 'all') {
-        url.searchParams.set(k, params[k]);
-      } else {
-        url.searchParams.delete(k);
-      }
-    });
+    if (params.cat  && params.cat  !== 'all')      url.searchParams.set('cat', params.cat);
+    else                                            url.searchParams.delete('cat');
+    if (params.sort && params.sort !== 'featured') url.searchParams.set('sort', params.sort);
+    else                                            url.searchParams.delete('sort');
+    if (params.view && params.view !== 'grid')     url.searchParams.set('view', params.view);
+    else                                            url.searchParams.delete('view');
     window.history.replaceState({}, '', url);
   }
 
   function applySort(items, sort) {
     const copy = items.slice();
     switch (sort) {
-      case 'price-asc':  return copy.sort((a,b) => a.price - b.price);
-      case 'price-desc': return copy.sort((a,b) => b.price - a.price);
-      case 'model-asc':  return copy.sort((a,b) => (a.model || '').localeCompare(b.model || ''));
-      case 'ram-desc':   return copy.sort((a,b) => (b.ram || 0) - (a.ram || 0));
-      case 'featured':
+      case 'price-asc':  return copy.sort((a,b) => Number(a.price) - Number(b.price));
+      case 'price-desc': return copy.sort((a,b) => Number(b.price) - Number(a.price));
+      case 'model-asc':  return copy.sort((a,b) => (a.model||'').localeCompare(b.model||''));
+      case 'ram-desc':   return copy.sort((a,b) => (Number(b.ram)||0) - (Number(a.ram)||0));
       default:           return copy;
     }
   }
@@ -61,21 +60,19 @@
     const el = document.getElementById('pcs-count');
     if (el) {
       el.textContent = visible === total
-        ? total + ' machines · tested, warranted, priced fairly'
-        : visible + ' of ' + total + ' machines shown';
+        ? total + ' items \u00b7 desktops, tiny PCs, monitors'
+        : visible + ' of ' + total + ' items shown';
     }
     NS.SortBar?.setCount?.(visible);
   }
 
-  function renderTabs(host, state, onChange) {
+  function mountTabs(host, state, onChange) {
     host.innerHTML = CATEGORIES.map(function (c) {
       const active = state.category === c.id;
-      return (
-        '<button type="button" class="filter-btn' + (active ? ' is-active' : '') + '"' +
-        ' data-filter="' + c.id + '"' +
-        ' aria-pressed="' + (active ? 'true' : 'false') + '">' +
-        c.label + '</button>'
-      );
+      return '<button type="button" class="filter-btn' + (active ? ' is-active' : '') + '"' +
+             ' data-filter="' + c.id + '"' +
+             ' aria-pressed="' + (active ? 'true' : 'false') + '">' +
+             c.label + '</button>';
     }).join('');
 
     host.addEventListener('click', function (e) {
@@ -99,7 +96,7 @@
 
     gridHost.innerHTML =
       '<div class="product-loading" role="status" aria-live="polite">' +
-        '<i data-lucide="loader-2"></i><span>Loading PCs and monitors…</span>' +
+        '<i data-lucide="loader-2"></i><span>Loading PCs and monitors\u2026</span>' +
       '</div>';
     NS.renderIcons?.(gridHost);
 
@@ -118,7 +115,6 @@
     }
 
     const urlState = readParams();
-
     const state = {
       category: urlState.cat,
       sort:     urlState.sort,
@@ -130,7 +126,7 @@
     function render() {
       const filtered = state.category === 'all'
         ? allItems
-        : allItems.filter(i => i._category === state.category);
+        : allItems.filter(i => i._subtype === state.category);
       const sorted = applySort(filtered, state.sort);
       grid.render(sorted);
       updateCount(sorted.length, allItems.length);
@@ -139,7 +135,7 @@
     }
 
     if (tabsHost) {
-      renderTabs(tabsHost, { category: state.category }, function (cat) {
+      mountTabs(tabsHost, { category: state.category }, function (cat) {
         state.category = cat;
         render();
       });
@@ -147,25 +143,9 @@
 
     if (sortHost) {
       NS.SortBar.mount(sortHost);
-      document.addEventListener('sort:change', (e) => {
-        state.sort = e.detail.sort;
-        render();
-      });
-      document.addEventListener('view:change', (e) => {
-        state.view = e.detail.view;
-        render();
-      });
+      document.addEventListener('sort:change', e => { state.sort = e.detail.sort; render(); });
+      document.addEventListener('view:change', e => { state.view = e.detail.view; render(); });
     }
-
-    gridHost.addEventListener('click', function (e) {
-      const btn = e.target.closest('[data-action="add-to-cart"]');
-      if (!btn) return;
-      const card = btn.closest('[data-id]');
-      if (!card) return;
-      document.dispatchEvent(new CustomEvent('cart:add', {
-        detail: { id: card.dataset.id }
-      }));
-    });
 
     render();
     console.info('[IT Zone] Loaded ' + allItems.length + ' PCs & monitors.');

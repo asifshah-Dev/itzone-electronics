@@ -2,8 +2,8 @@
 /* ─────────────────────────────────────────────────────────
    Navbar — 3 rows.
    Row 1 (not sticky): socials · tagline
-   Rows 2+3 (sticky, JS-driven): search · LOGO · call · cart
-   Category buttons navigate via JS so ?tag= never gets lost.
+   Rows 2+3 (JS-sticky): search·phone·LOGO·call·hamburger + categories
+   No cart.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -13,7 +13,7 @@
 
   const PHONE_DISPLAY = '03265974741';
   const PHONE_TEL     = 'tel:+923265974741';
-  const TAGLINE = 'Free nationwide delivery · 1-year warranty on every laptop';
+  const TAGLINE = 'Free nationwide delivery \u00b7 1-year warranty on every laptop';
 
   const NAV_ITEMS = [
     { id: 'inventory', label: 'Laptops',        href: 'pages/inventory.html', icon: 'laptop' },
@@ -27,7 +27,7 @@
     { name: 'Twitter',   href: 'https://twitter.com/',       icon: 'twitter' },
   ];
 
-   function buildCategories(data) {
+  function buildCategories(data) {
     const laptops = Array.isArray(data.laptops) ? data.laptops : [];
     const pcs     = data.pcs || {};
     const desktops = pcs.desktops || [];
@@ -38,10 +38,7 @@
 
     const hay = (i) => ((i.model || '') + ' ' + (i.extras || '') + ' ' + (i.gpu || '')).toLowerCase();
 
-    /* Every category is defined here. Empty ones are filtered out
-       automatically by the .filter() at the end. */
     const candidates = [
-      /* ── PRICE ─────────────────────────────────────────── */
       { id: 'upto-30k',   label: 'Upto 30k',
         test: i => Number(i.price) > 0 && Number(i.price) <= 30000 },
       { id: '30k-50k',    label: '30k to 50k',
@@ -51,7 +48,6 @@
       { id: '70k-plus',   label: '70k Plus',
         test: i => Number(i.price) > 70000 },
 
-      /* ── CPU ───────────────────────────────────────────── */
       { id: 'i5',         label: 'Core i5',
         test: i => (i.cpu || '').toLowerCase().includes('i5') },
       { id: 'i7',         label: 'Core i7',
@@ -61,7 +57,6 @@
       { id: 'ryzen',      label: 'Ryzen',
         test: i => /ryzen|r5|r7/i.test(i.cpu || '') },
 
-      /* ── BRAND ─────────────────────────────────────────── */
       { id: 'dell',       label: 'Dell',
         test: i => i.brand === 'DELL' },
       { id: 'hp',         label: 'HP',
@@ -69,11 +64,8 @@
       { id: 'lenovo',     label: 'Lenovo',
         test: i => i.brand === 'LENOVO' },
 
-      /* ── FEATURES ──────────────────────────────────────── */
       { id: 'touch',      label: 'Touch',
         test: i => hay(i).includes('touch') || hay(i).includes('2in1') || hay(i).includes('2-in-1') },
-      { id: 'numpad',     label: 'NUMPAD',
-        test: i => hay(i).includes('numpad') },
       { id: 'gaming',     label: 'Gaming / Workstation',
         test: i => {
           if (i.gpu && String(i.gpu).trim() !== '') return true;
@@ -85,19 +77,14 @@
                  h.includes('dedicated') || h.includes('graphic');
         } },
 
-      /* ── TYPE (PCs section) ────────────────────────────── */
-      { id: 'laptops-only',  label: 'Laptops',
-        test: i => laptops.includes(i) },
-      { id: 'desktops',      label: 'Desktops',
+      { id: 'desktops',  label: 'Desktops',
         test: i => desktops.includes(i) },
-      { id: 'tiny-pcs',      label: 'Tiny PCs',
+      { id: 'tiny-pcs',  label: 'Tiny PCs',
         test: i => tiny.includes(i) },
-      { id: 'monitors',      label: 'Monitors',
+      { id: 'monitors',  label: 'Monitors',
         test: i => monitors.includes(i) },
     ];
 
-    /* Keep only categories with at least 1 match in our data,
-       and require a minimum of 2 items to avoid dead-end links. */
     return candidates
       .map(c => Object.assign({}, c, { _count: combined.filter(c.test).length }))
       .filter(c => c._count >= 2)
@@ -115,29 +102,16 @@
     return href;
   }
 
-  /* Absolute URL to inventory page (works from any folder) */
-  function inventoryUrl() {
-    /* From /pages/… → 'inventory.html'
-       From /        → 'pages/inventory.html' */
-    return isInPagesDir() ? 'inventory.html' : 'pages/inventory.html';
-  }
-
-    /* Navigate with tag — bulletproof against server rewrites.
-     We stash the tag in sessionStorage as a fallback in case
-     the query string gets dropped by a dev server redirect. */
   function gotoTag(slug) {
     try { sessionStorage.setItem('itz.pendingTag', slug); } catch (e) {}
     try { sessionStorage.setItem('itz.pendingAt', String(Date.now())); } catch (e) {}
-    /* Force .html so extensionless-serve can't strip the query */
     const url = (isInPagesDir() ? '' : 'pages/') + 'inventory.html?tag=' + encodeURIComponent(slug);
-    console.info('[IT Zone] gotoTag →', url);
     window.location.href = url;
   }
 
   function gotoSearch(q) {
     try { sessionStorage.removeItem('itz.pendingTag'); } catch (e) {}
     const url = (isInPagesDir() ? '' : 'pages/') + 'inventory.html?q=' + encodeURIComponent(q);
-    console.info('[IT Zone] gotoSearch →', url);
     window.location.href = url;
   }
 
@@ -183,7 +157,6 @@
     return `
       <nav class="site-nav" aria-label="Primary">
 
-        <!-- ROW 1 — NOT sticky -->
         <div class="nav-row nav-row-1">
           <div class="nav-container">
             <div class="nav-socials">${socialLinks}</div>
@@ -191,7 +164,6 @@
           </div>
         </div>
 
-        <!-- ROWS 2 + 3 — sticky (fixed via JS when scrolled past row 1) -->
         <div class="nav-sticky" id="nav-sticky">
           <div class="nav-container">
 
@@ -206,7 +178,7 @@
                   <label for="nav-search-input" class="visually-hidden">Search laptops</label>
                   <i data-lucide="search" class="nav-search-icon"></i>
                   <input type="search" id="nav-search-input" class="nav-search-input"
-                         placeholder="Search laptops…" autocomplete="off">
+                         placeholder="Search laptops\u2026" autocomplete="off">
                 </form>
 
                 <a href="${PHONE_TEL}" class="nav-phone-icon" aria-label="Call ${PHONE_DISPLAY}">
@@ -214,7 +186,7 @@
                 </a>
               </div>
 
-              <a class="brand" href="${r('index.html')}" aria-label="IT Zone Electronics — Home">
+              <a class="brand" href="${r('index.html')}" aria-label="IT Zone Electronics \u2014 Home">
                 <img class="brand-logo" src="${logoSrc}" alt="IT Zone Electronics"
                      decoding="async" fetchpriority="high">
               </a>
@@ -224,10 +196,6 @@
                   <i data-lucide="phone"></i>
                   <span>Call now <strong>${PHONE_DISPLAY}</strong></span>
                 </a>
-                <button type="button" class="cart-btn" id="cart-trigger" aria-label="Open shopping cart">
-                  <i data-lucide="shopping-cart"></i>
-                  <span class="cart-count" id="cart-count" data-visible="false">0</span>
-                </button>
                 <button type="button" class="nav-toggler" id="nav-toggler"
                         aria-label="Open menu" aria-expanded="false" aria-controls="primary-menu">
                   <i data-lucide="menu"></i>
@@ -252,17 +220,15 @@
           </div>
         </div>
 
-        <!-- Placeholder for JS sticky -->
         <div class="nav-sticky-placeholder" id="nav-sticky-placeholder" hidden></div>
       </nav>
 
-      <!-- LEFT-SIDE SEARCH DRAWER -->
       <aside class="mobile-search" id="mobile-search" aria-hidden="true" aria-label="Search">
         <header class="mobile-search-head">
           <form class="mobile-search-form" role="search" onsubmit="return false;">
             <i data-lucide="search" class="mobile-search-icon"></i>
             <input type="search" id="mobile-search-input" class="mobile-search-input"
-                   placeholder="Search laptops…" autocomplete="off">
+                   placeholder="Search laptops\u2026" autocomplete="off">
             <button type="button" class="mobile-search-clear" id="mobile-search-clear" aria-label="Clear search">
               <i data-lucide="x"></i>
             </button>
@@ -277,7 +243,6 @@
         </div>
       </aside>
 
-      <!-- RIGHT-SIDE MENU DRAWER -->
       <ul class="nav-links" id="primary-menu">
         <li class="drawer-header">
           <a class="drawer-brand" href="${r('index.html')}" aria-label="Home">
@@ -327,16 +292,11 @@
 
     const lockScroll = (on) => { document.documentElement.style.overflow = on ? 'hidden' : ''; };
 
-    /* ── Category buttons navigate with JS (no <a>, no lost ?tag=) ── */
     root.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-cat]');
-      if (btn) {
-        e.preventDefault();
-        gotoTag(btn.dataset.cat);
-      }
+      if (btn) { e.preventDefault(); gotoTag(btn.dataset.cat); }
     });
 
-    /* ── Right drawer ─────────────────────────────────────── */
     if (toggler && menu && backdrop) {
       menu.classList.remove('is-open');
       backdrop.classList.remove('is-open');
@@ -387,7 +347,6 @@
       else if (mq.addListener) mq.addListener(mqHandler);
     }
 
-    /* ── Left search drawer ───────────────────────────────── */
     function openSearch() {
       searchPanel.classList.add('is-open');
       searchPanel.setAttribute('aria-hidden', 'false');
@@ -462,11 +421,9 @@
       });
     }
 
-    /* ── JS-based sticky: measure row 1's height ──────────── */
     setupSticky();
   }
 
-  /* ── JS sticky: when scrolled past row 1, fix the sticky block ── */
   function setupSticky() {
     const sticky = document.getElementById('nav-sticky');
     const placeholder = document.getElementById('nav-sticky-placeholder');
@@ -477,8 +434,6 @@
     let spacerHeight = 0;
 
     function measure() {
-      /* Set placeholder height to sticky block's height so layout
-         doesn't jump when we switch to fixed */
       spacerHeight = sticky.offsetHeight;
       placeholder.style.height = spacerHeight + 'px';
     }
