@@ -1,8 +1,8 @@
 // assets/js/pages/inventory.page.js
 /* ─────────────────────────────────────────────────────────
-   Laptops page controller.
-   Filters (brand + quick tags), search, sort, view mode.
-   Reads URL params: ?tag=…&q=…&sort=…&view=…
+   Inventory page — Laptops + PCs merged.
+   Filters: brand buttons, quick tag (from URL), search.
+   Sort + view mode.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -11,7 +11,7 @@
 
   let allItems = [];
 
-  /* ── Quick tag → predicate ────────────────────────────── */
+  /* ── Quick tag predicates ─────────────────────────────── */
   const TAG_FILTERS = {
     '50k-70k':   (i) => i.price >= 50000 && i.price <= 70000,
     'upto-100k': (i) => i.price <= 100000,
@@ -21,23 +21,23 @@
     'hp':        (i) => i.brand === 'HP',
     'dell':      (i) => i.brand === 'DELL',
     'touch':     (i) => {
-      const hay = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
-      return hay.includes('touch');
+      const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
+      return h.includes('touch');
     },
     'numpad':    (i) => {
-      const hay = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
-      return hay.includes('numpad') || hay.includes('numpad') || hay.includes('num pad');
+      const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
+      return h.includes('numpad');
     },
     'gaming':    (i) => {
-      if (i.gpu) return true;
-      const hay = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
-      return hay.includes('p51') || hay.includes('p14') ||
-             hay.includes('z book') || hay.includes('zbook') ||
-             hay.includes('xps') || hay.includes('xeon');
+      if (i.gpu && String(i.gpu).trim() !== '') return true;
+      const h = ((i.model || '') + ' ' + (i.extras || '')).toLowerCase();
+      return h.includes('p51') || h.includes('p14') ||
+             h.includes('z book') || h.includes('zbook') ||
+             h.includes('xps') || h.includes('xeon') ||
+             h.includes('quadro') || h.includes('dedicated');
     },
   };
 
-  /* ── Read URL params ──────────────────────────────────── */
   function readParams() {
     const p = new URLSearchParams(window.location.search);
     return {
@@ -60,56 +60,50 @@
     window.history.replaceState({}, '', url);
   }
 
-  /* ── Filter ───────────────────────────────────────────── */
+  /* ── Merge laptops + desktops + tiny + monitors ───────── */
+  function mergeAll(laptops, pcs) {
+    const out = [];
+    (laptops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'laptop' })));
+    (pcs?.desktops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'desktop' })));
+    (pcs?.tiny     || []).forEach(i => out.push(Object.assign({}, i, { _type: 'tiny' })));
+    (pcs?.monitors || []).forEach(i => out.push(Object.assign({}, i, { _type: 'monitor' })));
+    return out;
+  }
+
   function applyFilters(state) {
     let items = allItems.slice();
-
-    // Quick tag
-    if (state.tag && TAG_FILTERS[state.tag]) {
-      items = items.filter(TAG_FILTERS[state.tag]);
-    }
-
-    // Brand filter buttons (optional — kept for pages that use them)
-    if (state.brand && state.brand !== 'all') {
-      items = items.filter(i => i.brand === state.brand);
-    }
-
-    // Search query
+    if (state.tag && TAG_FILTERS[state.tag]) items = items.filter(TAG_FILTERS[state.tag]);
+    if (state.brand && state.brand !== 'all') items = items.filter(i => i.brand === state.brand);
     const q = (state.q || '').toLowerCase();
     if (q) {
       items = items.filter(i => {
-        const hay = [
-          i.brand, i.model, i.cpu, i.gen, i.extras,
-          i.ram + 'GB', i.ssd + 'GB',
-        ].filter(Boolean).join(' ').toLowerCase();
-        return hay.includes(q);
+        const h = [i.brand, i.model, i.cpu, i.gen, i.extras, i.hdd, i.gpu,
+                   i.resolution, i.size, i.ram + 'GB', i.ssd + 'GB']
+                  .filter(Boolean).join(' ').toLowerCase();
+        return h.includes(q);
       });
     }
-
     return items;
   }
 
-  /* ── Sort ─────────────────────────────────────────────── */
   function applySort(items, sort) {
     const copy = items.slice();
     switch (sort) {
       case 'price-asc':  return copy.sort((a,b) => a.price - b.price);
       case 'price-desc': return copy.sort((a,b) => b.price - a.price);
-      case 'model-asc':  return copy.sort((a,b) => (a.model || '').localeCompare(b.model || ''));
-      case 'ram-desc':   return copy.sort((a,b) => (b.ram || 0) - (a.ram || 0));
-      case 'ssd-desc':   return copy.sort((a,b) => (b.ssd || 0) - (a.ssd || 0));
-      case 'featured':
+      case 'model-asc':  return copy.sort((a,b) => (a.model||'').localeCompare(b.model||''));
+      case 'ram-desc':   return copy.sort((a,b) => (b.ram||0) - (a.ram||0));
+      case 'ssd-desc':   return copy.sort((a,b) => (b.ssd||0) - (a.ssd||0));
       default:           return copy;
     }
   }
 
-  /* ── Update headings/count ────────────────────────────── */
   function updateCount(visible, total) {
     const el = document.getElementById('inventory-count');
     if (el) {
       el.textContent = visible === total
-        ? total + ' machines · tested, warranted, priced fairly'
-        : visible + ' of ' + total + ' machines shown';
+        ? total + ' items · laptops, desktops, monitors'
+        : visible + ' of ' + total + ' items shown';
     }
     NS.SortBar?.setCount?.(visible);
   }
@@ -119,7 +113,6 @@
     const filtersHost = document.getElementById('product-filters');
     const searchHost  = document.getElementById('product-search');
     const sortHost    = document.getElementById('product-sort');
-
     if (!gridHost) return;
 
     gridHost.innerHTML =
@@ -128,10 +121,15 @@
       '</div>';
     NS.renderIcons?.(gridHost);
 
+    /* Fetch both files in parallel */
     try {
-      allItems = await NS.Data.laptops();
+      const [laptops, pcs] = await Promise.all([
+        NS.Data.laptops().catch(() => []),
+        NS.Data.pcs().catch(() => ({})),
+      ]);
+      allItems = mergeAll(laptops, pcs);
     } catch (err) {
-      console.error('[IT Zone] Failed to load laptops:', err);
+      console.error('[IT Zone] Failed to load inventory:', err);
       gridHost.innerHTML =
         '<div class="product-empty" role="alert">' +
           '<i data-lucide="alert-circle"></i>' +
@@ -142,7 +140,6 @@
     }
 
     const urlState = readParams();
-
     const state = {
       brand: 'all',
       tag:   urlState.tag,
@@ -153,7 +150,6 @@
 
     const grid = NS.ProductGrid.mount(gridHost);
 
-    /* ── Render pipeline ───────────────────────────────── */
     function render() {
       const filtered = applyFilters(state);
       const sorted = applySort(filtered, state.sort);
@@ -163,38 +159,25 @@
       writeParams(state);
     }
 
-    /* ── Filters ────────────────────────────────────────── */
     NS.Filters.mount(filtersHost);
-    document.addEventListener('filter:change', (e) => {
+    document.addEventListener('filter:change', e => {
       state.brand = e.detail.brand;
       render();
     });
 
-    /* ── Search ─────────────────────────────────────────── */
     NS.SearchBar.mount(searchHost, state.q);
-    document.addEventListener('search:change', (e) => {
+    document.addEventListener('search:change', e => {
       state.q = e.detail.query;
       render();
     });
 
-    /* ── Sort + view ────────────────────────────────────── */
     NS.SortBar.mount(sortHost);
-    document.addEventListener('sort:change', (e) => {
-      state.sort = e.detail.sort;
-      render();
-    });
-    document.addEventListener('view:change', (e) => {
-      state.view = e.detail.view;
-      render();
-    });
+    document.addEventListener('sort:change', e => { state.sort = e.detail.sort; render(); });
+    document.addEventListener('view:change', e => { state.view = e.detail.view; render(); });
 
-    /* ── Empty-state reset ──────────────────────────────── */
-    gridHost.addEventListener('click', (e) => {
+    gridHost.addEventListener('click', e => {
       if (e.target.closest('#empty-reset')) {
-        state.brand = 'all';
-        state.tag = '';
-        state.q = '';
-        state.sort = 'featured';
+        state.brand = 'all'; state.tag = ''; state.q = ''; state.sort = 'featured';
         document.querySelectorAll('.filter-btn').forEach(b => {
           const isAll = b.dataset.filter === 'all';
           b.classList.toggle('is-active', isAll);
@@ -203,22 +186,17 @@
         const si = document.getElementById('page-search'); if (si) si.value = '';
         const ni = document.getElementById('nav-search-input'); if (ni) ni.value = '';
         render();
+        return;
       }
-    });
-
-    /* ── Add to cart ────────────────────────────────────── */
-    gridHost.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-action="add-to-cart"]');
       if (!btn) return;
       const card = btn.closest('[data-id]');
       if (!card) return;
-      document.dispatchEvent(new CustomEvent('cart:add', {
-        detail: { id: card.dataset.id }
-      }));
+      document.dispatchEvent(new CustomEvent('cart:add', { detail: { id: card.dataset.id } }));
     });
 
     render();
-    console.info('[IT Zone] Loaded ' + allItems.length + ' laptops.'
+    console.info('[IT Zone] Loaded ' + allItems.length + ' items from laptops + pcs.'
       + (state.tag ? ' (tag=' + state.tag + ')' : ''));
   }
 

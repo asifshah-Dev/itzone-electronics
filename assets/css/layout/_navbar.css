@@ -1,12 +1,7 @@
 /* assets/css/layout/_navbar.css
    ─────────────────────────────────────────────────────────
-   Navbar v3.
-   - Row 1 (socials+tagline) NOT sticky
-   - Rows 2 & 3 sticky
-   - White bar edge to edge, no green bleed
-   - Bigger category text
-   - Left search drawer (mobile)
-   - Mobile layout: socials → search+phone+logo+cart → 2 links
+   Navbar v3 — sticky rows 2 & 3.
+   Row 1 scrolls away. Rows 2+3 stick to top.
    ───────────────────────────────────────────────────────── */
 
 .nav-backdrop[hidden] { display: none !important; }
@@ -17,16 +12,18 @@
   z-index: var(--z-sticky);
   width: 100%;
   background: transparent;
+  /* 🔑 do NOT set overflow or height — sticky needs a free
+     parent chain */
 }
 
-/* Row 1 sits above sticky — scrolls away with page */
+/* Row 1 sits above sticky */
 .nav-row-1 {
   background: rgba(13, 74, 38, 0.89);
   backdrop-filter: blur(8px) saturate(140%);
   -webkit-backdrop-filter: blur(8px) saturate(140%);
 }
 
-/* Rows 2 + 3 stick to the top */
+/* Rows 2 + 3 stick to the top of the viewport */
 .nav-sticky {
   position: sticky;
   top: 0;
@@ -125,7 +122,6 @@
   min-width: 0;
 }
 
-/* mobile-only search button (hidden ≥ 992px) */
 .nav-search-btn {
   display: none;
   align-items: center;
@@ -322,7 +318,6 @@
   min-width: max-content;
 }
 
-/* Bigger category text */
 .cat-link {
   display: inline-flex;
   align-items: center;
@@ -336,8 +331,12 @@
   transition: color .12s ease, background-color .12s ease;
 }
 .cat-link:hover { color: var(--brand-primary); background: var(--brand-primary-soft); }
+.cat-link.is-active {
+  color: #fff;
+  background: var(--brand-primary);
+}
 
-/* ── Mobile-only 2-link row (hidden on desktop) ────────── */
+/* ── Mobile 2-link row ────────────────────────────────── */
 .nav-row-3-mobile {
   display: none;
   width: 100%;
@@ -495,7 +494,7 @@
 .mobile-cat .lucide,
 .mobile-cat svg { width: 1.1rem; height: 1.1rem; color: var(--brand-highlight); }
 
-/* ── Right drawer (menu) ───────────────────────────────── */
+/* ── Right drawer ─────────────────────────────────────── */
 .nav-links { display: none; }
 .drawer-header,
 .drawer-call-wrap,
@@ -518,13 +517,8 @@
 /* ── MOBILE < 992px ───────────────────────────────────── */
 @media (max-width: 991.98px) {
 
-  .nav-row-1 {
-    justify-content: center;
-    padding-block: var(--space-2);
-  }
-  .nav-row-1 > .nav-container {
-    justify-content: center;
-  }
+  .nav-row-1 { justify-content: center; padding-block: var(--space-2); }
+  .nav-row-1 > .nav-container { justify-content: center; }
   .nav-tagline { display: none; }
   .nav-socials { margin: 0 auto; }
 
@@ -543,9 +537,7 @@
   }
 
   .nav-call { display: none !important; }
-
   .nav-row-3 { display: none !important; }
-
   .nav-row-3-mobile {
     display: flex !important;
     margin-inline: -0.75rem;
@@ -553,7 +545,7 @@
     width: auto;
   }
 
-  /* Right-side menu drawer */
+  /* Drawer */
   .nav-links {
     display: flex !important;
     position: fixed;
@@ -684,8 +676,6 @@
 /* ── Tight widths ──────────────────────────────────────── */
 @media (max-width: 576px) {
   .nav-container { padding: 0 0.5rem; }
-  .nav-search { padding: var(--space-2) var(--space-3); }
-  .nav-search-input { font-size: var(--fs-xs); }
   .nav-phone-icon, .nav-search-btn, .nav-toggler, .cart-btn { width: 2.5rem; height: 2.5rem; }
   .brand-logo { height: clamp(60px, 15vw, 78px); max-width: clamp(160px, 52vw, 220px); }
   .cat-link { font-size: var(--fs-xs); }
