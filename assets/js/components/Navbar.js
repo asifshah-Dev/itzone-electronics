@@ -1,9 +1,9 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
-   Navbar — multi-row layout.
-   ROW 1: social icons (left)   ·   tagline (center)
-   ROW 2: search bar (left)      ·   phone icon (right)
-   ROW 3: nav links · LOGO · call+number + cart
+   Navbar — two rows.
+   ROW 1: social icons (left) · tagline (center)
+   ROW 2: search · phone icon · LOGO · Call now+number · cart
+   Number: 03265974741
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -11,7 +11,7 @@
 
   const NS = (window.ITZone = window.ITZone || {});
 
-  const PHONE_DISPLAY = '0326 597 4741';
+  const PHONE_DISPLAY = '03265974741';
   const PHONE_TEL     = 'tel:+923265974741';
 
   const TAGLINE = 'Free nationwide delivery · 1-year warranty on every laptop';
@@ -22,10 +22,10 @@
   ];
 
   const SOCIALS = [
-    { name: 'Facebook',  href: 'https://facebook.com/',  icon: 'facebook'  },
-    { name: 'Instagram', href: 'https://instagram.com/', icon: 'instagram' },
+    { name: 'Facebook',  href: 'https://facebook.com/',      icon: 'facebook' },
+    { name: 'Instagram', href: 'https://instagram.com/',     icon: 'instagram' },
     { name: 'WhatsApp',  href: 'https://wa.me/923265974741', icon: 'message-circle' },
-    { name: 'Twitter',   href: 'https://twitter.com/',   icon: 'twitter'   },
+    { name: 'Twitter',   href: 'https://twitter.com/',       icon: 'twitter' },
   ];
 
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
@@ -60,21 +60,17 @@
     `;
   }
 
-  function template(currentPage) {
+  function template() {
     const logoSrc = resolveHref('assets/img/logo.svg');
 
-    const links = NAV_ITEMS.map((item) => {
-      const isActive = item.id === currentPage;
-      return `
-        <li>
-          <a class="nav-link"
-             href="${resolveHref(item.href)}"
-             ${isActive ? 'aria-current="page"' : ''}>
-            <i data-lucide="${item.icon}"></i>
-            <span>${item.label}</span>
-          </a>
-        </li>`;
-    }).join('');
+    const drawerLinks = NAV_ITEMS.map((item) => `
+      <li>
+        <a class="nav-link" href="${resolveHref(item.href)}">
+          <i data-lucide="${item.icon}"></i>
+          <span>${item.label}</span>
+        </a>
+      </li>
+    `).join('');
 
     const socialLinks = SOCIALS.map(s => `
       <a href="${s.href}" class="social-link" target="_blank" rel="noopener noreferrer"
@@ -89,67 +85,28 @@
 
           <!-- ══════════ ROW 1: socials + tagline ══════════ -->
           <div class="nav-row nav-row-top">
-            <div class="nav-socials">
-              ${socialLinks}
-            </div>
+            <div class="nav-socials">${socialLinks}</div>
             <p class="nav-tagline" role="status">${TAGLINE}</p>
           </div>
 
-          <!-- ══════════ ROW 2: search + phone ═══════════ -->
-          <div class="nav-row nav-row-search">
-            <form class="nav-search" role="search" onsubmit="return false;">
-              <label for="nav-search-input" class="visually-hidden">Search laptops</label>
-              <i data-lucide="search" class="nav-search-icon"></i>
-              <input type="search"
-                     id="nav-search-input"
-                     class="nav-search-input"
-                     placeholder="Search laptops, models, brands…"
-                     autocomplete="off">
-            </form>
-            <a href="${PHONE_TEL}" class="nav-phone-icon" aria-label="Call ${PHONE_DISPLAY}">
-              <i data-lucide="phone"></i>
-            </a>
-          </div>
+          <!-- ══════════ ROW 2: search · phone · LOGO · call · cart ══════════ -->
+          <div class="nav-row nav-row-main">
 
-          <!-- ══════════ ROW 3: links · logo · call + cart ══════════ -->
-          <div class="nav-row nav-row-bottom">
+            <!-- LEFT: search + phone icon -->
+            <div class="nav-search-group">
+              <form class="nav-search" role="search" onsubmit="return false;">
+                <label for="nav-search-input" class="visually-hidden">Search laptops</label>
+                <i data-lucide="search" class="nav-search-icon"></i>
+                <input type="search"
+                       id="nav-search-input"
+                       class="nav-search-input"
+                       placeholder="Search laptops…"
+                       autocomplete="off">
+              </form>
 
-            <!-- LEFT: hamburger (mobile) or nav links (desktop) -->
-            <div class="nav-left">
-              <button type="button"
-                      class="nav-toggler"
-                      id="nav-toggler"
-                      aria-label="Open menu"
-                      aria-expanded="false"
-                      aria-controls="primary-menu">
-                <i data-lucide="menu"></i>
-              </button>
-
-              <ul class="nav-links" id="primary-menu">
-                <!-- Drawer header (mobile only) -->
-                <li class="drawer-header">
-                  <a class="drawer-brand"
-                     href="${resolveHref('index.html')}"
-                     aria-label="IT Zone Electronics — Home">
-                    <img class="drawer-logo" src="${logoSrc}" alt="IT Zone Electronics" decoding="async">
-                  </a>
-                  <button type="button"
-                          class="drawer-close"
-                          id="drawer-close"
-                          aria-label="Close menu">
-                    <i data-lucide="x"></i>
-                  </button>
-                </li>
-
-                ${links}
-
-                <li class="drawer-call-wrap">
-                  <a href="${PHONE_TEL}" class="btn btn-brand drawer-call">
-                    <i data-lucide="phone"></i>
-                    <span>Call ${PHONE_DISPLAY}</span>
-                  </a>
-                </li>
-              </ul>
+              <a href="${PHONE_TEL}" class="nav-phone-icon" aria-label="Call ${PHONE_DISPLAY}">
+                <i data-lucide="phone"></i>
+              </a>
             </div>
 
             <!-- CENTER: logo -->
@@ -163,13 +120,12 @@
                    fetchpriority="high">
             </a>
 
-            <!-- RIGHT: call + cart -->
+            <!-- RIGHT: call now (inline) + cart + hamburger -->
             <div class="nav-actions">
               <a href="${PHONE_TEL}" class="nav-call">
                 <i data-lucide="phone"></i>
                 <span class="nav-call-text">
-                  <span class="nav-call-label">Call now</span>
-                  <span class="nav-call-number">${PHONE_DISPLAY}</span>
+                  Call now <strong>${PHONE_DISPLAY}</strong>
                 </span>
               </a>
 
@@ -180,9 +136,44 @@
                 <i data-lucide="shopping-cart"></i>
                 <span class="cart-count" id="cart-count" data-visible="false">0</span>
               </button>
+
+              <button type="button"
+                      class="nav-toggler"
+                      id="nav-toggler"
+                      aria-label="Open menu"
+                      aria-expanded="false"
+                      aria-controls="primary-menu">
+                <i data-lucide="menu"></i>
+              </button>
             </div>
 
           </div>
+
+          <!-- ══════════ DRAWER (mobile only) ══════════ -->
+          <ul class="nav-links" id="primary-menu">
+            <li class="drawer-header">
+              <a class="drawer-brand"
+                 href="${resolveHref('index.html')}"
+                 aria-label="IT Zone Electronics — Home">
+                <img class="drawer-logo" src="${logoSrc}" alt="IT Zone Electronics" decoding="async">
+              </a>
+              <button type="button"
+                      class="drawer-close"
+                      id="drawer-close"
+                      aria-label="Close menu">
+                <i data-lucide="x"></i>
+              </button>
+            </li>
+
+            ${drawerLinks}
+
+            <li class="drawer-call-wrap">
+              <a href="${PHONE_TEL}" class="btn btn-brand drawer-call">
+                <i data-lucide="phone"></i>
+                <span>Call ${PHONE_DISPLAY}</span>
+              </a>
+            </li>
+          </ul>
 
         </div>
       </nav>
@@ -263,7 +254,6 @@
       else if (mq.addListener) mq.addListener(mqHandler);
     }
 
-    // Search bar — hook into the shop later
     const search = root.querySelector('#nav-search-input');
     if (search) {
       search.addEventListener('keydown', (e) => {
@@ -271,8 +261,7 @@
           e.preventDefault();
           const q = search.value.trim();
           if (!q) return;
-          const url = resolveHref('pages/inventory.html') + '?q=' + encodeURIComponent(q);
-          window.location.href = url;
+          window.location.href = resolveHref('pages/inventory.html') + '?q=' + encodeURIComponent(q);
         }
       });
     }
@@ -290,9 +279,7 @@
     if (host.dataset.mounted === 'true') return;
     host.dataset.mounted = 'true';
 
-    const currentPage = document.body.dataset.page || 'home';
-    host.innerHTML = template(currentPage);
-
+    host.innerHTML = template();
     attachLogoFallback(host);
     wire(host);
     NS.renderIcons?.(host);
