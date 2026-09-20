@@ -64,91 +64,15 @@
     <!-- <Navbar /> will be injected here by components/Navbar.js -->
   </header>
 
-  <main id="main" tabindex="-1">
+ <main id="main" tabindex="-1">
 
-  <!-- TEMPORARY — delete in Step 5 when the real hero ships -->
+  <!-- Placeholder — real hero arrives in Step 5 -->
   <section class="section">
     <div class="container">
-      <p style="font-size: var(--fs-sm); letter-spacing: var(--ls-wider);
-                text-transform: uppercase; color: var(--text-muted);
-                margin-bottom: var(--space-3);">
-        Step 3 — Bootstrap + Tokens
-      </p>
-
       <h1>Premium business laptops, <span class="text-gradient-brand">driven by values</span>.</h1>
-
       <p class="section-subtitle">
-        Dell · HP · Lenovo — meticulously tested, business-grade machines
-        at fair prices. Karachi based, nationwide delivery.
+        Dell · HP · Lenovo — tested, warrantied, delivered nationwide.
       </p>
-
-      <!-- Button system preview -->
-      <div class="d-flex flex-wrap gap-3" style="margin-top: var(--space-5);">
-        <a href="#inventory" class="btn btn-brand btn-lg">
-          <i data-lucide="shopping-bag"></i>
-          Browse inventory
-        </a>
-        <a href="#reviews" class="btn btn-outline-brand btn-lg">
-          <i data-lucide="star"></i>
-          Read reviews
-        </a>
-        <button type="button" class="btn btn-accent">
-          <i data-lucide="phone"></i>
-          Call now
-        </button>
-        <button type="button" class="btn btn-ghost">
-          <i data-lucide="info"></i>
-          Learn more
-        </button>
-        <button type="button" class="btn btn-icon btn-outline-brand" aria-label="Shopping cart">
-          <i data-lucide="shopping-cart"></i>
-        </button>
-      </div>
-
-      <!-- Size preview -->
-      <div class="d-flex flex-wrap align-items-center gap-3" style="margin-top: var(--space-5);">
-        <button class="btn btn-brand btn-sm">Small</button>
-        <button class="btn btn-brand">Default</button>
-        <button class="btn btn-brand btn-lg">Large</button>
-        <button class="btn btn-brand btn-xl">Extra large</button>
-        <button class="btn btn-brand" disabled>Disabled</button>
-      </div>
-
-      <!-- Bootstrap grid + our tokens -->
-      <div class="row g-4" style="margin-top: var(--space-7);">
-        <div class="col-6 col-md-3">
-          <div class="card p-3">
-            <p style="margin:0; color: var(--text-muted); font-size: var(--fs-sm);">Brand</p>
-            <p style="margin:0; font-weight: var(--fw-bold); font-size: var(--fs-xl);">
-              Primary
-            </p>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card p-3">
-            <p style="margin:0; color: var(--text-muted); font-size: var(--fs-sm);">Danger</p>
-            <p style="margin:0; font-weight: var(--fw-bold); font-size: var(--fs-xl);">
-              Accent
-            </p>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card p-3">
-            <p style="margin:0; color: var(--text-muted); font-size: var(--fs-sm);">Radius</p>
-            <p style="margin:0; font-weight: var(--fw-bold); font-size: var(--fs-xl);">
-              Pill
-            </p>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card p-3">
-            <p style="margin:0; color: var(--text-muted); font-size: var(--fs-sm);">Shadow</p>
-            <p style="margin:0; font-weight: var(--fw-bold); font-size: var(--fs-xl);">
-              Soft
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -159,11 +83,16 @@
     <!-- filled in Step 11 -->
   </footer>
 
-  <!-- ── Scripts (order + defer is law) ──────────────────── -->
-  <script defer src="assets/js/vendors/bootstrap.bundle.min.js"></script>
-  <script defer src="assets/js/vendors/lucide.min.js"></script>
-  <script type="module" src="assets/js/main.js"></script>
-  <script defer src="assets/js/main.js"></script>
+  <!-- Vendors -->
+<script defer src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+<script defer src="assets/js/vendors/lucide.min.js"></script>
+
+<!-- Components (mount into <header>/<footer>) -->
+<script defer src="assets/js/components/Navbar.js"></script>
+<script defer src="assets/js/components/Footer.js"></script>
+
+<!-- App bootstrap (must be last) -->
+<script defer src="assets/js/main.js"></script>
 
 
 </body>

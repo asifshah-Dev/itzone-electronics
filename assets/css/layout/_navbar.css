@@ -1,1 +1,300 @@
- 
+/* assets/css/layout/_navbar.css
+   ─────────────────────────────────────────────────────────
+   Site header + navbar. Extends Bootstrap .navbar.
+   Sticky, backdrop-blurred, mobile drawer.
+   ───────────────────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════════════
+   1. HEADER WRAPPER
+   ═══════════════════════════════════════════════════════ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    border-color     var(--dur-base) var(--ease-out),
+    box-shadow       var(--dur-base) var(--ease-out);
+}
+
+/* JS adds .is-scrolled when the user scrolls past 8px */
+.site-header.is-scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom-color: var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ═══════════════════════════════════════════════════════
+   2. NAVBAR CONTAINER
+   ═══════════════════════════════════════════════════════ */
+.site-nav {
+  --bs-navbar-padding-y: 0;
+  padding-block: var(--space-3);
+}
+
+.site-nav .container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 56px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   3. BRAND (logo + wordmark)
+   ═══════════════════════════════════════════════════════ */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.brand:hover { opacity: 0.85; color: var(--text-primary); }
+
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.brand:hover .brand-logo { transform: rotate(-6deg) scale(1.04); }
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.brand-name {
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  font-weight: var(--fw-black);
+  letter-spacing: var(--ls-tight);
+  background: linear-gradient(
+    135deg,
+    var(--itz-green-900) 0%,
+    var(--itz-green-500) 55%,
+    var(--itz-red-500) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand-tag {
+  font-size: 0.65rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   4. PRIMARY NAV LINKS
+   ═══════════════════════════════════════════════════════ */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-inline: auto; /* centers between brand and actions */
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.nav-link:hover {
+  color: var(--brand-primary);
+  background-color: var(--brand-primary-soft);
+}
+
+.nav-link[aria-current="page"] {
+  color: var(--brand-primary);
+  font-weight: var(--fw-semibold);
+}
+
+/* Active underline (subtle, animated) */
+.nav-link[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: 2px;
+  height: 2px;
+  background: var(--brand-primary);
+  border-radius: var(--radius-pill);
+}
+
+/* ═══════════════════════════════════════════════════════
+   5. ACTIONS (cart + CTA)
+   ═══════════════════════════════════════════════════════ */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* Cart button — icon + optional badge */
+.cart-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.cart-btn:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  background: var(--brand-primary-soft);
+}
+
+.cart-btn .lucide,
+.cart-btn svg { width: 1.15rem; height: 1.15rem; }
+
+.cart-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-accent);
+  color: var(--text-inverse);
+  font-size: 0.65rem;
+  font-weight: var(--fw-bold);
+  line-height: 1.15rem;
+  text-align: center;
+  font-feature-settings: "tnum";
+  border: 2px solid var(--bg-card);
+  transform: scale(0);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.cart-count[data-visible="true"] { transform: scale(1); }
+
+/* ═══════════════════════════════════════════════════════
+   6. MOBILE TOGGLER
+   ═══════════════════════════════════════════════════════ */
+.nav-toggler {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+.nav-toggler:hover {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary-soft);
+}
+
+.nav-toggler .lucide,
+.nav-toggler svg { width: 1.25rem; height: 1.25rem; }
+
+/* ═══════════════════════════════════════════════════════
+   7. RESPONSIVE — collapse into a drawer below md
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 991.98px) {
+  .nav-toggler { display: inline-flex; }
+
+  .nav-links {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(20rem, 85vw);
+    padding: 5rem var(--space-5) var(--space-5);
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-1);
+    background: var(--bg-card);
+    box-shadow: -12px 0 32px -12px rgba(15, 23, 42, 0.18);
+    transform: translateX(100%);
+    transition: transform var(--dur-slow) var(--ease-out);
+    z-index: calc(var(--z-sticky) + 1);
+    overflow-y: auto;
+  }
+
+  .nav-links.is-open { transform: translateX(0); }
+
+  .nav-link {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--fs-lg);
+    border-radius: var(--radius-md);
+  }
+
+  .nav-link[aria-current="page"]::after { display: none; }
+  .nav-link[aria-current="page"] {
+    background-color: var(--brand-primary-soft);
+  }
+}
+
+/* Backdrop for mobile drawer */
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out);
+  z-index: var(--z-sticky);
+}
+.nav-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ═══════════════════════════════════════════════════════
+   8. REDUCED MOTION
+   ═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .brand-logo,
+  .nav-links,
+  .nav-backdrop,
+  .cart-btn,
+  .nav-toggler {
+    transition: none;
+  }
+  .brand:hover .brand-logo { transform: none; }
+} 
