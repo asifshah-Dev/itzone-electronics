@@ -1,7 +1,9 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
-   Navbar layout (LEFT → RIGHT):
-     [LOGO]  [Laptops]  [PCs & Monitors]  ...spacer...  [🛒]  [📞 Call 0326 597 4741]
+   Navbar — multi-row layout.
+   ROW 1: social icons (left)   ·   tagline (center)
+   ROW 2: search bar (left)      ·   phone icon (right)
+   ROW 3: nav links · LOGO · call+number + cart
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -12,9 +14,18 @@
   const PHONE_DISPLAY = '0326 597 4741';
   const PHONE_TEL     = 'tel:+923265974741';
 
+  const TAGLINE = 'Free nationwide delivery · 1-year warranty on every laptop';
+
   const NAV_ITEMS = [
     { id: 'inventory', label: 'Laptops',        href: 'pages/inventory.html', icon: 'laptop' },
     { id: 'pcs',       label: 'PCs & Monitors', href: 'pages/pcs.html',       icon: 'monitor' },
+  ];
+
+  const SOCIALS = [
+    { name: 'Facebook',  href: 'https://facebook.com/',  icon: 'facebook'  },
+    { name: 'Instagram', href: 'https://instagram.com/', icon: 'instagram' },
+    { name: 'WhatsApp',  href: 'https://wa.me/923265974741', icon: 'message-circle' },
+    { name: 'Twitter',   href: 'https://twitter.com/',   icon: 'twitter'   },
   ];
 
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
@@ -65,13 +76,83 @@
         </li>`;
     }).join('');
 
+    const socialLinks = SOCIALS.map(s => `
+      <a href="${s.href}" class="social-link" target="_blank" rel="noopener noreferrer"
+         aria-label="${s.name}">
+        <i data-lucide="${s.icon}"></i>
+      </a>
+    `).join('');
+
     return `
       <nav class="navbar site-nav" aria-label="Primary">
         <div class="container">
 
-          <!-- ── LEFT: LOGO FIRST, then nav links ─────────── -->
-          <div class="nav-left">
+          <!-- ══════════ ROW 1: socials + tagline ══════════ -->
+          <div class="nav-row nav-row-top">
+            <div class="nav-socials">
+              ${socialLinks}
+            </div>
+            <p class="nav-tagline" role="status">${TAGLINE}</p>
+          </div>
 
+          <!-- ══════════ ROW 2: search + phone ═══════════ -->
+          <div class="nav-row nav-row-search">
+            <form class="nav-search" role="search" onsubmit="return false;">
+              <label for="nav-search-input" class="visually-hidden">Search laptops</label>
+              <i data-lucide="search" class="nav-search-icon"></i>
+              <input type="search"
+                     id="nav-search-input"
+                     class="nav-search-input"
+                     placeholder="Search laptops, models, brands…"
+                     autocomplete="off">
+            </form>
+            <a href="${PHONE_TEL}" class="nav-phone-icon" aria-label="Call ${PHONE_DISPLAY}">
+              <i data-lucide="phone"></i>
+            </a>
+          </div>
+
+          <!-- ══════════ ROW 3: links · logo · call + cart ══════════ -->
+          <div class="nav-row nav-row-bottom">
+
+            <!-- LEFT: hamburger (mobile) or nav links (desktop) -->
+            <div class="nav-left">
+              <button type="button"
+                      class="nav-toggler"
+                      id="nav-toggler"
+                      aria-label="Open menu"
+                      aria-expanded="false"
+                      aria-controls="primary-menu">
+                <i data-lucide="menu"></i>
+              </button>
+
+              <ul class="nav-links" id="primary-menu">
+                <!-- Drawer header (mobile only) -->
+                <li class="drawer-header">
+                  <a class="drawer-brand"
+                     href="${resolveHref('index.html')}"
+                     aria-label="IT Zone Electronics — Home">
+                    <img class="drawer-logo" src="${logoSrc}" alt="IT Zone Electronics" decoding="async">
+                  </a>
+                  <button type="button"
+                          class="drawer-close"
+                          id="drawer-close"
+                          aria-label="Close menu">
+                    <i data-lucide="x"></i>
+                  </button>
+                </li>
+
+                ${links}
+
+                <li class="drawer-call-wrap">
+                  <a href="${PHONE_TEL}" class="btn btn-brand drawer-call">
+                    <i data-lucide="phone"></i>
+                    <span>Call ${PHONE_DISPLAY}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- CENTER: logo -->
             <a class="brand"
                href="${resolveHref('index.html')}"
                aria-label="IT Zone Electronics — Home">
@@ -82,62 +163,24 @@
                    fetchpriority="high">
             </a>
 
-            <ul class="nav-links" id="primary-menu">
-              <!-- Drawer header (mobile only) -->
-              <li class="drawer-header">
-                <a class="drawer-brand"
-                   href="${resolveHref('index.html')}"
-                   aria-label="IT Zone Electronics — Home">
-                  <img class="drawer-logo"
-                       src="${logoSrc}"
-                       alt="IT Zone Electronics"
-                       decoding="async">
-                </a>
-                <button type="button"
-                        class="drawer-close"
-                        id="drawer-close"
-                        aria-label="Close menu">
-                  <i data-lucide="x"></i>
-                </button>
-              </li>
+            <!-- RIGHT: call + cart -->
+            <div class="nav-actions">
+              <a href="${PHONE_TEL}" class="nav-call">
+                <i data-lucide="phone"></i>
+                <span class="nav-call-text">
+                  <span class="nav-call-label">Call now</span>
+                  <span class="nav-call-number">${PHONE_DISPLAY}</span>
+                </span>
+              </a>
 
-              ${links}
-
-              <li class="drawer-call-wrap">
-                <a href="${PHONE_TEL}" class="btn btn-brand drawer-call">
-                  <i data-lucide="phone"></i>
-                  <span>Call ${PHONE_DISPLAY}</span>
-                </a>
-              </li>
-            </ul>
-
-          </div>
-
-          <!-- ── RIGHT: cart + call ──────────────────────── -->
-          <div class="nav-actions">
-
-            <button type="button"
-                    class="cart-btn"
-                    id="cart-trigger"
-                    aria-label="Open shopping cart">
-              <i data-lucide="shopping-cart"></i>
-              <span class="cart-count" id="cart-count" data-visible="false">0</span>
-            </button>
-
-            <a href="${PHONE_TEL}"
-               class="btn btn-brand nav-call">
-              <i data-lucide="phone"></i>
-              <span>Call ${PHONE_DISPLAY}</span>
-            </a>
-
-            <button type="button"
-                    class="nav-toggler"
-                    id="nav-toggler"
-                    aria-label="Open menu"
-                    aria-expanded="false"
-                    aria-controls="primary-menu">
-              <i data-lucide="menu"></i>
-            </button>
+              <button type="button"
+                      class="cart-btn"
+                      id="cart-trigger"
+                      aria-label="Open shopping cart">
+                <i data-lucide="shopping-cart"></i>
+                <span class="cart-count" id="cart-count" data-visible="false">0</span>
+              </button>
+            </div>
 
           </div>
 
@@ -150,7 +193,6 @@
   function attachLogoFallback(root) {
     root.querySelectorAll('img.brand-logo, img.drawer-logo').forEach((img) => {
       img.addEventListener('error', () => {
-        console.warn('[IT Zone] logo.svg failed — inline fallback.');
         const wrapper = document.createElement('div');
         const cls = img.classList.contains('drawer-logo') ? 'drawer-logo' : 'brand-logo';
         wrapper.innerHTML = inlineLogoSVG(cls).trim();
@@ -166,68 +208,74 @@
     const closeBtn = root.querySelector('#drawer-close');
     const header   = document.querySelector('.site-header');
 
-    if (!toggler || !menu || !backdrop) return;
-
-    menu.classList.remove('is-open');
-    backdrop.classList.remove('is-open');
-    backdrop.hidden = true;
-    document.documentElement.style.overflow = '';
-
-    const lockScroll = (on) => { document.documentElement.style.overflow = on ? 'hidden' : ''; };
-
-    const setIcon = (el, name) => {
-      el.innerHTML = `<i data-lucide="${name}"></i>`;
-      NS.renderIcons?.(el);
-    };
-
-    const openMenu = () => {
-      menu.classList.add('is-open');
-      backdrop.hidden = false;
-      void backdrop.offsetWidth;
-      backdrop.classList.add('is-open');
-      toggler.setAttribute('aria-expanded', 'true');
-      setIcon(toggler, 'x');
-      lockScroll(true);
-    };
-
-    const closeMenu = () => {
+    if (toggler && menu && backdrop) {
       menu.classList.remove('is-open');
       backdrop.classList.remove('is-open');
-      toggler.setAttribute('aria-expanded', 'false');
-      setIcon(toggler, 'menu');
-      lockScroll(false);
-      window.setTimeout(() => { backdrop.hidden = true; }, 250);
-    };
+      backdrop.hidden = true;
+      document.documentElement.style.overflow = '';
 
-    if (toggler.dataset.bound === 'true') return;
-    toggler.dataset.bound = 'true';
+      const lockScroll = (on) => { document.documentElement.style.overflow = on ? 'hidden' : ''; };
+      const setIcon = (el, name) => {
+        el.innerHTML = `<i data-lucide="${name}"></i>`;
+        NS.renderIcons?.(el);
+      };
 
-    toggler.addEventListener('click', (e) => {
-      e.preventDefault();
-      menu.classList.contains('is-open') ? closeMenu() : openMenu();
-    });
+      const openMenu = () => {
+        menu.classList.add('is-open');
+        backdrop.hidden = false;
+        void backdrop.offsetWidth;
+        backdrop.classList.add('is-open');
+        toggler.setAttribute('aria-expanded', 'true');
+        setIcon(toggler, 'x');
+        lockScroll(true);
+      };
 
-    if (closeBtn) {
-      closeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeMenu();
-        toggler.focus();
+      const closeMenu = () => {
+        menu.classList.remove('is-open');
+        backdrop.classList.remove('is-open');
+        toggler.setAttribute('aria-expanded', 'false');
+        setIcon(toggler, 'menu');
+        lockScroll(false);
+        window.setTimeout(() => { backdrop.hidden = true; }, 250);
+      };
+
+      if (toggler.dataset.bound !== 'true') {
+        toggler.dataset.bound = 'true';
+        toggler.addEventListener('click', (e) => {
+          e.preventDefault();
+          menu.classList.contains('is-open') ? closeMenu() : openMenu();
+        });
+      }
+      if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => { e.preventDefault(); closeMenu(); toggler.focus(); });
+      }
+      backdrop.addEventListener('click', closeMenu);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menu.classList.contains('is-open')) {
+          closeMenu(); toggler.focus();
+        }
       });
+
+      const mq = window.matchMedia('(min-width: 992px)');
+      const mqHandler = (e) => { if (e.matches && menu.classList.contains('is-open')) closeMenu(); };
+      if (mq.addEventListener) mq.addEventListener('change', mqHandler);
+      else if (mq.addListener) mq.addListener(mqHandler);
     }
 
-    backdrop.addEventListener('click', closeMenu);
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && menu.classList.contains('is-open')) {
-        closeMenu();
-        toggler.focus();
-      }
-    });
-
-    const mq = window.matchMedia('(min-width: 992px)');
-    const mqHandler = (e) => { if (e.matches && menu.classList.contains('is-open')) closeMenu(); };
-    if (mq.addEventListener) mq.addEventListener('change', mqHandler);
-    else if (mq.addListener) mq.addListener(mqHandler);
+    // Search bar — hook into the shop later
+    const search = root.querySelector('#nav-search-input');
+    if (search) {
+      search.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const q = search.value.trim();
+          if (!q) return;
+          const url = resolveHref('pages/inventory.html') + '?q=' + encodeURIComponent(q);
+          window.location.href = url;
+        }
+      });
+    }
 
     if (header) {
       const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
