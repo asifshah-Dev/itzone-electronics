@@ -1,13 +1,23 @@
 // assets/js/components/ProductCard.js
 /* ─────────────────────────────────────────────────────────
-   Product card — with image slot.
-   Pure template function. No DOM side-effects.
+   Product card.
+   - Wraps image + body in an <a> that links to product.html
+   - Stashes id + from in sessionStorage so the detail page
+     can recover them if the server strips query strings.
    ───────────────────────────────────────────────────────── */
 
 (function () {
   'use strict';
 
   const NS = (window.ITZone = window.ITZone || {});
+
+  function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
+
+  function r(href) {
+    if (/^https?:/.test(href)) return href;
+    if (isInPagesDir()) return href.startsWith('pages/') ? href.replace('pages/', '') : `../${href}`;
+    return href;
+  }
 
   function formatPKR(n) {
     return 'PKR ' + new Intl.NumberFormat('en-PK').format(n);
@@ -27,15 +37,13 @@
     return rows;
   }
 
-  /* ── Category → icon (for the placeholder) ────────────── */
   function categoryIcon(item) {
-    if (item._category === 'monitor') return 'monitor';
-    if (item._category === 'tiny')    return 'box';
-    if (item._category === 'desktop') return 'cpu';
+    if (item._subtype === 'monitor' || item.resolution) return 'monitor';
+    if (item._subtype === 'tiny') return 'box';
+    if (item._subtype === 'desktop') return 'cpu';
     return 'laptop';
   }
 
-  /* ── Image block: <img> if image, else inline SVG icon ── */
   function imageBlock(item) {
     const src = item.image || '';
     if (src) {
@@ -53,45 +61,63 @@
     );
   }
 
+  function productUrl(item) {
+    const id = encodeURIComponent(item.id);
+    const from = item._subtype === 'laptop' || !item._subtype ? 'laptops' : 'pcs';
+    return r('pages/product.html') + '?id=' + id + '&from=' + from;
+  }
+
+  /* Stash the target id in sessionStorage right before navigation
+     so the detail page can recover if the server strips the query. */
+  function stashForNavigation(item) {
+    try {
+      sessionStorage.setItem('itz.pendingProductId', String(item.id));
+      sessionStorage.setItem('itz.pendingProductFrom',
+        item._subtype === 'laptop' || !item._subtype ? 'laptops' : 'pcs');
+      sessionStorage.setItem('itz.pendingProductAt', String(Date.now()));
+    } catch (e) { /* private mode */ }
+  }
+
   function template(item) {
     const specRows = specs(item).map(function (s) {
       return '<li><i data-lucide="' + s.icon + '"></i><span>' + s.text + '</span></li>';
     }).join('');
 
+    const url = productUrl(item);
+
     return (
-      '<article class="product-card"' +
-      ' data-id="' + item.id + '"' +
-      ' data-brand="' + item.brand + '"' +
-      ' data-model="' + (item.model || '').toLowerCase() + '"' +
-      ' data-gen="' + ((item.gen || '').toLowerCase()) + '"' +
-      ' data-ram="' + item.ram + '"' +
-      ' data-ssd="' + item.ssd + '"' +
-      ' data-price="' + item.price + '"' +
-      ' role="listitem">' +
+      '<article class="product-card" data-id="' + item.id + '" role="listitem">' +
 
-        imageBlock(item) +
+        '<a class="product-link" href="' + url + '" ' +
+           'data-product-id="' + item.id + '" ' +
+           'data-product-from="' +
+             (item._subtype === 'laptop' || !item._subtype ? 'laptops' : 'pcs') + '" ' +
+           'aria-label="View ' + item.brand + ' ' + item.model + '">' +
 
-        '<div class="product-card-body">' +
+          imageBlock(item) +
 
-          '<header class="product-card-head">' +
-            '<span class="product-brand">' + item.brand + '</span>' +
-            '<h3 class="product-model">' + item.model + '</h3>' +
-          '</header>' +
+          '<div class="product-card-body">' +
+            '<header class="product-card-head">' +
+              '<span class="product-brand">' + item.brand + '</span>' +
+              '<h3 class="product-model">' + item.model + '</h3>' +
+            '</header>' +
+            '<ul class="product-specs">' + specRows + '</ul>' +
+          '</div>' +
+        '</a>' +
 
-          '<ul class="product-specs">' + specRows + '</ul>' +
+        '<footer class="product-card-foot">' +
+          '<div class="product-price">' +
+            '<span class="product-price-label">PKR</span>' +
+            '<span class="product-price-value">' +
+              new Intl.NumberFormat('en-PK').format(item.price) +
+            '</span>' +
+          '</div>' +
+          '<button type="button" class="product-add" data-action="add-to-cart" ' +
+            'aria-label="Add ' + item.brand + ' ' + item.model + ' to cart">' +
+            '<i data-lucide="shopping-bag"></i><span>Add</span>' +
+          '</button>' +
+        '</footer>' +
 
-          '<footer class="product-card-foot">' +
-            '<div class="product-price">' +
-              '<span class="product-price-label">PKR</span>' +
-              '<span class="product-price-value">' + new Intl.NumberFormat('en-PK').format(item.price) + '</span>' +
-            '</div>' +
-            '<button type="button" class="product-add" data-action="add-to-cart" ' +
-              'aria-label="Add ' + item.brand + ' ' + item.model + ' to cart">' +
-              '<i data-lucide="shopping-bag"></i><span>Add</span>' +
-            '</button>' +
-          '</footer>' +
-
-        '</div>' +
       '</article>'
     );
   }
@@ -102,8 +128,24 @@
     return wrapper.firstElementChild;
   }
 
+  /* Global listener: whenever a `.product-link` is clicked,
+     stash the id before the browser navigates. */
+  document.addEventListener('click', function (e) {
+    const link = e.target.closest('.product-link');
+    if (!link) return;
+    const id = link.dataset.productId;
+    const from = link.dataset.productFrom;
+    if (!id) return;
+    try {
+      sessionStorage.setItem('itz.pendingProductId', id);
+      sessionStorage.setItem('itz.pendingProductFrom', from || 'laptops');
+      sessionStorage.setItem('itz.pendingProductAt', String(Date.now()));
+    } catch (err) { /* ignore */ }
+  }, true);
+
   NS.ProductCard = {
     render: render,
-    formatPKR: formatPKR
+    formatPKR: formatPKR,
+    stashForNavigation: stashForNavigation
   };
 })();

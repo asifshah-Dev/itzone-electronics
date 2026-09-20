@@ -25,10 +25,11 @@
     };
   }
 
-  const ROUTES = {
+    const ROUTES = {
     home:      () => window.ITZone.homePage?.init(),
     inventory: () => window.ITZone.inventoryPage?.init(),
     pcs:       () => window.ITZone.pcsPage?.init(),
+    product:   () => window.ITZone.productPage?.init(),
   };
 
   function boot() {

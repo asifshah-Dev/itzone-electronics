@@ -16,12 +16,11 @@
   ];
 
   let allItems = [];
-
   function flatten(data) {
     const out = [];
-    (data.desktops || []).forEach(i => out.push(Object.assign({}, i, { _category: 'desktop' })));
-    (data.tiny || []).forEach(i => out.push(Object.assign({}, i, { _category: 'tiny' })));
-    (data.monitors || []).forEach(i => out.push(Object.assign({}, i, { _category: 'monitor' })));
+    (data.desktops || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'desktop' })));
+    (data.tiny     || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'tiny' })));
+    (data.monitors || []).forEach(i => out.push(Object.assign({}, i, { _type: 'pc', _subtype: 'monitor' })));
     return out;
   }
 

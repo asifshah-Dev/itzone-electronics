@@ -15,38 +15,15 @@
   <meta property="og:description" content="Certified refurbished laptops from Dell, HP, Lenovo.">
   <meta property="og:url"         content="https://itzone.pk/">
   <meta property="og:image"       content="https://itzone.pk/assets/img/og/og-default.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-
-  <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="IT Zone Electronics — Premium Business Laptops">
-  <meta name="twitter:image"       content="https://itzone.pk/assets/img/og/og-default.jpg">
 
   <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="assets/css/vendors/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/main.css">
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "IT Zone Electronics",
-    "url": "https://itzone.pk",
-    "logo": "https://itzone.pk/assets/img/logo.svg",
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+92-326-597-4741",
-      "contactType": "sales",
-      "areaServed": "PK"
-    }
-  }
-  </script>
 </head>
 
 <body data-page="home">
@@ -57,48 +34,43 @@
 
   <main id="main" tabindex="-1">
 
-    <!-- Hero -->
     <section id="hero-slot" class="hero-section" aria-labelledby="hero-title-heading"></section>
 
-    <!-- Featured products -->
     <section id="featured" class="section" aria-labelledby="featured-heading">
       <div class="container">
         <header class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
           <div>
-            <h2 id="featured-heading" class="section-title mb-1">Featured laptops</h2>
-            <p class="section-subtitle mb-0">Hand-picked machines from our latest stock.</p>
+            <h2 id="featured-heading" class="section-title mb-1">Featured products</h2>
+            <p class="section-subtitle mb-0">Hand-picked from our latest stock.</p>
           </div>
-          <a href="pages/inventory.html" class="btn btn-outline-brand">
-            <i data-lucide="arrow-right"></i>
-            <span>Browse all</span>
-          </a>
+          <div class="d-flex gap-2">
+            <a href="pages/inventory.html" class="btn btn-outline-brand">
+              <i data-lucide="laptop"></i>
+              <span>All Laptops</span>
+            </a>
+            <a href="pages/pcs.html" class="btn btn-outline-brand">
+              <i data-lucide="monitor"></i>
+              <span>PCs &amp; Monitors</span>
+            </a>
+          </div>
         </header>
 
-        <div id="featured-grid" role="list"></div>
+        <div id="featured-grid" class="row g-4" role="list"></div>
       </div>
     </section>
 
-    <!-- Inventory preview (link-out) -->
     <section id="inventory" class="section-tight" aria-labelledby="inventory-heading">
       <div class="container">
         <div class="cta-strip">
           <div>
             <h2 id="inventory-heading" class="section-title mb-1">Full inventory</h2>
-            <p class="section-subtitle mb-0">30 laptops · 11 desktops · 6 tiny PCs · 5 monitors.</p>
+            <p class="section-subtitle mb-0">Laptops, desktops, tiny PCs, and monitors.</p>
           </div>
           <div class="d-flex gap-3 flex-wrap">
-            <a href="pages/inventory.html" class="btn btn-brand">All Laptops</a>
+            <a href="pages/inventory.html" class="btn btn-brand">All Products</a>
             <a href="pages/pcs.html" class="btn btn-outline-brand">PCs &amp; Monitors</a>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- Reviews placeholder -->
-    <section id="reviews" class="section-tight" aria-labelledby="reviews-heading">
-      <div class="container">
-        <h2 id="reviews-heading" class="section-title">What our customers say</h2>
-        <p class="section-subtitle">Reviews section arrives in a later step.</p>
       </div>
     </section>
 
@@ -106,24 +78,18 @@
 
   <footer class="site-footer"></footer>
 
-  <!-- Vendors -->
   <script defer src="assets/js/vendors/bootstrap.bundle.min.js"></script>
   <script defer src="assets/js/vendors/lucide.min.js"></script>
 
-  <!-- Core -->
   <script defer src="assets/js/core/data.js"></script>
 
-  <!-- Components -->
   <script defer src="assets/js/components/Navbar.js"></script>
   <script defer src="assets/js/components/Footer.js"></script>
   <script defer src="assets/js/components/Hero.js"></script>
   <script defer src="assets/js/components/ProductCard.js"></script>
-  <script defer src="assets/js/components/ProductGrid.js"></script>
-  <script defer src="assets/js/components/SortBar.js"></script>
-  <!-- Page module -->
+
   <script defer src="assets/js/pages/home.js"></script>
 
-  <!-- App bootstrap (last) -->
   <script defer src="assets/js/main.js"></script>
 
 </body>
