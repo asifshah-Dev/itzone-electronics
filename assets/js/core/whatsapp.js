@@ -2,6 +2,7 @@
 /* ─────────────────────────────────────────────────────────
    WhatsApp order helper.
    Builds deep-link URLs with prefilled product messages.
+   No product link is included in the message.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -26,39 +27,29 @@
     return parts.join(' · ');
   }
 
-  function productUrl(item) {
-    const inPages = /\/pages\//.test(window.location.pathname);
-    const base = window.location.origin +
-                 window.location.pathname.replace(/\/pages\/.*$/, '/') +
-                 (inPages ? 'pages/' : 'pages/') + 'product.html';
-    const id   = encodeURIComponent(item.id);
-    const from = /^(pc-|mon-)/.test(item.id) ? 'pcs' : 'laptops';
-    return base + '?id=' + id + '&from=' + from;
-  }
-
-  /* Short message for card "Order on WhatsApp" buttons */
+  /* Short message for card "Order" buttons — no product URL */
   function shortMessage(item) {
     const lines = [
       'Hi IT Zone! I want to order:',
       '',
-      '• ' + item.brand + ' ' + item.model,
-      '• Price: ' + formatPKR(item.price),
+      '\u2022 ' + item.brand + ' ' + item.model,
+      '\u2022 Price: ' + formatPKR(item.price),
     ];
     const specs = specLine(item);
-    if (specs) lines.push('• ' + specs);
+    if (specs) lines.push('\u2022 ' + specs);
     lines.push('');
-    lines.push('Link: ' + productUrl(item));
+    lines.push('Please confirm availability and delivery.');
     return lines.join('\n');
   }
 
-  /* Longer message for the product detail page */
+  /* Longer message for the product detail page — no product URL */
   function detailMessage(item) {
     const lines = [
       'Hi IT Zone! I want to order this product:',
       '',
-      '━━━━━━━━━━━━━━━━━━━━━━',
+      '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501',
       item.brand + ' ' + item.model,
-      '━━━━━━━━━━━━━━━━━━━━━━',
+      '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501',
       '',
       'Price: ' + formatPKR(item.price),
     ];
@@ -73,14 +64,10 @@
     if (item.extras)     lines.push('Notes: ' + item.extras);
 
     lines.push('');
-    lines.push('Product page:');
-    lines.push(productUrl(item));
-    lines.push('');
     lines.push('Please confirm availability and delivery.');
     return lines.join('\n');
   }
 
-  /* Generic message (hero, footer, contact) */
   function genericMessage(context) {
     const lines = ['Hi IT Zone!'];
     if (context) lines.push(context);
@@ -93,7 +80,7 @@
     return 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(message || '');
   }
 
-  function productUrl_(item) {
+  function productOrderUrl(item) {
     return buildUrl(shortMessage(item));
   }
 
@@ -110,7 +97,7 @@
     buildUrl: buildUrl,
     shortMessage: shortMessage,
     detailMessage: detailMessage,
-    productUrl: productUrl_,
+    productUrl: productOrderUrl,
     productDetailUrl: productDetailUrl,
     genericUrl: genericUrl,
   };

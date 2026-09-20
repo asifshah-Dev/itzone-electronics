@@ -22,8 +22,10 @@
 
   /* Fallback WhatsApp URL builder in case whatsapp.js isn't loaded */
   function fallbackWaUrl(item) {
-    const msg = 'Hi IT Zone! I want to order: ' + item.brand + ' ' + item.model +
-                ' (PKR ' + item.price + '). Please confirm availability.';
+    const msg = 'Hi IT Zone! I want to order:\n\n' +
+                '\u2022 ' + item.brand + ' ' + item.model + '\n' +
+                '\u2022 Price: PKR ' + new Intl.NumberFormat('en-PK').format(item.price) + '\n\n' +
+                'Please confirm availability and delivery.';
     return 'https://wa.me/923265974741?text=' + encodeURIComponent(msg);
   }
 
