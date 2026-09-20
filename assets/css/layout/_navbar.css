@@ -1,104 +1,89 @@
 /* assets/css/layout/_navbar.css
    ─────────────────────────────────────────────────────────
-   Site header + navbar. Extends Bootstrap .navbar.
-   Sticky, backdrop-blurred, mobile drawer.
+   Navbar layout (LEFT → RIGHT):
+     [LOGO]  [Laptops]  [PCs & Monitors]  ...spacer...  [🛒]  [📞 Call 0326 597 4741]
+   Dark green gradient, big rounded logo, generous padding.
    ───────────────────────────────────────────────────────── */
 
-/* ═══════════════════════════════════════════════════════
-   1. HEADER WRAPPER
-   ═══════════════════════════════════════════════════════ */
+.nav-backdrop[hidden] { display: none !important; }
+
+/* ── Header wrapper ────────────────────────────────────── */
 .site-header {
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: saturate(180%) blur(12px);
-  -webkit-backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid transparent;
+  width: 100%;
+  background: linear-gradient(135deg, var(--itz-green-700) 0%, var(--itz-green-900) 100%);
+  border-bottom: none;
   transition:
-    background-color var(--dur-base) var(--ease-out),
-    border-color     var(--dur-base) var(--ease-out),
-    box-shadow       var(--dur-base) var(--ease-out);
+    box-shadow var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
 }
-
-/* JS adds .is-scrolled when the user scrolls past 8px */
 .site-header.is-scrolled {
-  background: rgba(255, 255, 255, 0.95);
-  border-bottom-color: var(--border-color);
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(135deg, var(--itz-green-900) 0%, #062b14 100%);
+  box-shadow: 0 8px 24px -8px rgba(10, 15, 13, 0.35);
 }
 
-/* ═══════════════════════════════════════════════════════
-   2. NAVBAR CONTAINER
-   ═══════════════════════════════════════════════════════ */
+/* ── Navbar container ──────────────────────────────────── */
 .site-nav {
   --bs-navbar-padding-y: 0;
   padding-block: var(--space-3);
+  width: 100%;
 }
 
 .site-nav .container {
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  min-height: 56px;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-height: 120px;                       /* taller for bigger logo */
+  flex-wrap: nowrap;
+  /* 🔑 generous left/right breathing room */
+  padding-left: clamp(2rem, 5vw, 4rem) !important;
+  padding-right: clamp(2rem, 5vw, 4rem) !important;
 }
 
-/* ═══════════════════════════════════════════════════════
-   3. BRAND (logo + wordmark)
-   ═══════════════════════════════════════════════════════ */
+/* ── LEFT group: LOGO FIRST, then nav links ────────────── */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);                     /* bigger gap after logo */
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+/* ── LOGO — bigger, rounded, with soft shadow ──────────── */
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
   text-decoration: none;
-  color: var(--text-primary);
   flex-shrink: 0;
-  transition: opacity var(--dur-fast) var(--ease-out);
+  line-height: 0;
+  border-radius: 16px;                     /* matches logo radius */
+  overflow: hidden;                        /* clips the logo to the radius */
+  box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.55);
+  background: #ffffff;                     /* white backing so the logo pops */
+  padding: 6px;                            /* inner padding inside the rounded chip */
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
 }
-.brand:hover { opacity: 0.85; color: var(--text-primary); }
+.brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.65);
+}
 
 .brand-logo {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  transition: transform var(--dur-base) var(--ease-out);
-}
-.brand:hover .brand-logo { transform: rotate(-6deg) scale(1.04); }
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
+  display: block;
+  height: clamp(72px, 9vw, 100px);         /* BIG */
+  width: auto;
+  max-width: clamp(200px, 26vw, 320px);
+  object-fit: contain;
+  object-position: center;
+  border-radius: 12px;                     /* rounded corners on the image itself */
 }
 
-.brand-name {
-  font-family: var(--font-sans);
-  font-size: 1.15rem;
-  font-weight: var(--fw-black);
-  letter-spacing: var(--ls-tight);
-  background: linear-gradient(
-    135deg,
-    var(--itz-green-900) 0%,
-    var(--itz-green-500) 55%,
-    var(--itz-red-500) 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.brand-tag {
-  font-size: 0.65rem;
-  font-weight: var(--fw-semibold);
-  letter-spacing: var(--ls-wider);
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-/* ═══════════════════════════════════════════════════════
-   4. PRIMARY NAV LINKS
-   ═══════════════════════════════════════════════════════ */
+/* ── Nav links (desktop) — light text on dark green ────── */
 .nav-links {
   display: flex;
   align-items: center;
@@ -106,7 +91,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  margin-inline: auto; /* centers between brand and actions */
+  flex-shrink: 0;
 }
 
 .nav-link {
@@ -114,49 +99,50 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
   font-size: var(--fs-base);
-  font-weight: var(--fw-medium);
-  color: var(--text-secondary);
+  font-weight: var(--fw-semibold);
+  color: rgba(255, 255, 255, 0.88);
   border-radius: var(--radius-md);
   transition:
     color var(--dur-fast) var(--ease-out),
     background-color var(--dur-fast) var(--ease-out);
 }
+.nav-link .lucide,
+.nav-link svg { width: 1.15rem; height: 1.15rem; flex-shrink: 0; }
 
 .nav-link:hover {
-  color: var(--brand-primary);
-  background-color: var(--brand-primary-soft);
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.12);
 }
-
 .nav-link[aria-current="page"] {
-  color: var(--brand-primary);
-  font-weight: var(--fw-semibold);
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.14);
 }
-
-/* Active underline (subtle, animated) */
 .nav-link[aria-current="page"]::after {
   content: "";
   position: absolute;
   left: var(--space-4);
   right: var(--space-4);
-  bottom: 2px;
+  bottom: 4px;
   height: 2px;
-  background: var(--brand-primary);
+  background: var(--brand-highlight);
   border-radius: var(--radius-pill);
 }
 
-/* ═══════════════════════════════════════════════════════
-   5. ACTIONS (cart + CTA)
-   ═══════════════════════════════════════════════════════ */
+/* Drawer-only elements — hidden on desktop */
+.drawer-header,
+.drawer-call-wrap { display: none; }
+
+/* ── RIGHT group: cart + call ──────────────────────────── */
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   flex-shrink: 0;
+  margin-left: auto;
 }
 
-/* Cart button — icon + optional badge */
 .cart-btn {
   position: relative;
   display: inline-flex;
@@ -165,24 +151,22 @@
   width: 2.75rem;
   height: 2.75rem;
   border-radius: var(--radius-pill);
-  border: 1.5px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-primary);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   cursor: pointer;
   transition:
     border-color var(--dur-fast) var(--ease-out),
     background-color var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out);
 }
-
 .cart-btn:hover {
-  border-color: var(--brand-primary);
-  color: var(--brand-primary);
-  background: var(--brand-primary-soft);
+  border-color: var(--brand-highlight);
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--brand-highlight);
 }
-
 .cart-btn .lucide,
-.cart-btn svg { width: 1.15rem; height: 1.15rem; }
+.cart-btn svg { width: 1.2rem; height: 1.2rem; }
 
 .cart-count {
   position: absolute;
@@ -199,15 +183,42 @@
   line-height: 1.15rem;
   text-align: center;
   font-feature-settings: "tnum";
-  border: 2px solid var(--bg-card);
+  border: 2px solid var(--itz-green-900);
   transform: scale(0);
   transition: transform var(--dur-base) var(--ease-out);
 }
 .cart-count[data-visible="true"] { transform: scale(1); }
 
-/* ═══════════════════════════════════════════════════════
-   6. MOBILE TOGGLER
-   ═══════════════════════════════════════════════════════ */
+.nav-call {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-pill);
+  background: var(--brand-accent);
+  color: #ffffff;
+  border: 1.5px solid var(--brand-accent);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color     var(--dur-fast) var(--ease-out),
+    box-shadow       var(--dur-base) var(--ease-out),
+    transform        var(--dur-fast) var(--ease-out);
+}
+.nav-call:hover {
+  background: var(--itz-red-400);
+  border-color: var(--itz-red-400);
+  color: #ffffff;
+  box-shadow: 0 8px 20px -6px rgba(212, 40, 28, 0.5);
+  transform: translateY(-1px);
+}
+.nav-call .lucide,
+.nav-call svg { width: 1.1rem; height: 1.1rem; }
+
+/* ── Hamburger (mobile only) ───────────────────────────── */
 .nav-toggler {
   display: none;
   align-items: center;
@@ -215,86 +226,264 @@
   width: 2.75rem;
   height: 2.75rem;
   border-radius: var(--radius-pill);
-  border: 1.5px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-primary);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   cursor: pointer;
+  flex-shrink: 0;
   transition:
     border-color var(--dur-fast) var(--ease-out),
     background-color var(--dur-fast) var(--ease-out);
 }
 .nav-toggler:hover {
-  border-color: var(--brand-primary);
-  background: var(--brand-primary-soft);
+  border-color: var(--brand-highlight);
+  background: rgba(255, 255, 255, 0.18);
 }
-
 .nav-toggler .lucide,
-.nav-toggler svg { width: 1.25rem; height: 1.25rem; }
+.nav-toggler svg { width: 1.3rem; height: 1.3rem; }
 
-/* ═══════════════════════════════════════════════════════
-   7. RESPONSIVE — collapse into a drawer below md
-   ═══════════════════════════════════════════════════════ */
-@media (max-width: 991.98px) {
-  .nav-toggler { display: inline-flex; }
+/* ── Desktop ≥ 992px ──────────────────────────────────── */
+@media (min-width: 992px) {
+  .nav-toggler { display: none; }
+  .drawer-header,
+  .drawer-call-wrap { display: none !important; }
 
   .nav-links {
-    position: fixed;
-    inset: 0 0 0 auto;
-    width: min(20rem, 85vw);
-    padding: 5rem var(--space-5) var(--space-5);
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-1);
-    background: var(--bg-card);
-    box-shadow: -12px 0 32px -12px rgba(15, 23, 42, 0.18);
-    transform: translateX(100%);
-    transition: transform var(--dur-slow) var(--ease-out);
-    z-index: calc(var(--z-sticky) + 1);
-    overflow-y: auto;
-  }
-
-  .nav-links.is-open { transform: translateX(0); }
-
-  .nav-link {
-    padding: var(--space-3) var(--space-4);
-    font-size: var(--fs-lg);
-    border-radius: var(--radius-md);
-  }
-
-  .nav-link[aria-current="page"]::after { display: none; }
-  .nav-link[aria-current="page"] {
-    background-color: var(--brand-primary-soft);
+    display: flex !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    transform: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    flex-direction: row !important;
+    margin: 0 !important;
+    overflow: visible !important;
   }
 }
 
-/* Backdrop for mobile drawer */
+/* ── Mobile < 992px ───────────────────────────────────── */
+@media (max-width: 991.98px) {
+  .nav-call { display: none !important; }
+  .nav-toggler { display: inline-flex !important; }
+
+  .site-nav .container {
+    min-height: 90px;
+    gap: var(--space-3);
+    padding-left: clamp(1.25rem, 4vw, 2rem) !important;
+    padding-right: clamp(1.25rem, 4vw, 2rem) !important;
+  }
+
+  .nav-left { gap: var(--space-3); }
+
+  .brand {
+    border-radius: 12px;
+    padding: 4px;
+  }
+  .brand-logo {
+    height: clamp(56px, 12vw, 72px);
+    max-width: clamp(150px, 45vw, 220px);
+    border-radius: 8px;
+  }
+
+  .nav-links {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: min(22rem, 88vw) !important;
+    height: 100dvh !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--space-2);
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none;
+
+    background: linear-gradient(135deg, var(--itz-green-700) 0%, var(--itz-green-900) 100%) !important;
+    box-shadow: -12px 0 32px -12px rgba(0, 0, 0, 0.55) !important;
+
+    transform: translateX(100%) !important;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+
+    transition:
+      transform var(--dur-slow) var(--ease-out),
+      opacity   var(--dur-base) var(--ease-out),
+      visibility 0s linear var(--dur-slow);
+
+    z-index: calc(var(--z-sticky) + 1) !important;
+    overflow-y: auto;
+  }
+  .nav-links.is-open {
+    transform: translateX(0) !important;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transition:
+      transform var(--dur-slow) var(--ease-out),
+      opacity   var(--dur-base) var(--ease-out),
+      visibility 0s linear 0s;
+  }
+
+  .drawer-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    margin-bottom: var(--space-2);
+  }
+  .drawer-brand {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    line-height: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    padding: 4px;
+    box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.5);
+  }
+  .drawer-logo {
+    display: block;
+    height: 60px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  .drawer-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .drawer-close:hover {
+    border-color: var(--brand-highlight);
+    color: var(--brand-highlight);
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .drawer-close .lucide,
+  .drawer-close svg { width: 1.25rem; height: 1.25rem; }
+
+  .nav-link {
+    padding: var(--space-3) var(--space-5) !important;
+    font-size: var(--fs-lg);
+    border-radius: 0;
+    justify-content: flex-start !important;
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: var(--fw-medium);
+  }
+  .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+  }
+  .nav-link .lucide,
+  .nav-link svg { width: 1.35rem; height: 1.35rem; }
+
+  .nav-link[aria-current="page"] {
+    background: rgba(255, 255, 255, 0.14);
+    border-left: 4px solid var(--brand-highlight);
+    padding-left: calc(var(--space-5) - 4px) !important;
+    color: #ffffff;
+  }
+  .nav-link[aria-current="page"]::after { display: none !important; }
+
+  .drawer-call-wrap {
+    display: block !important;
+    margin-top: auto;
+    padding: var(--space-5);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+  .drawer-call {
+    width: 100%;
+    justify-content: center;
+    padding-block: var(--space-3) !important;
+    font-size: var(--fs-base) !important;
+    background: var(--brand-accent) !important;
+    border-color: var(--brand-accent) !important;
+    color: #ffffff !important;
+  }
+}
+
+/* ── Backdrop ──────────────────────────────────────────── */
 .nav-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(10, 15, 13, 0.55);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--dur-base) var(--ease-out);
   z-index: var(--z-sticky);
+  display: none;
 }
-.nav-backdrop.is-open {
-  opacity: 1;
-  pointer-events: auto;
+.nav-backdrop.is-open { opacity: 1; pointer-events: auto; }
+@media (max-width: 991.98px) {
+  .nav-backdrop:not([hidden]) { display: block; }
 }
 
-/* ═══════════════════════════════════════════════════════
-   8. REDUCED MOTION
-   ═══════════════════════════════════════════════════════ */
-@media (prefers-reduced-motion: reduce) {
-  .site-header,
-  .brand-logo,
-  .nav-links,
-  .nav-backdrop,
-  .cart-btn,
-  .nav-toggler {
-    transition: none;
+/* ── Tight widths ──────────────────────────────────────── */
+@media (max-width: 576px) {
+  .site-nav .container {
+    min-height: 76px;
+    gap: var(--space-2);
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
   }
-  .brand:hover .brand-logo { transform: none; }
-} 
+  .brand { border-radius: 10px; padding: 3px; }
+  .brand-logo {
+    height: clamp(48px, 14vw, 64px);
+    max-width: clamp(130px, 50vw, 190px);
+    border-radius: 8px;
+  }
+  .nav-left { gap: var(--space-2); }
+  .nav-actions { gap: var(--space-2); }
+  .cart-btn, .nav-toggler { width: 2.5rem; height: 2.5rem; }
+}
+@media (max-width: 380px) {
+  .site-nav .container {
+    min-height: 66px;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .brand { border-radius: 8px; padding: 2px; }
+  .brand-logo {
+    height: clamp(42px, 13vw, 54px);
+    max-width: 48vw;
+    border-radius: 6px;
+  }
+  .cart-btn, .nav-toggler { width: 2.25rem; height: 2.25rem; }
+}
+
+/* ── Reduced motion ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .site-header, .brand-logo, .nav-links, .nav-backdrop,
+  .cart-btn, .nav-toggler, .drawer-close, .nav-call, .brand {
+    transition: none !important;
+  }
+  .brand:hover { transform: none; }
+  .nav-call:hover { transform: none; }
+}

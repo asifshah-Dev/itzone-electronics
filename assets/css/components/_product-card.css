@@ -1,1 +1,43 @@
- 
+/* Append to assets/css/components/_product-card.css
+   ─────────────────────────────────────────────────────────
+   Contact card micro-styling (used on pages/contact.html).
+   ───────────────────────────────────────────────────────── */
+
+.contact-card {
+  transition: box-shadow var(--dur-base) var(--ease-out),
+              transform    var(--dur-base) var(--ease-out);
+}
+.contact-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.contact-card-icon {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--brand-primary);
+  margin-bottom: var(--space-3);
+  stroke-width: 2;
+}
+
+.contact-card .card-title {
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-lg);
+  margin-bottom: var(--space-2);
+  letter-spacing: var(--ls-tight);
+}
+
+.contact-card .card-link {
+  font-weight: var(--fw-medium);
+  color: var(--brand-primary);
+}
+.contact-card .card-link:hover {
+  color: var(--brand-primary-hover);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.contact-card .card-text {
+  color: var(--text-secondary);
+}

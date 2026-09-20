@@ -1,21 +1,13 @@
 /* assets/css/utilities/_overrides.css
    ─────────────────────────────────────────────────────────
    The ONLY file allowed to override Bootstrap classes.
-
-   Rules:
-   1. Never use !important. Use --bs-* hooks or higher
-      specificity within this file.
-   2. Never redefine a Bootstrap class you don't use.
-   3. If you can express it with a token, do so.
+   Never use !important here unless documented.
    ───────────────────────────────────────────────────────── */
 
 /* ═══════════════════════════════════════════════════════
-   1. Re-map Bootstrap's theme variables to our tokens.
-      This runs AFTER bootstrap.min.css in the cascade,
-      so our values win.
+   1. Re-map Bootstrap's theme to our tokens
    ═══════════════════════════════════════════════════════ */
 :root {
-  /* Brand */
   --bs-primary:       var(--brand-primary);
   --bs-primary-rgb:   11, 94, 46;
   --bs-primary-text-emphasis: var(--itz-green-900);
@@ -25,13 +17,11 @@
   --bs-danger:        var(--brand-accent);
   --bs-danger-rgb:    193, 18, 31;
 
-  /* Surfaces */
   --bs-body-bg:       var(--bg-page);
   --bs-body-color:    var(--text-primary);
   --bs-secondary-bg:  var(--bg-subtle);
   --bs-tertiary-bg:   var(--itz-ink-100);
 
-  /* Typography */
   --bs-body-font-family:      var(--font-sans);
   --bs-body-font-size:        var(--fs-base);
   --bs-body-font-weight:      var(--fw-regular);
@@ -43,7 +33,6 @@
   --bs-link-hover-color-rgb:  11, 61, 31;
   --bs-link-decoration:       none;
 
-  /* Borders & radii */
   --bs-border-color:          var(--border-color);
   --bs-border-color-translucent: rgba(15, 23, 42, 0.08);
   --bs-border-radius:         var(--radius-md);
@@ -53,17 +42,14 @@
   --bs-border-radius-xxl:     var(--radius-2xl);
   --bs-border-radius-pill:    var(--radius-pill);
 
-  /* Shadows */
   --bs-box-shadow-sm: var(--shadow-sm);
   --bs-box-shadow:    var(--shadow-md);
   --bs-box-shadow-lg: var(--shadow-lg);
 
-  /* Focus ring */
-  --bs-focus-ring-color: rgba(11, 94, 46, 0.35);
-  --bs-focus-ring-width: 3px;
+  --bs-focus-ring-color:  rgba(11, 94, 46, 0.35);
+  --bs-focus-ring-width:  3px;
   --bs-focus-ring-offset: 2px;
 
-  /* Buttons — default padding/radius reuse our tokens */
   --bs-btn-font-family:      var(--font-sans);
   --bs-btn-font-weight:      var(--fw-semibold);
   --bs-btn-border-radius:    var(--radius-pill);
@@ -73,31 +59,53 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   2. Container width — align Bootstrap's container with
-      our --container-max (overrides BS default 1320px @xxl).
+   2. CONTAINER — the missing link
+
+   Bootstrap's `.container` only sets `width` inside media
+   queries. Below 576px it has NO width, so it inherits from
+   its parent block context. If any parent constrains width,
+   the container collapses.
+
+   We fix this by declaring `width: 100%` unconditionally,
+   then letting Bootstrap's responsive max-widths take over
+   for larger viewports. We only override at the top end
+   (xxl → 1240px).
    ═══════════════════════════════════════════════════════ */
+.container,
+.container-fluid,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl {
+  width: 100%;
+  padding-inline: var(--container-pad, 1rem);
+  margin-inline: auto;
+}
+
 @media (min-width: 1400px) {
   .container,
   .container-lg,
   .container-xl,
   .container-xxl {
-    max-width: var(--container-max);
+    max-width: var(--container-max, 1240px);
   }
 }
 
-/* ═══════════════════════════════════════════════════════
-   3. Small global fixes
-   ═══════════════════════════════════════════════════════ */
+/* Navbar container gets space-between for flex layout */
+.site-nav .container {
+  justify-content: space-between;
+}
 
-/* Bootstrap underlines links on hover by default.
-   We don't want that; we use color change + weight. */
+/* ═══════════════════════════════════════════════════════
+   3. Links
+   ═══════════════════════════════════════════════════════ */
 a { text-decoration: none; }
 a:hover { text-decoration: none; }
 
-/* Bootstrap's .btn uses --bs-btn-* tokens; our :root
-   remap above handles most of it. But the default .btn
-   still ships with its own padding/radius cascade, so we
-   nudge the transition + cursor for consistency. */
+/* ═══════════════════════════════════════════════════════
+   4. Buttons base
+   ═══════════════════════════════════════════════════════ */
 .btn {
   cursor: pointer;
   transition:
@@ -108,24 +116,31 @@ a:hover { text-decoration: none; }
     transform        var(--dur-fast) var(--ease-out);
 }
 
-/* Bootstrap's utilities like .gap-3 use fixed values.
-   We don't override them — they're fine. But we DO want
-   .g-4 and .g-5 in grids to feel consistent with our scale. */
+/* ═══════════════════════════════════════════════════════
+   5. Grid gutters
+   ═══════════════════════════════════════════════════════ */
 .row.g-4 { --bs-gutter-x: var(--space-5); --bs-gutter-y: var(--space-5); }
 .row.g-5 { --bs-gutter-x: var(--space-6); --bs-gutter-y: var(--space-6); }
 
-/* .card sits on --bs-card-* — remap to our tokens */
+/* ═══════════════════════════════════════════════════════
+   6. Cards
+   ═══════════════════════════════════════════════════════ */
 .card {
-  --bs-card-bg:      var(--bg-card);
-  --bs-card-border-color: var(--border-color);
-  --bs-card-border-radius: var(--radius-lg);
-  --bs-card-inner-border-radius: calc(var(--radius-lg) - 1px);
-  --bs-card-spacer-x: var(--space-5);
-  --bs-card-spacer-y: var(--space-5);
+  --bs-card-bg:                   var(--bg-card);
+  --bs-card-border-color:         var(--border-color);
+  --bs-card-border-radius:        var(--radius-lg);
+  --bs-card-inner-border-radius:  calc(var(--radius-lg) - 1px);
+  --bs-card-spacer-x:             var(--space-5);
+  --bs-card-spacer-y:             var(--space-5);
+  --bs-card-cap-bg:               var(--bg-card);
+  --bs-card-color:                var(--text-primary);
+  --bs-card-title-color:          var(--text-primary);
+  --bs-card-subtitle-color:       var(--text-muted);
 }
 
-/* Navbar — Bootstrap defaults to a slightly off-white;
-   lock it to our card white so the sticky navbar reads clean. */
+/* ═══════════════════════════════════════════════════════
+   7. Navbar variables
+   ═══════════════════════════════════════════════════════ */
 .navbar {
   --bs-navbar-padding-y: var(--space-3);
   --bs-navbar-color: var(--text-primary);
@@ -134,4 +149,4 @@ a:hover { text-decoration: none; }
   --bs-navbar-brand-hover-color: var(--brand-primary);
   --bs-navbar-toggler-border-color: var(--border-color);
   --bs-navbar-toggler-focus-width: 3px;
-} 
+}

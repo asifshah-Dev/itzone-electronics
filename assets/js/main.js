@@ -1,43 +1,80 @@
 // assets/js/main.js
 /* ─────────────────────────────────────────────────────────
-   App bootstrap (classic script, deferred).
-   Step 4: mounts Navbar + Footer on every page.
+   App bootstrap. Mounts chrome, then route content.
    ───────────────────────────────────────────────────────── */
 
 (function () {
   'use strict';
 
-  const ITZone = (window.ITZone = window.ITZone || {});
+  if (window.ITZone?.__booted) {
+    console.info('[IT Zone] already booted — skip.');
+    return;
+  }
 
-  /** Re-render all Lucide placeholders currently in the DOM. */
+  const ITZone = (window.ITZone = window.ITZone || {});
+  ITZone.__booted = true;
+
   ITZone.renderIcons = function (root) {
-    if (typeof window.lucide?.createIcons !== 'function') return;
-    window.lucide.createIcons({
-      nameAttr: 'data-lucide',
-      attrs: { 'stroke-width': 2, 'aria-hidden': 'true' },
-      ...(root ? { root } : {}),
-    });
+    if (typeof window.lucide?.createIcons !== 'function') {
+      if (!ITZone._warnedLucide) {
+        console.warn('[IT Zone] Lucide missing — icons skipped.');
+        ITZone._warnedLucide = true;
+      }
+      return;
+    }
+    try {
+      window.lucide.createIcons({
+        nameAttr: 'data-lucide',
+        attrs: { 'stroke-width': 2, 'aria-hidden': 'true' },
+        ...(root ? { root } : {}),
+      });
+    } catch (err) {
+      console.error('[IT Zone] Lucide render failed:', err);
+    }
+  };
+
+  function vendorStatus() {
+    return {
+      bootstrap: typeof window.bootstrap !== 'undefined',
+      lucide:    typeof window.lucide !== 'undefined' &&
+                 typeof window.lucide.createIcons === 'function',
+    };
+  }
+
+  const ROUTES = {
+    home: () => window.ITZone.Hero?.mount(),
+    pcs:  () => window.ITZone.pcsPage?.init(),
   };
 
   function boot() {
     const page = document.body.dataset.page || 'home';
+    const vendors = vendorStatus();
 
-    // Mount persistent chrome
-    ITZone.Navbar?.mount();
-    ITZone.Footer?.mount();
+    // 1. Persistent chrome
+    try { ITZone.Navbar?.mount(); } catch (e) { console.error('Navbar:', e); }
+    try { ITZone.Footer?.mount(); } catch (e) { console.error('Footer:', e); }
 
-    console.info(`[IT Zone] booted — page="${page}"` +
-      ` | bootstrap ${window.bootstrap ? '✓' : '✗'}` +
-      ` | lucide ${window.lucide ? '✓' : '✗'}`);
-
-    // Ensure skip-link target is focusable
+    // 2. Skip-link target
     const main = document.getElementById('main');
     if (main && !main.hasAttribute('tabindex')) {
       main.setAttribute('tabindex', '-1');
     }
 
-    // Icons inside dynamically injected chrome
+    // 3. Icons inside chrome
     ITZone.renderIcons();
+
+    // 4. Page content
+    const route = ROUTES[page];
+    if (route) {
+      try { route(); } catch (e) { console.error(`Route "${page}" error:`, e); }
+    }
+
+    // 5. Boot log
+    const ok = (b) => b ? '✓' : '✗';
+    console.info(
+      `[IT Zone] booted — page="${page}" | ` +
+      `bootstrap ${ok(vendors.bootstrap)} | lucide ${ok(vendors.lucide)}`
+    );
   }
 
   if (document.readyState === 'loading') {

@@ -1,0 +1,72 @@
+/* assets/css/utilities/_emergency.css
+   ─────────────────────────────────────────────────────────
+   EMERGENCY CONTAINER FIX.
+   Forces Bootstrap's container to span the full viewport up
+   to our max-width, at EVERY breakpoint, regardless of any
+   other rule in the project.
+   ───────────────────────────────────────────────────────── */
+
+/* Force html/body to full width */
+html,
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+}
+
+/* Force every section/header/footer/main to full width */
+header,
+footer,
+main,
+section,
+nav {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* THE container fix — beats everything */
+.container,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl,
+.site-nav .container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* On wide screens, cap at 1240px */
+@media (min-width: 1400px) {
+  .container,
+  .container-lg,
+  .container-xl,
+  .container-xxl {
+    max-width: 1240px !important;
+  }
+}
+
+/* Force grid rows/cols to full width */
+.row {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+[class*="col-"] {
+  box-sizing: border-box !important;
+}
+
+/* Force contact page cards to be at least reasonable width */
+@media (min-width: 576px) {
+  .contact-card {
+    min-width: 200px;
+  }
+}

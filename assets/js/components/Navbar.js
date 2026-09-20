@@ -1,9 +1,7 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
-   Navbar component.
-   Injects the site header markup into <header class="site-header">
-   on every page, wires the mobile drawer, marks the active link
-   via <body data-page>, and provides a cart-badge API for Step 9.
+   Navbar layout (LEFT → RIGHT):
+     [LOGO]  [Laptops]  [PCs & Monitors]  ...spacer...  [🛒]  [📞 Call 0326 597 4741]
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -11,33 +9,49 @@
 
   const NS = (window.ITZone = window.ITZone || {});
 
-  /* ── Nav model — one source of truth ────────────────────
-     Add new pages here; they appear on every page's navbar. */
+  const PHONE_DISPLAY = '0326 597 4741';
+  const PHONE_TEL     = 'tel:+923265974741';
+
   const NAV_ITEMS = [
-    { id: 'home',      label: 'Home',     href: 'index.html',              icon: 'home' },
-    { id: 'inventory', label: 'Laptops',  href: 'pages/inventory.html',    icon: 'laptop' },
-    { id: 'reviews',   label: 'Reviews',  href: '#reviews',                icon: 'star' },
-    { id: 'contact',   label: 'Contact',  href: 'pages/contact.html',      icon: 'mail' },
+    { id: 'inventory', label: 'Laptops',        href: 'pages/inventory.html', icon: 'laptop' },
+    { id: 'pcs',       label: 'PCs & Monitors', href: 'pages/pcs.html',       icon: 'monitor' },
   ];
 
-  /* ── Compute the correct href relative to the current page.
-     GitHub Pages serves at /<repo>/ — pages in /pages/ need
-     ../ prefixes; index.html needs plain paths. ───────────── */
-  function isInPagesDir() {
-    return /\/(pages)\//.test(window.location.pathname);
-  }
+  function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
 
   function resolveHref(href) {
-    // Hash-only links (e.g. #reviews) and external URLs pass through
     if (href.startsWith('#')) return isInPagesDir() ? `../index.html${href}` : href;
-    if (/^https?:/.test(href)) return href;
-    // Normalize relative paths for /pages/ context
+    if (/^https?:|^tel:|^mailto:/.test(href)) return href;
     if (isInPagesDir()) return href.startsWith('pages/') ? href.replace('pages/', '') : `../${href}`;
     return href;
   }
 
-  /* ── Markup template ───────────────────────────────────── */
+  function inlineLogoSVG(cls) {
+    return `
+      <svg class="${cls || 'brand-logo'}" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="itzGreenNav" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#0d4a26"/>
+            <stop offset="100%" stop-color="#1fa050"/>
+          </linearGradient>
+          <linearGradient id="itzRedNav" x1="60" y1="15" x2="60" y2="65" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#e8382a"/>
+            <stop offset="100%" stop-color="#8a0f0a"/>
+          </linearGradient>
+        </defs>
+        <path d="M 22 40 A 48 48 0 1 0 98 40" stroke="url(#itzGreenNav)" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <path d="M 38 34 A 22 22 0 1 0 82 34" stroke="url(#itzRedNav)" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <rect x="54" y="14" width="12" height="34" rx="6" fill="url(#itzRedNav)"/>
+        <rect x="40" y="70" width="14" height="42" rx="4" fill="url(#itzGreenNav)"/>
+        <rect x="66" y="70" width="14" height="42" rx="4" fill="url(#itzGreenNav)"/>
+        <path d="M 66 74 L 90 74 L 90 82 L 66 82 Z" fill="url(#itzGreenNav)"/>
+      </svg>
+    `;
+  }
+
   function template(currentPage) {
+    const logoSrc = resolveHref('assets/img/logo.svg');
+
     const links = NAV_ITEMS.map((item) => {
       const isActive = item.id === currentPage;
       return `
@@ -55,23 +69,53 @@
       <nav class="navbar site-nav" aria-label="Primary">
         <div class="container">
 
-          <a class="brand" href="${resolveHref('index.html')}" aria-label="IT Zone Electronics — Home">
-            <img src="${resolveHref('assets/img/logo.svg')}"
-                 alt="" width="44" height="44"
-                 class="brand-logo"
-                 fetchpriority="high"
-                 decoding="async">
-            <span class="brand-text">
-              <span class="brand-name">IT ZONE</span>
-              <span class="brand-tag">Electronics</span>
-            </span>
-          </a>
+          <!-- ── LEFT: LOGO FIRST, then nav links ─────────── -->
+          <div class="nav-left">
 
-          <ul class="nav-links" id="primary-menu">
-            ${links}
-          </ul>
+            <a class="brand"
+               href="${resolveHref('index.html')}"
+               aria-label="IT Zone Electronics — Home">
+              <img class="brand-logo"
+                   src="${logoSrc}"
+                   alt="IT Zone Electronics"
+                   decoding="async"
+                   fetchpriority="high">
+            </a>
 
+            <ul class="nav-links" id="primary-menu">
+              <!-- Drawer header (mobile only) -->
+              <li class="drawer-header">
+                <a class="drawer-brand"
+                   href="${resolveHref('index.html')}"
+                   aria-label="IT Zone Electronics — Home">
+                  <img class="drawer-logo"
+                       src="${logoSrc}"
+                       alt="IT Zone Electronics"
+                       decoding="async">
+                </a>
+                <button type="button"
+                        class="drawer-close"
+                        id="drawer-close"
+                        aria-label="Close menu">
+                  <i data-lucide="x"></i>
+                </button>
+              </li>
+
+              ${links}
+
+              <li class="drawer-call-wrap">
+                <a href="${PHONE_TEL}" class="btn btn-brand drawer-call">
+                  <i data-lucide="phone"></i>
+                  <span>Call ${PHONE_DISPLAY}</span>
+                </a>
+              </li>
+            </ul>
+
+          </div>
+
+          <!-- ── RIGHT: cart + call ──────────────────────── -->
           <div class="nav-actions">
+
             <button type="button"
                     class="cart-btn"
                     id="cart-trigger"
@@ -80,9 +124,10 @@
               <span class="cart-count" id="cart-count" data-visible="false">0</span>
             </button>
 
-            <a href="tel:+923001234567" class="btn btn-brand d-none d-md-inline-flex">
+            <a href="${PHONE_TEL}"
+               class="btn btn-brand nav-call">
               <i data-lucide="phone"></i>
-              <span>Call now</span>
+              <span>Call ${PHONE_DISPLAY}</span>
             </a>
 
             <button type="button"
@@ -93,6 +138,7 @@
                     aria-controls="primary-menu">
               <i data-lucide="menu"></i>
             </button>
+
           </div>
 
         </div>
@@ -101,39 +147,73 @@
     `;
   }
 
-  /* ── Wire behaviours ───────────────────────────────────── */
+  function attachLogoFallback(root) {
+    root.querySelectorAll('img.brand-logo, img.drawer-logo').forEach((img) => {
+      img.addEventListener('error', () => {
+        console.warn('[IT Zone] logo.svg failed — inline fallback.');
+        const wrapper = document.createElement('div');
+        const cls = img.classList.contains('drawer-logo') ? 'drawer-logo' : 'brand-logo';
+        wrapper.innerHTML = inlineLogoSVG(cls).trim();
+        img.replaceWith(wrapper.firstElementChild);
+      }, { once: true });
+    });
+  }
+
   function wire(root) {
     const toggler  = root.querySelector('#nav-toggler');
     const menu     = root.querySelector('#primary-menu');
     const backdrop = root.querySelector('#nav-backdrop');
+    const closeBtn = root.querySelector('#drawer-close');
     const header   = document.querySelector('.site-header');
 
     if (!toggler || !menu || !backdrop) return;
 
+    menu.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
+    backdrop.hidden = true;
+    document.documentElement.style.overflow = '';
+
+    const lockScroll = (on) => { document.documentElement.style.overflow = on ? 'hidden' : ''; };
+
+    const setIcon = (el, name) => {
+      el.innerHTML = `<i data-lucide="${name}"></i>`;
+      NS.renderIcons?.(el);
+    };
+
     const openMenu = () => {
       menu.classList.add('is-open');
       backdrop.hidden = false;
-      // rAF so the transition fires after `hidden` is removed
-      requestAnimationFrame(() => backdrop.classList.add('is-open'));
+      void backdrop.offsetWidth;
+      backdrop.classList.add('is-open');
       toggler.setAttribute('aria-expanded', 'true');
-      toggler.setAttribute('aria-label', 'Close menu');
-      toggler.innerHTML = '<i data-lucide="x"></i>';
-      NS.renderIcons?.(toggler);
+      setIcon(toggler, 'x');
+      lockScroll(true);
     };
 
     const closeMenu = () => {
       menu.classList.remove('is-open');
       backdrop.classList.remove('is-open');
       toggler.setAttribute('aria-expanded', 'false');
-      toggler.setAttribute('aria-label', 'Open menu');
-      toggler.innerHTML = '<i data-lucide="menu"></i>';
-      NS.renderIcons?.(toggler);
+      setIcon(toggler, 'menu');
+      lockScroll(false);
       window.setTimeout(() => { backdrop.hidden = true; }, 250);
     };
 
-    toggler.addEventListener('click', () => {
+    if (toggler.dataset.bound === 'true') return;
+    toggler.dataset.bound = 'true';
+
+    toggler.addEventListener('click', (e) => {
+      e.preventDefault();
       menu.classList.contains('is-open') ? closeMenu() : openMenu();
     });
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeMenu();
+        toggler.focus();
+      });
+    }
 
     backdrop.addEventListener('click', closeMenu);
 
@@ -144,33 +224,31 @@
       }
     });
 
-    // Close drawer if viewport grows past md
     const mq = window.matchMedia('(min-width: 992px)');
-    mq.addEventListener('change', (e) => {
-      if (e.matches && menu.classList.contains('is-open')) closeMenu();
-    });
+    const mqHandler = (e) => { if (e.matches && menu.classList.contains('is-open')) closeMenu(); };
+    if (mq.addEventListener) mq.addEventListener('change', mqHandler);
+    else if (mq.addListener) mq.addListener(mqHandler);
 
-    // Sticky header shadow on scroll
     if (header) {
-      const onScroll = () => {
-        header.classList.toggle('is-scrolled', window.scrollY > 8);
-      };
+      const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
       onScroll();
       window.addEventListener('scroll', onScroll, { passive: true });
     }
   }
 
-  /* ── Public API ────────────────────────────────────────── */
   function mount() {
     const host = document.querySelector('.site-header');
     if (!host) return;
+    if (host.dataset.mounted === 'true') return;
+    host.dataset.mounted = 'true';
 
     const currentPage = document.body.dataset.page || 'home';
     host.innerHTML = template(currentPage);
-    wire(host);
 
+    attachLogoFallback(host);
+    wire(host);
     NS.renderIcons?.(host);
   }
 
   NS.Navbar = { mount };
-})(); 
+})();

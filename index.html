@@ -1,18 +1,15 @@
- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b5e2e">
+  <meta name="theme-color" content="#0d4a26">
 
-  <!-- ── SEO ─────────────────────────────────────────────── -->
   <title>IT Zone Electronics — Premium Refurbished Business Laptops in Pakistan</title>
   <meta name="description"
         content="Buy certified refurbished Dell, HP, and Lenovo business laptops in Karachi. 1-year warranty, nationwide delivery, tested quality.">
   <link rel="canonical" href="https://itzone.pk/">
 
-  <!-- Open Graph -->
   <meta property="og:type"        content="website">
   <meta property="og:title"       content="IT Zone Electronics — Premium Business Laptops">
   <meta property="og:description" content="Certified refurbished laptops from Dell, HP, Lenovo.">
@@ -21,22 +18,20 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
-  <!-- Twitter -->
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="IT Zone Electronics — Premium Business Laptops">
   <meta name="twitter:image"       content="https://itzone.pk/assets/img/og/og-default.jpg">
 
-  <!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet">
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
 
-<!-- Styles: Bootstrap (Step 3 adds the file; leave the link here now) -->
-<link rel="stylesheet" href="assets/css/vendors/bootstrap.min.css">
-<link rel="stylesheet" href="assets/css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
-  <!-- ── Structured data (Organization) ─────────────────── -->
+  <link rel="stylesheet" href="assets/css/vendors/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/main.css">
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -46,7 +41,7 @@
     "logo": "https://itzone.pk/assets/img/logo.svg",
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+92-300-1234567",
+      "telephone": "+92-326-597-4741",
       "contactType": "sales",
       "areaServed": "PK"
     }
@@ -56,44 +51,52 @@
 
 <body data-page="home">
 
-  <!-- ── Skip link (a11y) ─────────────────────────────────── -->
   <a href="#main" class="skip-link">Skip to main content</a>
 
-  <!-- ── Header / Navbar (Step 4) ─────────────────────────── -->
-  <header class="site-header">
-    <!-- <Navbar /> will be injected here by components/Navbar.js -->
-  </header>
+  <header class="site-header"></header>
 
- <main id="main" tabindex="-1">
+  <main id="main" tabindex="-1">
 
-  <!-- Placeholder — real hero arrives in Step 5 -->
-  <section class="section">
-    <div class="container">
-      <h1>Premium business laptops, <span class="text-gradient-brand">driven by values</span>.</h1>
-      <p class="section-subtitle">
-        Dell · HP · Lenovo — tested, warrantied, delivered nationwide.
-      </p>
-    </div>
-  </section>
+    <!-- Hero -->
+    <section id="hero-slot" class="hero-section" aria-labelledby="hero-title-heading"></section>
 
-</main>
+    <!-- Inventory preview — filled in Step 8 -->
+    <section id="inventory" class="section" aria-labelledby="inventory-heading">
+      <div class="container">
+        <h2 id="inventory-heading" class="section-title">Available inventory</h2>
+        <p class="section-subtitle">Browse our full catalog — coming next.</p>
+      </div>
+    </section>
 
-  <!-- ── Footer (Step 11) ─────────────────────────────────── -->
-  <footer class="site-footer">
-    <!-- filled in Step 11 -->
-  </footer>
+    <!-- Reviews — filled in Step 10 -->
+    <section id="reviews" class="section-tight" aria-labelledby="reviews-heading">
+      <div class="container">
+        <h2 id="reviews-heading" class="section-title">What our customers say</h2>
+        <p class="section-subtitle">Customer reviews coming next.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer"></footer>
 
   <!-- Vendors -->
-<script defer src="assets/js/vendors/bootstrap.bundle.min.js"></script>
-<script defer src="assets/js/vendors/lucide.min.js"></script>
+  <script defer src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+  <script defer src="assets/js/vendors/lucide.min.js"></script>
 
-<!-- Components (mount into <header>/<footer>) -->
-<script defer src="assets/js/components/Navbar.js"></script>
-<script defer src="assets/js/components/Footer.js"></script>
+  <!-- Core -->
+  <script defer src="assets/js/core/data.js"></script>
 
-<!-- App bootstrap (must be last) -->
-<script defer src="assets/js/main.js"></script>
+  <!-- Components -->
+  <script defer src="assets/js/components/Navbar.js"></script>
+  <script defer src="assets/js/components/Footer.js"></script>
+  <script defer src="assets/js/components/Hero.js"></script>
 
+  <!-- Page modules -->
+  <script defer src="assets/js/pages/pcs.page.js"></script>
+
+  <!-- App bootstrap (last) -->
+  <script defer src="assets/js/main.js"></script>
 
 </body>
 </html>

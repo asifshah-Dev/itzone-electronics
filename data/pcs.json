@@ -1,0 +1,30 @@
+{
+  "desktops": [
+    { "id": "pc-d-01", "brand": "DELL",   "model": "OPTIPLEX 7070", "cpu": "I7 9TH", "ram": 8,  "hdd": "256GB SSD", "gpu": "", "price": 65000 },
+    { "id": "pc-d-02", "brand": "HP",     "model": "280 G2",        "cpu": "I5 6TH", "ram": 8,  "hdd": "128GB SSD", "gpu": "", "price": 35000 },
+    { "id": "pc-d-03", "brand": "DELL",   "model": "OPTIPLEX 7010", "cpu": "I5 13TH","ram": 8,  "hdd": "256GB SSD", "gpu": "", "price": 115000 },
+    { "id": "pc-d-04", "brand": "LENOVO", "model": "V520S",         "cpu": "I5 7TH", "ram": 8,  "hdd": "256GB SSD", "gpu": "", "price": 45000 },
+    { "id": "pc-d-05", "brand": "DELL",   "model": "VOSTRO 3268",   "cpu": "I5 7TH", "ram": 8,  "hdd": "256GB SSD", "gpu": "", "price": 45000 },
+    { "id": "pc-d-06", "brand": "LENOVO", "model": "P300",          "cpu": "XEON E3 1231 V3", "ram": 8, "hdd": "1TB", "gpu": "2GB NVIDIA DDR3", "price": 30000 },
+    { "id": "pc-d-07", "brand": "HP",     "model": "800 G1",        "cpu": "I5 4TH", "ram": 8,  "hdd": "128GB SSD", "gpu": "", "price": 23000 },
+    { "id": "pc-d-08", "brand": "HP",     "model": "800 G3",        "cpu": "I7 7TH", "ram": 32, "hdd": "256GB SSD", "gpu": "4GB RADEON DDR5", "price": 85000 },
+    { "id": "pc-d-09", "brand": "LENOVO", "model": "P310",          "cpu": "I7 6TH", "ram": 16, "hdd": "256GB SSD", "gpu": "2GB NVIDIA DDR3", "price": 52000 },
+    { "id": "pc-d-10", "brand": "HP",     "model": "800 G3",        "cpu": "I7 7TH", "ram": 32, "hdd": "256GB SSD", "gpu": "", "price": 75000 },
+    { "id": "pc-d-11", "brand": "DELL",   "model": "XPS 8700",      "cpu": "I7 4TH", "ram": 12, "hdd": "1TB", "gpu": "4GB NVIDIA DDR3", "price": 40000 }
+  ],
+  "tiny": [
+    { "id": "pc-t-01", "brand": "HP",   "model": "800 G1", "cpu": "I5 4TH", "ram": 8, "hdd": "128GB SSD", "gpu": "", "price": 22000 },
+    { "id": "pc-t-02", "brand": "HP",   "model": "800 G3", "cpu": "I5 7TH", "ram": 8, "hdd": "256GB SSD", "gpu": "", "price": 36000 },
+    { "id": "pc-t-03", "brand": "DELL", "model": "7060",   "cpu": "I7 8TH", "ram": 8, "hdd": "256GB SSD", "gpu": "", "price": 58000 },
+    { "id": "pc-t-04", "brand": "HP",   "model": "Z2 G4",  "cpu": "I7 8TH", "ram": 32,"hdd": "512GB SSD", "gpu": "4GB Dedicated Graphics Card", "price": 96000 },
+    { "id": "pc-t-05", "brand": "HP",   "model": "Z2 G3",  "cpu": "I7 6TH", "ram": 16,"hdd": "512GB SSD", "gpu": "2GB Dedicated Graphics Card", "price": 70000 },
+    { "id": "pc-t-06", "brand": "DELL", "model": "7050",   "cpu": "I7 6TH", "ram": 8, "hdd": "256GB SSD", "gpu": "", "price": 40000 }
+  ],
+  "monitors": [
+    { "id": "mon-01", "brand": "LG",   "model": "27QD68P",    "resolution": "4K",     "size": "27 inch bezel-less",   "price": 27000 },
+    { "id": "mon-02", "brand": "ACER", "model": "V276HL",     "resolution": "1080p",  "size": "27 inch bezel-less",   "price": 24000 },
+    { "id": "mon-03", "brand": "DELL", "model": "P2725HET",   "resolution": "1080p",  "size": "27 inch bezel-less",   "price": 24000 },
+    { "id": "mon-04", "brand": "LG",   "model": "27MD5KA-B",  "resolution": "5K",     "size": "27 inch standard bezel","price": 35000 },
+    { "id": "mon-05", "brand": "LG",   "model": "27BL650-C",  "resolution": "1080p",  "size": "27 inch bezel-less",   "price": 24000 }
+  ]
+}

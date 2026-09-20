@@ -22,3 +22,23 @@
 
 /* 5. Bootstrap overrides — MUST be last */
 @import url("utilities/_overrides.css");
+
+/* assets/css/main.css
+   ───────────────────────────────────────────────────────── */
+
+@import url("tokens.css");
+@import url("base.css");
+
+@import url("layout/_navbar.css");
+@import url("layout/_hero.css");
+@import url("layout/_grid.css");
+@import url("layout/_footer.css");
+
+@import url("components/_buttons.css");
+@import url("components/_product-card.css");
+@import url("components/_reviews.css");
+
+@import url("utilities/_overrides.css");
+
+/* ⚠️ EMERGENCY FIX — MUST BE LAST — overrides everything above */
+@import url("utilities/_emergency.css");
