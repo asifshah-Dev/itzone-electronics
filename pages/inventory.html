@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b5e2e">
+  <meta name="theme-color" content="#0d4a26">
 
   <title>All Laptops — Dell, HP, Lenovo | IT Zone Electronics</title>
   <meta name="description"
@@ -36,14 +36,21 @@
 
     <section class="section">
       <div class="container">
-        <h1>All laptops</h1>
-        <p class="section-subtitle">
-          Every machine is tested, warranted, and priced fairly. Filter below.
-        </p>
-        <div id="product-grid" class="row g-4 mt-4" role="list">
-          <!-- Populated in Step 8 -->
-          <p class="text-muted">Inventory loads in Step 8.</p>
+
+        <header class="mb-4">
+          <h1 class="section-title">All Laptops</h1>
+          <p class="section-subtitle" id="inventory-count">
+            Loading inventory…
+          </p>
+        </header>
+
+        <div class="inventory-toolbar">
+          <div class="product-filters" id="product-filters" role="group" aria-label="Filter by brand"></div>
+          <div class="product-search" id="product-search" role="search"></div>
         </div>
+
+        <div id="product-grid" role="list"></div>
+
       </div>
     </section>
 
@@ -51,10 +58,25 @@
 
   <footer class="site-footer"></footer>
 
+  <!-- Vendors -->
   <script defer src="../assets/js/vendors/bootstrap.bundle.min.js"></script>
   <script defer src="../assets/js/vendors/lucide.min.js"></script>
+
+  <!-- Core -->
+  <script defer src="../assets/js/core/data.js"></script>
+
+  <!-- Components -->
   <script defer src="../assets/js/components/Navbar.js"></script>
   <script defer src="../assets/js/components/Footer.js"></script>
+  <script defer src="../assets/js/components/ProductCard.js"></script>
+  <script defer src="../assets/js/components/ProductGrid.js"></script>
+  <script defer src="../assets/js/components/Filters.js"></script>
+  <script defer src="../assets/js/components/SearchBar.js"></script>
+
+  <!-- Page module -->
+  <script defer src="../assets/js/pages/inventory.page.js"></script>
+
+  <!-- App bootstrap (last) -->
   <script defer src="../assets/js/main.js"></script>
 
 </body>

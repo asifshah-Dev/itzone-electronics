@@ -1,6 +1,6 @@
 // assets/js/main.js
 /* ─────────────────────────────────────────────────────────
-   App bootstrap. Mounts chrome, then route content.
+   App bootstrap. Mounts chrome, then routes page content.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -42,34 +42,30 @@
   }
 
   const ROUTES = {
-    home: () => window.ITZone.Hero?.mount(),
-    pcs:  () => window.ITZone.pcsPage?.init(),
+    home:      () => window.ITZone.Hero?.mount(),
+    inventory: () => window.ITZone.inventoryPage?.init(),
+    pcs:       () => window.ITZone.pcsPage?.init(),
   };
 
   function boot() {
     const page = document.body.dataset.page || 'home';
     const vendors = vendorStatus();
 
-    // 1. Persistent chrome
     try { ITZone.Navbar?.mount(); } catch (e) { console.error('Navbar:', e); }
     try { ITZone.Footer?.mount(); } catch (e) { console.error('Footer:', e); }
 
-    // 2. Skip-link target
     const main = document.getElementById('main');
     if (main && !main.hasAttribute('tabindex')) {
       main.setAttribute('tabindex', '-1');
     }
 
-    // 3. Icons inside chrome
     ITZone.renderIcons();
 
-    // 4. Page content
     const route = ROUTES[page];
     if (route) {
       try { route(); } catch (e) { console.error(`Route "${page}" error:`, e); }
     }
 
-    // 5. Boot log
     const ok = (b) => b ? '✓' : '✗';
     console.info(
       `[IT Zone] booted — page="${page}" | ` +

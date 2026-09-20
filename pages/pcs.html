@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b5e2e">
+  <meta name="theme-color" content="#0d4a26">
 
   <title>PCs, Desktops & Monitors — IT Zone Electronics</title>
   <meta name="description"
-        content="Business desktops, tiny PCs, and professional monitors. Dell, HP, Lenovo — tested and warrantied.">
+        content="Business desktops, tiny form-factor PCs, and professional monitors. Dell, HP, Lenovo — tested and warrantied.">
   <link rel="canonical" href="https://itzone.pk/pages/pcs.html">
 
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="PCs, Desktops & Monitors — IT Zone Electronics">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="PCs, Desktops & Monitors — IT Zone Electronics">
   <meta property="og:description" content="Business-grade desktops and monitors.">
-  <meta property="og:url" content="https://itzone.pk/pages/pcs.html">
-  <meta property="og:image" content="https://itzone.pk/assets/img/og/og-default.jpg">
+  <meta property="og:url"         content="https://itzone.pk/pages/pcs.html">
+  <meta property="og:image"       content="https://itzone.pk/assets/img/og/og-default.jpg">
 
   <link rel="icon" href="../assets/img/logo.svg" type="image/svg+xml">
 
@@ -33,27 +33,45 @@
   <header class="site-header"></header>
 
   <main id="main" tabindex="-1">
+
     <section class="section">
       <div class="container">
-        <h1>PCs, Desktops & Monitors</h1>
-        <p class="section-subtitle">
-          Business-grade towers, tiny PCs, and professional displays.
-        </p>
-        <div id="pcs-grid" class="row g-4 mt-4" role="list">
-          <p class="text-muted">Loading…</p>
+
+        <header class="mb-4">
+          <h1 class="section-title">PCs, Desktops &amp; Monitors</h1>
+          <p class="section-subtitle" id="pcs-count">Loading inventory…</p>
+        </header>
+
+        <div class="inventory-toolbar">
+          <div class="product-filters" id="pcs-tabs" role="group" aria-label="Filter by category"></div>
         </div>
+
+        <div id="pcs-grid" role="list"></div>
+
       </div>
     </section>
+
   </main>
 
   <footer class="site-footer"></footer>
 
+  <!-- Vendors -->
   <script defer src="../assets/js/vendors/bootstrap.bundle.min.js"></script>
   <script defer src="../assets/js/vendors/lucide.min.js"></script>
+
+  <!-- Core -->
   <script defer src="../assets/js/core/data.js"></script>
+
+  <!-- Components (dependency order) -->
   <script defer src="../assets/js/components/Navbar.js"></script>
   <script defer src="../assets/js/components/Footer.js"></script>
+  <script defer src="../assets/js/components/ProductCard.js"></script>
+  <script defer src="../assets/js/components/ProductGrid.js"></script>
+
+  <!-- Page module -->
   <script defer src="../assets/js/pages/pcs.page.js"></script>
+
+  <!-- App bootstrap (LAST) -->
   <script defer src="../assets/js/main.js"></script>
 
 </body>
