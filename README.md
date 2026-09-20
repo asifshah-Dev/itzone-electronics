@@ -14,4 +14,4 @@ Then open http://localhost:5173
 
 ## Structure
 See `/assets/css/main.css` for the cascade entry point and
-`/assets/js/main.js` for the app bootstrap.
+`/assets/js/main.js` for the app bootstrap. 
