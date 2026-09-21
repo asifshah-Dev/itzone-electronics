@@ -1,7 +1,7 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
-   Navbar — white rows 1 & 2, transparent green row 3.
-   Reduced category list — only essential filters.
+   Navbar — white rows 1 & 2, glass green row 3.
+   Categories visible on all screen sizes with horizontal scroll on mobile.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -25,8 +25,6 @@
     { name: 'Twitter',   href: 'https://twitter.com/',       icon: 'twitter' },
   ];
 
-  /* ── Reduced category list — 7 essentials ────────────────
-     Price bands, top CPUs, top brands only. */
   function buildCategories(data) {
     const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
     const pcs      = data.pcs || {};
@@ -37,21 +35,16 @@
     const combined = laptops.concat(allPCs);
 
     const candidates = [
-      /* ── PRICE BANDS ───────────────────────────────────── */
       { id: '30k-50k', label: '30k to 50k',
         test: function (i) { const p = Number(i.price); return p > 30000 && p <= 50000; } },
       { id: '50k-70k', label: '50k to 70k',
         test: function (i) { const p = Number(i.price); return p > 50000 && p <= 70000; } },
       { id: '70k-plus', label: '70k Plus',
         test: function (i) { return Number(i.price) > 70000; } },
-
-      /* ── CPUs ──────────────────────────────────────────── */
       { id: 'i5', label: 'Core i5',
         test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i5') !== -1; } },
       { id: 'i7', label: 'Core i7',
         test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i7') !== -1; } },
-
-      /* ── TOP BRANDS ────────────────────────────────────── */
       { id: 'dell', label: 'Dell',
         test: function (i) { return i.brand === 'DELL'; } },
       { id: 'hp', label: 'HP',
@@ -62,9 +55,7 @@
 
     return candidates
       .map(function (c) {
-        return Object.assign({}, c, {
-          _count: combined.filter(c.test).length
-        });
+        return Object.assign({}, c, { _count: combined.filter(c.test).length });
       })
       .filter(function (c) { return c._count >= 2; })
       .map(function (c) { delete c._count; return c; });
@@ -94,7 +85,6 @@
     window.location.href = url;
   }
 
-  /* Official WhatsApp SVG glyph */
   function whatsappSvg(size) {
     const s = size || 16;
     return (
@@ -199,14 +189,6 @@
               <div class="cat-links-scroll">
                 <div class="cat-links">${catButtons}</div>
               </div>
-            </div>
-
-            <div class="nav-row nav-row-3-mobile">
-              ${NAV_ITEMS.map(function (item) {
-                return '<a class="mobile-link" href="' + r(item.href) + '">' +
-                  '<i data-lucide="' + item.icon + '"></i><span>' + item.label + '</span>' +
-                '</a>';
-              }).join('')}
             </div>
 
           </div>
