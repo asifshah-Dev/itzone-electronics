@@ -1,7 +1,7 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
-   Navbar — white background, green category bar.
-   Categories reduced to high-interest picks in priority order.
+   Navbar — white rows 1 & 2, transparent green row 3.
+   Reduced category list — only essential filters.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -25,12 +25,8 @@
     { name: 'Twitter',   href: 'https://twitter.com/',       icon: 'twitter' },
   ];
 
-  /* ── Reduced category list — client priority order ───────
-     1. Price bands (most common filter)
-     2. CPU tiers
-     3. Top brands
-     4. Workstation / specialty
-     Max 8-10 items to fit the bar without scrolling. */
+  /* ── Reduced category list — 7 essentials ────────────────
+     Price bands, top CPUs, top brands only. */
   function buildCategories(data) {
     const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
     const pcs      = data.pcs || {};
@@ -40,55 +36,38 @@
     const allPCs   = [].concat(desktops, tiny, monitors);
     const combined = laptops.concat(allPCs);
 
-    const hay = (i) => ((i.model || '') + ' ' + (i.extras || '') + ' ' + (i.gpu || '')).toLowerCase();
-
     const candidates = [
-      /* ── PRICE (most used) ─────────────────────────────── */
-      { id: 'upto-30k',   label: 'Upto 30k',
-        test: i => { const p = Number(i.price); return p > 0 && p <= 30000; } },
-      { id: '30k-50k',    label: '30k to 50k',
-        test: i => { const p = Number(i.price); return p > 30000 && p <= 50000; } },
-      { id: '50k-70k',    label: '50k to 70k',
-        test: i => { const p = Number(i.price); return p > 50000 && p <= 70000; } },
-      { id: '70k-plus',   label: '70k Plus',
-        test: i => Number(i.price) > 70000 },
+      /* ── PRICE BANDS ───────────────────────────────────── */
+      { id: '30k-50k', label: '30k to 50k',
+        test: function (i) { const p = Number(i.price); return p > 30000 && p <= 50000; } },
+      { id: '50k-70k', label: '50k to 70k',
+        test: function (i) { const p = Number(i.price); return p > 50000 && p <= 70000; } },
+      { id: '70k-plus', label: '70k Plus',
+        test: function (i) { return Number(i.price) > 70000; } },
 
-      /* ── CPU (targeted buyers) ─────────────────────────── */
-      { id: 'i5',         label: 'Core i5',
-        test: i => (i.cpu || '').toLowerCase().includes('i5') },
-      { id: 'i7',         label: 'Core i7',
-        test: i => (i.cpu || '').toLowerCase().includes('i7') },
+      /* ── CPUs ──────────────────────────────────────────── */
+      { id: 'i5', label: 'Core i5',
+        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i5') !== -1; } },
+      { id: 'i7', label: 'Core i7',
+        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i7') !== -1; } },
 
-      /* ── BRAND (brand loyalty) ─────────────────────────── */
-      { id: 'dell',       label: 'Dell',
-        test: i => i.brand === 'DELL' },
-      { id: 'hp',         label: 'HP',
-        test: i => i.brand === 'HP' },
-      { id: 'lenovo',     label: 'Lenovo',
-        test: i => i.brand === 'LENOVO' },
-
-      /* ── SPECIALTY (niche) ─────────────────────────────── */
-      { id: 'gaming',     label: 'Gaming / Workstation',
-        test: i => {
-          if (i.gpu && String(i.gpu).trim() !== '') return true;
-          const h = hay(i);
-          return h.includes('p51') || h.includes('p14') ||
-                 h.includes('z book') || h.includes('zbook') ||
-                 h.includes('z2') || h.includes('xps') ||
-                 h.includes('xeon') || h.includes('quadro') ||
-                 h.includes('dedicated') || h.includes('graphic');
-        } },
-      { id: 'monitors',   label: 'Monitors',
-        test: i => monitors.includes(i) },
-      { id: 'desktops',   label: 'Desktops',
-        test: i => desktops.includes(i) },
+      /* ── TOP BRANDS ────────────────────────────────────── */
+      { id: 'dell', label: 'Dell',
+        test: function (i) { return i.brand === 'DELL'; } },
+      { id: 'hp', label: 'HP',
+        test: function (i) { return i.brand === 'HP'; } },
+      { id: 'lenovo', label: 'Lenovo',
+        test: function (i) { return i.brand === 'LENOVO'; } },
     ];
 
-    /* Keep only categories with at least 2 matching items */
     return candidates
-      .map(c => Object.assign({}, c, { _count: combined.filter(c.test).length }))
-      .filter(c => c._count >= 2)
-      .map(c => { delete c._count; return c; });
+      .map(function (c) {
+        return Object.assign({}, c, {
+          _count: combined.filter(c.test).length
+        });
+      })
+      .filter(function (c) { return c._count >= 2; })
+      .map(function (c) { delete c._count; return c; });
   }
 
   let CATEGORIES = [];
@@ -115,9 +94,9 @@
     window.location.href = url;
   }
 
-  /* Official WhatsApp SVG path — 24x24 filled brand glyph */
+  /* Official WhatsApp SVG glyph */
   function whatsappSvg(size) {
-    const s = size || 18;
+    const s = size || 16;
     return (
       '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">' +
         '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />' +

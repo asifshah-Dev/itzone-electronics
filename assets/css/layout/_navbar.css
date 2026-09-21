@@ -1,10 +1,9 @@
 /* assets/css/layout/_navbar.css
    ─────────────────────────────────────────────────────────
-   Navbar v5 — white background, green category bar.
-   - No chip background behind logo (logo has its own white)
-   - Bolder icons and text
-   - No bottom border on row 1
-   - Consistent brand-green hover colors
+   Navbar v11 — glass morphism.
+   Row 1: white
+   Row 2: white → glass when sticky
+   Row 3: always glass morphism green
    ───────────────────────────────────────────────────────── */
 
 .nav-backdrop[hidden] { display: none !important; }
@@ -13,22 +12,43 @@
 .site-header {
   width: 100%;
   background: transparent;
+  position: relative;
 }
 
-/* ── ROW 1 — WHITE, no bottom border ───────────────────── */
+/* ── ROW 1 — WHITE ─────────────────────────────────────── */
 .nav-row-1 {
   background: #ffffff;
-  /* removed the bottom border */
+  border-bottom: 1px solid #e2e8f0;
 }
 
-/* ── Sticky wrapper ────────────────────────────────────── */
+/* ── Sticky wrapper (rows 2 + 3) ───────────────────────── */
 .nav-sticky {
   background: #ffffff;
   z-index: var(--z-sticky);
-  transition: box-shadow var(--dur-base) var(--ease-out);
+  transition:
+    background-color var(--dur-base) var(--ease-out),
+    box-shadow       var(--dur-base) var(--ease-out),
+    backdrop-filter  var(--dur-base) var(--ease-out);
 }
+
+/* ═══════════════════════════════════════════════════════
+   GLASS MORPHISM — Row 2 when sticky
+   ═══════════════════════════════════════════════════════ */
+.site-header.is-stuck .nav-row-2 {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 8px 32px -12px rgba(13, 74, 38, 0.15);
+}
+
+/* Sticky wrapper itself becomes transparent so the glass
+   in row 2 is what you see */
 .site-header.is-stuck .nav-sticky {
-  box-shadow: 0 8px 24px -12px rgba(10, 15, 13, 0.18);
+  background: transparent;
+  box-shadow: none;
 }
 
 /* ── Container ─────────────────────────────────────────── */
@@ -47,7 +67,7 @@
   width: 100%;
 }
 
-/* ── ROW 1 — socials + tagline ─────────────────────────── */
+/* ── ROW 1 content ─────────────────────────────────────── */
 .nav-row-1 {
   justify-content: space-between;
   gap: var(--space-4);
@@ -72,8 +92,8 @@
   width: 2rem;
   height: 2rem;
   border-radius: var(--radius-sm);
-  color: #0f172a;                         /* dark, bold */
-  transition: color .12s ease, background-color .12s ease;
+  color: #0f172a;
+  transition: color .14s ease, background-color .14s ease;
 }
 .social-link:hover {
   color: var(--brand-primary);
@@ -83,15 +103,15 @@
 .social-link svg {
   width: 1.15rem;
   height: 1.15rem;
-  stroke-width: 2.5;                       /* bolder icons */
+  stroke-width: 2.5;
 }
 
 .nav-tagline {
   margin: 0;
-  font-size: var(--fs-sm);                 /* larger */
-  font-weight: var(--fw-semibold);         /* bolder */
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.01em;
-  color: #334155;
+  color: #0f172a;
   text-align: center;
   flex: 1 1 auto;
   white-space: nowrap;
@@ -104,13 +124,15 @@
   height: 2rem;
 }
 
-/* ── ROW 2 ─────────────────────────────────────────────── */
+/* ── ROW 2 — white by default ──────────────────────────── */
 .nav-row-2 {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--space-4);
   padding-block: var(--space-3);
+  background: #ffffff;
+  transition: background-color var(--dur-base) var(--ease-out);
 }
 
 .nav-left {
@@ -132,10 +154,7 @@
   color: #0f172a;
   cursor: pointer;
   flex-shrink: 0;
-  transition:
-    border-color .14s ease,
-    color .14s ease,
-    background-color .14s ease;
+  transition: all .14s ease;
 }
 .nav-search-btn:hover {
   border-color: var(--brand-primary);
@@ -148,7 +167,7 @@
 .nav-search {
   flex: 1 1 auto;
   min-width: 0;
-  max-width: 380px;
+  max-width: 400px;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -156,12 +175,23 @@
   border: 1.5px solid #e2e8f0;
   border-radius: var(--radius-pill);
   padding: var(--space-2) var(--space-4);
+  transition: border-color .14s ease, box-shadow .14s ease, background-color .14s ease;
 }
 .nav-search:focus-within {
   background: #ffffff;
   border-color: var(--brand-primary);
   box-shadow: 0 0 0 3px rgba(13, 74, 38, 0.12);
 }
+/* When glass is active, make the search field itself glassier */
+.site-header.is-stuck .nav-search {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+.site-header.is-stuck .nav-search:focus-within {
+  background: #ffffff;
+  border-color: var(--brand-primary);
+}
+
 .nav-search-icon {
   color: var(--brand-primary);
   width: 1.1rem;
@@ -176,14 +206,13 @@
   background: transparent;
   font-family: var(--font-sans);
   font-size: var(--fs-sm);
-  font-weight: var(--fw-medium);
+  font-weight: var(--fw-semibold);
   color: #0f172a;
   min-width: 0;
   width: 100%;
 }
-.nav-search-input::placeholder { color: #94a3b8; font-weight: 500; }
+.nav-search-input::placeholder { color: #64748b; font-weight: 600; }
 
-/* ── Phone icon — MATCHES call button (brand green) ───── */
 .nav-phone-icon {
   display: inline-flex;
   align-items: center;
@@ -193,12 +222,9 @@
   flex-shrink: 0;
   border-radius: var(--radius-pill);
   border: 1.5px solid var(--brand-primary);
-  background: transparent;
+  background: #ffffff;
   color: var(--brand-primary);
-  transition:
-    background-color .14s ease,
-    border-color .14s ease,
-    color .14s ease;
+  transition: all .14s ease;
 }
 .nav-phone-icon:hover {
   background: var(--brand-primary);
@@ -208,7 +234,7 @@
 .nav-phone-icon .lucide,
 .nav-phone-icon svg { width: 1.2rem; height: 1.2rem; stroke-width: 2.5; }
 
-/* ── Logo — NO white chip ──────────────────────────────── */
+/* Logo — no chip, bigger */
 .brand {
   justify-self: center;
   display: inline-flex;
@@ -227,13 +253,12 @@
 
 .brand-logo {
   display: block;
-  height: clamp(60px, 6.5vw, 84px);
+  height: clamp(72px, 8vw, 104px);
   width: auto;
-  max-width: clamp(180px, 20vw, 280px);
+  max-width: clamp(220px, 26vw, 360px);
   object-fit: contain;
 }
 
-/* ── Actions ───────────────────────────────────────────── */
 .nav-actions {
   justify-self: end;
   display: flex;
@@ -242,37 +267,35 @@
   flex-shrink: 0;
 }
 
-/* Call button — SAME brand green as phone icon */
 .nav-call {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--brand-primary);
+  background: var(--brand-primary);
+  color: #ffffff;
   border: 1.5px solid var(--brand-primary);
   text-decoration: none;
   white-space: nowrap;
   font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);           /* bolder */
+  font-weight: 800;
   transition:
     background-color .14s ease,
-    color .14s ease,
-    border-color .14s ease;
+    border-color .14s ease,
+    transform .14s ease,
+    box-shadow .14s ease;
 }
 .nav-call:hover {
-  background: var(--brand-primary);
+  background: var(--itz-green-900);
+  border-color: var(--itz-green-900);
   color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -8px rgba(10, 61, 31, 0.6);
 }
 .nav-call .lucide,
 .nav-call svg { width: 1.15rem; height: 1.15rem; stroke-width: 2.5; flex-shrink: 0; }
-.nav-call strong {
-  font-weight: 800;
-  color: var(--brand-primary);
-  margin-left: 4px;
-}
-.nav-call:hover strong { color: #ffffff; }
+.nav-call strong { font-weight: 800; color: #ffffff; margin-left: 4px; }
 
 .nav-toggler {
   display: none;
@@ -286,10 +309,7 @@
   color: #0f172a;
   cursor: pointer;
   flex-shrink: 0;
-  transition:
-    border-color .14s ease,
-    color .14s ease,
-    background-color .14s ease;
+  transition: all .14s ease;
 }
 .nav-toggler:hover {
   border-color: var(--brand-primary);
@@ -300,18 +320,60 @@
 .nav-toggler svg { width: 1.35rem; height: 1.35rem; stroke-width: 2.5; }
 
 /* ═══════════════════════════════════════════════════════
-   ROW 3 — GREEN CATEGORY BAR
+   ROW 3 — GLASS MORPHISM GREEN
+   Always glassy. Even before sticky.
    ═══════════════════════════════════════════════════════ */
 .nav-row-3 {
   display: block;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  background: linear-gradient(90deg, #0d4a26 0%, #0a3d1f 100%);
+  background: transparent;
   padding: 0;
+  position: relative;
+}
+
+.nav-row-3::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Glass morphism green — semi-transparent gradient + heavy blur */
+  background: linear-gradient(135deg,
+    rgba(13, 74, 38, 0.72) 0%,
+    rgba(10, 61, 31, 0.78) 50%,
+    rgba(20, 107, 56, 0.72) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  /* Glass edge highlight */
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  /* Inner top shine — hallmark of glass */
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 8px 32px -12px rgba(10, 15, 13, 0.35);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Subtle diagonal light streak for extra glass depth */
+.nav-row-3::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.08) 45%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.08) 55%,
+    rgba(255, 255, 255, 0) 70%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .cat-links-scroll {
+  position: relative;
+  z-index: 1;
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
@@ -324,35 +386,53 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   flex-wrap: nowrap;
   padding: var(--space-3) var(--space-4);
   min-width: max-content;
 }
 
+/* Category pills — frosted glass look */
 .cat-link {
   display: inline-flex;
   align-items: center;
   padding: var(--space-2) var(--space-4);
   font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);           /* bolder */
-  color: rgba(255, 255, 255, 0.95);
-  border-radius: var(--radius-md);
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--radius-pill);
   white-space: nowrap;
   text-decoration: none;
-  background: transparent;
-  border: none;
   cursor: pointer;
   font-family: inherit;
-  transition: color .12s ease, background-color .12s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  /* Inner top shine */
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+  transition: all .18s ease;
 }
 .cat-link:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.16);
+  color: var(--brand-primary);
+  background: rgba(255, 255, 255, 0.98);
+  border-color: #ffffff;
+  text-shadow: none;
+  transform: translateY(-1px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 8px 20px -8px rgba(0, 0, 0, 0.45);
 }
 .cat-link.is-active {
   color: var(--brand-primary);
   background: #ffffff;
+  border-color: #ffffff;
+  text-shadow: none;
+}
+.cat-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 
 /* Mobile 2-link row */
@@ -374,9 +454,16 @@
   font-weight: var(--fw-bold);
   color: var(--brand-primary);
   text-decoration: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-pill);
+  background: #ffffff;
+  border: 1.5px solid var(--brand-primary);
+  transition: all .14s ease;
 }
-.mobile-link:hover { background: var(--brand-primary-soft); }
+.mobile-link:hover {
+  background: var(--brand-primary);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
 .mobile-link .lucide,
 .mobile-link svg { width: 1.2rem; height: 1.2rem; stroke-width: 2.5; }
 
@@ -396,7 +483,7 @@
   pointer-events: none;
   transition:
     transform var(--dur-slow) var(--ease-out),
-    opacity   var(--dur-base) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out),
     visibility 0s linear var(--dur-slow);
   z-index: calc(var(--z-sticky) + 2);
   display: flex;
@@ -410,7 +497,7 @@
   pointer-events: auto;
   transition:
     transform var(--dur-slow) var(--ease-out),
-    opacity   var(--dur-base) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out),
     visibility 0s linear 0s;
 }
 
@@ -554,8 +641,8 @@
 
   .brand { padding: 0; }
   .brand-logo {
-    height: clamp(60px, 15vw, 84px);
-    max-width: clamp(170px, 52vw, 240px);
+    height: clamp(64px, 16vw, 90px);
+    max-width: clamp(180px, 55vw, 260px);
   }
 
   .nav-call { display: none !important; }
@@ -565,6 +652,13 @@
     margin-inline: -0.75rem;
     padding-inline: 0.75rem;
     width: auto;
+  }
+
+  /* Mobile glass on the sticky row 2 */
+  .site-header.is-stuck .nav-row-2 {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
   }
 
   .nav-links {
@@ -587,7 +681,7 @@
     pointer-events: none;
     transition:
       transform var(--dur-slow) var(--ease-out),
-      opacity   var(--dur-base) var(--ease-out),
+      opacity var(--dur-base) var(--ease-out),
       visibility 0s linear var(--dur-slow);
     z-index: calc(var(--z-sticky) + 2);
     overflow-y: auto;
@@ -599,7 +693,7 @@
     pointer-events: auto;
     transition:
       transform var(--dur-slow) var(--ease-out),
-      opacity   var(--dur-base) var(--ease-out),
+      opacity var(--dur-base) var(--ease-out),
       visibility 0s linear 0s;
   }
 
@@ -701,12 +795,12 @@
 @media (max-width: 576px) {
   .nav-container { padding: 0 0.5rem; }
   .nav-phone-icon, .nav-search-btn, .nav-toggler { width: 2.5rem; height: 2.5rem; }
-  .brand-logo { height: clamp(54px, 14vw, 72px); max-width: clamp(150px, 48vw, 210px); }
-  .cat-link { font-size: var(--fs-xs); }
+  .brand-logo { height: clamp(60px, 15vw, 80px); max-width: clamp(160px, 50vw, 220px); }
+  .cat-link { font-size: var(--fs-xs); padding: var(--space-1) var(--space-3); }
 }
 @media (max-width: 380px) {
   .nav-container { padding: 0 0.375rem; }
-  .brand-logo { height: clamp(48px, 13vw, 64px); max-width: 50vw; }
+  .brand-logo { height: clamp(54px, 14vw, 70px); max-width: 54vw; }
   .nav-phone-icon, .nav-search-btn, .nav-toggler { width: 2.3rem; height: 2.3rem; }
 }
 
@@ -732,5 +826,6 @@
   .site-header, .brand-logo, .nav-links, .nav-backdrop,
   .nav-toggler, .drawer-close, .nav-call, .brand,
   .social-link, .nav-phone-icon, .nav-search-btn,
-  .mobile-search, .nav-sticky, .cat-link { transition: none !important; }
+  .mobile-search, .nav-sticky, .cat-link, .mobile-link,
+  .nav-row-2, .nav-search { transition: none !important; }
 }
