@@ -1,7 +1,7 @@
 // assets/js/pages/pcs.page.js
 /* ─────────────────────────────────────────────────────────
    PCs & Monitors page.
-   Category tabs + sort + view.
+   Category tabs + sort + view (persisted).
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -29,8 +29,8 @@
     const p = new URLSearchParams(window.location.search);
     return {
       cat:  (p.get('cat')  || 'all').trim(),
-      sort: (p.get('sort') || 'featured').trim(),
-      view: (p.get('view') || 'grid').trim(),
+      sort: (p.get('sort') || '').trim(),
+      view: (p.get('view') || '').trim(),
     };
   }
 
@@ -50,7 +50,7 @@
     switch (sort) {
       case 'price-asc':  return copy.sort((a,b) => Number(a.price) - Number(b.price));
       case 'price-desc': return copy.sort((a,b) => Number(b.price) - Number(a.price));
-      case 'model-asc':  return copy.sort((a,b) => (a.model||'').localeCompare(b.model||''));
+      case 'model-asc':  return copy.sort((a,b) => String(a.model||'').localeCompare(String(b.model||'')));
       case 'ram-desc':   return copy.sort((a,b) => (Number(b.ram)||0) - (Number(a.ram)||0));
       default:           return copy;
     }
@@ -63,7 +63,9 @@
         ? total + ' items \u00b7 desktops, tiny PCs, monitors'
         : visible + ' of ' + total + ' items shown';
     }
-    NS.SortBar?.setCount?.(visible);
+    if (NS.SortBar && typeof NS.SortBar.setCount === 'function') {
+      NS.SortBar.setCount(visible);
+    }
   }
 
   function mountTabs(host, state, onChange) {
@@ -94,6 +96,11 @@
     const sortHost = document.getElementById('pcs-sort');
     if (!gridHost) return;
 
+    if (!NS.ProductCard || typeof NS.ProductCard.render !== 'function') {
+      console.error('[IT Zone] PCs: ProductCard not loaded.');
+      return;
+    }
+
     gridHost.innerHTML =
       '<div class="product-loading" role="status" aria-live="polite">' +
         '<i data-lucide="loader-2"></i><span>Loading PCs and monitors\u2026</span>' +
@@ -115,19 +122,26 @@
     }
 
     const urlState = readParams();
+    const storedView = (NS.SortBar && NS.SortBar.getStoredView)
+      ? NS.SortBar.getStoredView() : 'grid';
+    const storedSort = (NS.SortBar && NS.SortBar.getStoredSort)
+      ? NS.SortBar.getStoredSort() : 'featured';
+
     const state = {
       category: urlState.cat,
-      sort:     urlState.sort,
-      view:     urlState.view,
+      sort: urlState.sort || storedSort || 'featured',
+      view: urlState.view || storedView || 'grid',
     };
 
     const grid = NS.ProductGrid.mount(gridHost);
+    if (!grid) return;
 
     function render() {
       const filtered = state.category === 'all'
         ? allItems
         : allItems.filter(i => i._subtype === state.category);
       const sorted = applySort(filtered, state.sort);
+
       grid.render(sorted);
       updateCount(sorted.length, allItems.length);
       gridHost.classList.toggle('is-list', state.view === 'list');
@@ -141,14 +155,14 @@
       });
     }
 
-    if (sortHost) {
-      NS.SortBar.mount(sortHost);
-      document.addEventListener('sort:change', e => { state.sort = e.detail.sort; render(); });
-      document.addEventListener('view:change', e => { state.view = e.detail.view; render(); });
+    if (sortHost && NS.SortBar && typeof NS.SortBar.mount === 'function') {
+      NS.SortBar.mount(sortHost, state.view);
+      document.addEventListener('sort:change', function (e) { state.sort = e.detail.sort; render(); });
+      document.addEventListener('view:change', function (e) { state.view = e.detail.view; render(); });
     }
 
     render();
-    console.info('[IT Zone] Loaded ' + allItems.length + ' PCs & monitors.');
+    console.info('[IT Zone] Loaded ' + allItems.length + ' PCs & monitors. View:', state.view);
   }
 
   NS.pcsPage = { init: init };

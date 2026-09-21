@@ -2,6 +2,7 @@
 /* ─────────────────────────────────────────────────────────
    Inventory page — combines laptops.json + pcs.json.
    Type tabs + tag filter + search + sort + view.
+   View persists across reloads (URL + localStorage).
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -65,8 +66,8 @@
       type: (p.get('type') || 'all').trim(),
       tag: tag,
       q: q,
-      sort: (p.get('sort') || 'featured').trim(),
-      view: (p.get('view') || 'grid').trim(),
+      sort: (p.get('sort') || '').trim(),
+      view: (p.get('view') || '').trim(),
     };
   }
 
@@ -176,15 +177,6 @@
     const sortHost = document.getElementById('product-sort');
     if (!gridHost) return;
 
-    /* ── Module check ──────────────────────────────────── */
-    console.group('[IT Zone] Inventory: module check');
-    console.log('Data:',        typeof NS.Data);
-    console.log('ProductCard:', typeof NS.ProductCard,
-                NS.ProductCard ? ('render: ' + typeof NS.ProductCard.render) : '');
-    console.log('ProductGrid:', typeof NS.ProductGrid);
-    console.log('SortBar:',     typeof NS.SortBar);
-    console.groupEnd();
-
     if (!NS.ProductCard || typeof NS.ProductCard.render !== 'function') {
       console.error('[IT Zone] Inventory: ProductCard not loaded — aborting.');
       gridHost.innerHTML = '<div class="product-empty">Product card module not loaded.</div>';
@@ -214,13 +206,21 @@
       return;
     }
 
+    /* ── Resolve initial state ─────────────────────────────
+       Priority: URL → localStorage → default
+       ────────────────────────────────────────────────────── */
     const urlState = readParams();
+    const storedView = (NS.SortBar && NS.SortBar.getStoredView)
+      ? NS.SortBar.getStoredView() : 'grid';
+    const storedSort = (NS.SortBar && NS.SortBar.getStoredSort)
+      ? NS.SortBar.getStoredSort() : 'featured';
+
     const state = {
-      type: urlState.type,
-      tag:  urlState.tag,
-      q:    urlState.q,
-      sort: urlState.sort,
-      view: urlState.view,
+      type: urlState.type || 'all',
+      tag:  urlState.tag  || '',
+      q:    urlState.q    || '',
+      sort: urlState.sort || storedSort || 'featured',
+      view: urlState.view || storedView || 'grid',
     };
 
     const grid = NS.ProductGrid.mount(gridHost);
@@ -229,9 +229,14 @@
     function render() {
       const filtered = applyFilters(state);
       const sorted = applySort(filtered, state.sort);
+
       grid.render(sorted);
       updateCount(sorted.length, allItems.length);
+
+      /* Apply list/grid class to the grid container */
       gridHost.classList.toggle('is-list', state.view === 'list');
+
+      /* Persist to URL */
       writeParams(state);
     }
 
@@ -241,9 +246,17 @@
     });
 
     if (sortHost && NS.SortBar && typeof NS.SortBar.mount === 'function') {
-      NS.SortBar.mount(sortHost);
-      document.addEventListener('sort:change', function (e) { state.sort = e.detail.sort; render(); });
-      document.addEventListener('view:change', function (e) { state.view = e.detail.view; render(); });
+      /* Pass current view so the toggle button reflects it */
+      NS.SortBar.mount(sortHost, state.view);
+
+      document.addEventListener('sort:change', function (e) {
+        state.sort = e.detail.sort;
+        render();
+      });
+      document.addEventListener('view:change', function (e) {
+        state.view = e.detail.view;
+        render();
+      });
     }
 
     gridHost.addEventListener('click', function (e) {
@@ -261,7 +274,8 @@
     });
 
     render();
-    console.info('[IT Zone] Loaded ' + allItems.length + ' items. Tag: "' + (state.tag || '\u2014') + '"');
+    console.info('[IT Zone] Loaded ' + allItems.length + ' items. View:',
+                 state.view, '| Tag: "' + (state.tag || '\u2014') + '"');
   }
 
   NS.inventoryPage = { init: init };
