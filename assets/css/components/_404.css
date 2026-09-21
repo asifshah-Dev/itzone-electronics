@@ -4,6 +4,10 @@
    ───────────────────────────────────────────────────────── */
 
 .not-found-section {
+  /* Full page takeover — no navbar or footer */
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
   padding-block: clamp(3rem, 6vw, 6rem);
   background:
     radial-gradient(60% 50% at 80% 0%,
@@ -13,7 +17,43 @@
       rgba(245, 184, 28, 0.06) 0%,
       rgba(245, 184, 28, 0) 55%),
     var(--bg-page);
-  min-height: 60vh;
+}
+
+.not-found-section > .container {
+  width: 100%;
+}
+
+/* Back-to-home pill at the top */
+.nf-back-home {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--brand-primary);
+  background: var(--brand-primary-soft);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  margin-bottom: var(--space-6);
+  transition: all .16s ease;
+}
+.nf-back-home:hover {
+  color: #ffffff;
+  background: var(--brand-primary);
+  transform: translateX(-2px);
+  box-shadow: 0 6px 16px -8px rgba(13, 74, 38, 0.5);
+}
+.nf-back-home .lucide,
+.nf-back-home svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 2.5;
+}
+.nf-back-home:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 3px;
 }
 
 /* ── Main grid: copy | illustration ───────────────────── */

@@ -20,16 +20,20 @@
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
 
-<body data-page="404">
+<body data-page="404" class="page-404">
 
   <a href="#main" class="skip-link">Skip to main content</a>
-
-  <header class="site-header"></header>
 
   <main id="main" tabindex="-1">
 
     <section class="not-found-section" aria-labelledby="nf-heading">
       <div class="container">
+
+        <!-- Back to home -->
+        <a href="index.html" class="nf-back-home" aria-label="Back to home">
+          <i data-lucide="arrow-left"></i>
+          <span>Back to home</span>
+        </a>
 
         <div class="not-found-grid">
 
@@ -48,7 +52,6 @@
               back to something useful.
             </p>
 
-            <!-- Quick search -->
             <form class="not-found-search" role="search" onsubmit="return false;">
               <label for="nf-search" class="visually-hidden">Search products</label>
               <i data-lucide="search" class="not-found-search-icon"></i>
@@ -62,17 +65,16 @@
               </button>
             </form>
 
-            <!-- Quick links -->
             <div class="not-found-links">
-              <a href="/" class="btn btn-brand">
+              <a href="index.html" class="btn btn-brand">
                 <i data-lucide="home"></i>
                 <span>Home</span>
               </a>
-              <a href="/pages/inventory.html" class="btn btn-outline-brand">
+              <a href="pages/inventory.html" class="btn btn-outline-brand">
                 <i data-lucide="laptop"></i>
                 <span>All Products</span>
               </a>
-              <a href="/pages/contact.html" class="btn btn-outline-brand">
+              <a href="pages/contact.html" class="btn btn-outline-brand">
                 <i data-lucide="mail"></i>
                 <span>Contact us</span>
               </a>
@@ -98,14 +100,11 @@
                 </radialGradient>
               </defs>
 
-              <!-- Glow background -->
               <circle cx="200" cy="170" r="150" fill="url(#nfGlow)"/>
 
-              <!-- Broken laptop screen -->
               <rect x="70" y="60" width="260" height="180" rx="12" fill="#0a0f0d" opacity="0.9"/>
               <rect x="82" y="72" width="236" height="156" rx="6" fill="#1c2622"/>
 
-              <!-- Crack -->
               <path d="M 190 72 L 175 130 L 205 150 L 185 220"
                     stroke="url(#nfRed)" stroke-width="3"
                     stroke-linecap="round" stroke-linejoin="round"
@@ -114,7 +113,6 @@
                     stroke="url(#nfRed)" stroke-width="2.5"
                     stroke-linecap="round" opacity="0.5"/>
 
-              <!-- Broken logo mark on screen -->
               <g transform="translate(200 150) scale(0.6)" opacity="0.35">
                 <circle cx="0" cy="0" r="58"
                         stroke="url(#nfGreen)" stroke-width="9"
@@ -124,13 +122,9 @@
                 <rect x="10" y="12" width="16" height="52" rx="5" fill="url(#nfGreen)"/>
               </g>
 
-              <!-- Laptop base -->
-              <path d="M 60 240 L 340 240 L 370 280 L 30 280 Z"
-                    fill="#7a8085"/>
-              <path d="M 60 240 L 340 240 L 345 246 L 55 246 Z"
-                    fill="#555"/>
+              <path d="M 60 240 L 340 240 L 370 280 L 30 280 Z" fill="#7a8085"/>
+              <path d="M 60 240 L 340 240 L 345 246 L 55 246 Z" fill="#555"/>
 
-              <!-- Ground shadow -->
               <ellipse cx="200" cy="305" rx="150" ry="12"
                        fill="#0a0f0d" opacity="0.1"/>
             </svg>
@@ -138,12 +132,9 @@
 
         </div>
 
-        <!-- Popular categories -->
         <div class="not-found-categories">
           <h2 class="not-found-categories-title">Or jump to a popular filter</h2>
-          <div class="not-found-cats" id="nf-cats">
-            <!-- Filled by JS from Navbar's category list -->
-          </div>
+          <div class="not-found-cats" id="nf-cats"></div>
         </div>
 
       </div>
@@ -151,17 +142,10 @@
 
   </main>
 
-  <footer class="site-footer"></footer>
-
-  <script defer src="assets/js/vendors/bootstrap.bundle.min.js"></script>
   <script defer src="assets/js/vendors/lucide.min.js"></script>
 
   <script defer src="assets/js/core/data.js"></script>
-  <script defer src="assets/js/core/whatsapp.js"></script>
   <script defer src="assets/js/core/cursor.js"></script>
-
-  <script defer src="assets/js/components/Navbar.js"></script>
-  <script defer src="assets/js/components/Footer.js"></script>
 
   <script defer src="assets/js/pages/404.page.js"></script>
   <script defer src="assets/js/main.js"></script>
