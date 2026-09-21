@@ -1,9 +1,9 @@
 /* assets/css/layout/_navbar.css
    ─────────────────────────────────────────────────────────
-   Navbar v13 — glass morphism.
+   Navbar v15 — full-bleed glass morphism.
    Row 1: white (hidden on mobile)
-   Row 2: white → glass when sticky
-   Row 3: glass green with sharp bold pills
+   Row 2: white → glass when sticky, edge-to-edge
+   Row 3: glass green with sharp bold pills, edge-to-edge
           · desktop: centered
           · mobile: horizontal scroll, scrollbar hidden
    ───────────────────────────────────────────────────────── */
@@ -23,37 +23,39 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-/* ── Sticky wrapper (rows 2 + 3) ───────────────────────── */
+/* ── Sticky wrapper (rows 2 + 3) — FULL VIEWPORT WIDTH ─── */
 .nav-sticky {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   background: #ffffff;
   z-index: var(--z-sticky);
   transition:
     background-color var(--dur-base) var(--ease-out),
-    box-shadow       var(--dur-base) var(--ease-out);
+    box-shadow       var(--dur-base) var(--ease-out),
+    backdrop-filter  var(--dur-base) var(--ease-out);
 }
 
 /* ═══════════════════════════════════════════════════════
-   GLASS MORPHISM — Row 2 when sticky
+   GLASS MORPHISM — sticky wrapper, edge-to-edge
    ═══════════════════════════════════════════════════════ */
-.site-header.is-stuck .nav-row-2 {
+.site-header.is-stuck .nav-sticky {
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
     0 8px 32px -12px rgba(13, 74, 38, 0.15);
 }
-.site-header.is-stuck .nav-sticky {
+.site-header.is-stuck .nav-row-2 {
   background: transparent;
-  box-shadow: none;
 }
 
 /* ── Container ─────────────────────────────────────────── */
 .nav-container {
   width: 100%;
   max-width: 100%;
-  margin: 0;
+  margin: 0 auto;
   padding: 0 0.75rem;
   display: flex;
   flex-direction: column;
@@ -182,7 +184,7 @@
 }
 .site-header.is-stuck .nav-search {
   background: rgba(255, 255, 255, 0.55);
-  border-color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.75);
 }
 .site-header.is-stuck .nav-search:focus-within {
   background: #ffffff;
@@ -222,6 +224,10 @@
   background: #ffffff;
   color: var(--brand-primary);
   transition: all .14s ease;
+}
+.site-header.is-stuck .nav-phone-icon {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.75);
 }
 .nav-phone-icon:hover {
   background: var(--brand-primary);
@@ -307,6 +313,10 @@
   flex-shrink: 0;
   transition: all .14s ease;
 }
+.site-header.is-stuck .nav-toggler {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.75);
+}
 .nav-toggler:hover {
   border-color: var(--brand-primary);
   color: var(--brand-primary);
@@ -316,8 +326,7 @@
 .nav-toggler svg { width: 1.35rem; height: 1.35rem; stroke-width: 2.5; }
 
 /* ═══════════════════════════════════════════════════════
-   ROW 3 — GLASS MORPHISM GREEN (visible everywhere)
-   Sharp bold text, pills scroll on mobile.
+   ROW 3 — GLASS MORPHISM GREEN (full viewport width)
    ═══════════════════════════════════════════════════════ */
 .nav-row-3 {
   display: block;
@@ -363,7 +372,6 @@
   pointer-events: none;
 }
 
-/* Horizontal scroll container — hidden scrollbar on all browsers */
 .cat-links-scroll {
   position: relative;
   z-index: 1;
@@ -371,14 +379,14 @@
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;              /* Firefox */
-  -ms-overflow-style: none;           /* IE / Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   filter: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 .cat-links-scroll::-webkit-scrollbar {
-  display: none;                       /* Chrome / Safari / Opera */
+  display: none;
   width: 0;
   height: 0;
 }
@@ -394,7 +402,7 @@
   filter: none !important;
 }
 
-/* Category pills — SHARP BOLD white text */
+/* Category pills — sharp bold white text */
 .cat-link {
   display: inline-flex;
   align-items: center;
@@ -435,10 +443,8 @@
   outline-offset: 2px;
 }
 
-/* Old mobile 2-link row — hidden everywhere now */
-.nav-row-3-mobile {
-  display: none !important;
-}
+/* Old mobile 2-link row — hidden everywhere */
+.nav-row-3-mobile { display: none !important; }
 .mobile-link { display: none; }
 
 /* ── LEFT-SIDE SEARCH DRAWER ───────────────────────────── */
@@ -603,10 +609,8 @@
 /* ── MOBILE < 992px ───────────────────────────────────── */
 @media (max-width: 991.98px) {
 
-  /* Hide socials + tagline row on mobile */
   .nav-row-1 { display: none; }
 
-  /* Row 2 layout */
   .nav-row-2 {
     grid-template-columns: 1fr auto 1fr;
     gap: var(--space-3);
@@ -623,10 +627,8 @@
 
   .nav-call { display: none !important; }
 
-  /* ── ROW 3 — SHOW, HORIZONTAL SCROLL ───────────────── */
-  .nav-row-3 {
-    display: block !important;
-  }
+  /* Row 3 stays visible on mobile */
+  .nav-row-3 { display: block !important; }
 
   .nav-row-3::before {
     background: linear-gradient(135deg,
@@ -637,7 +639,6 @@
     -webkit-backdrop-filter: blur(14px) saturate(160%);
   }
 
-  /* Scroll container — no visible scrollbar */
   .cat-links-scroll {
     overflow-x: auto;
     overflow-y: hidden;
@@ -651,28 +652,24 @@
     height: 0;
   }
 
-  /* Left-align pills for scroll (not centered) */
   .cat-links {
     justify-content: flex-start;
     padding: var(--space-2) var(--space-3);
     gap: var(--space-2);
   }
 
-  /* Slightly bigger tap targets on mobile */
   .cat-link {
     padding: var(--space-2) var(--space-4);
     font-size: var(--fs-sm);
     font-weight: 800;
   }
 
-  /* Glass on sticky row 2 (mobile) */
-  .site-header.is-stuck .nav-row-2 {
+  .site-header.is-stuck .nav-sticky {
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
   }
 
-  /* Right-side menu drawer */
   .nav-links {
     display: flex !important;
     position: fixed;
@@ -802,7 +799,6 @@
     font-size: var(--fs-base) !important;
   }
 
-  /* Old mobile 2-link row — gone */
   .nav-row-3-mobile { display: none !important; }
 }
 
