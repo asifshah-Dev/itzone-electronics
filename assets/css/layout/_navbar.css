@@ -1,9 +1,11 @@
 /* assets/css/layout/_navbar.css
    ─────────────────────────────────────────────────────────
-   Navbar v12 — glass morphism.
-   Row 1: white
+   Navbar v13 — glass morphism.
+   Row 1: white (hidden on mobile)
    Row 2: white → glass when sticky
-   Row 3: glass morphism green, SHARP BOLD text
+   Row 3: glass green with sharp bold pills
+          · desktop: centered
+          · mobile: horizontal scroll, scrollbar hidden
    ───────────────────────────────────────────────────────── */
 
 .nav-backdrop[hidden] { display: none !important; }
@@ -314,9 +316,8 @@
 .nav-toggler svg { width: 1.35rem; height: 1.35rem; stroke-width: 2.5; }
 
 /* ═══════════════════════════════════════════════════════
-   ROW 3 — GLASS MORPHISM GREEN (text stays sharp)
-   Blur is applied to a separate backdrop layer, text sits
-   above it fully opaque and bold.
+   ROW 3 — GLASS MORPHISM GREEN (visible everywhere)
+   Sharp bold text, pills scroll on mobile.
    ═══════════════════════════════════════════════════════ */
 .nav-row-3 {
   display: block;
@@ -362,6 +363,7 @@
   pointer-events: none;
 }
 
+/* Horizontal scroll container — hidden scrollbar on all browsers */
 .cat-links-scroll {
   position: relative;
   z-index: 1;
@@ -369,12 +371,17 @@
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  scrollbar-width: none;              /* Firefox */
+  -ms-overflow-style: none;           /* IE / Edge */
   filter: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
-.cat-links-scroll::-webkit-scrollbar { display: none; }
+.cat-links-scroll::-webkit-scrollbar {
+  display: none;                       /* Chrome / Safari / Opera */
+  width: 0;
+  height: 0;
+}
 
 .cat-links {
   display: flex;
@@ -428,37 +435,11 @@
   outline-offset: 2px;
 }
 
-/* Mobile 2-link row */
+/* Old mobile 2-link row — hidden everywhere now */
 .nav-row-3-mobile {
-  display: none;
-  width: 100%;
-  background: #ffffff;
-  border-top: 1px solid #e2e8f0;
-  padding-block: var(--space-2);
-  gap: var(--space-3);
-  justify-content: center;
+  display: none !important;
 }
-.mobile-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--fs-base);
-  font-weight: var(--fw-bold);
-  color: var(--brand-primary);
-  text-decoration: none;
-  border-radius: var(--radius-pill);
-  background: #ffffff;
-  border: 1.5px solid var(--brand-primary);
-  transition: all .14s ease;
-}
-.mobile-link:hover {
-  background: var(--brand-primary);
-  color: #ffffff;
-  transform: translateY(-1px);
-}
-.mobile-link .lucide,
-.mobile-link svg { width: 1.2rem; height: 1.2rem; stroke-width: 2.5; }
+.mobile-link { display: none; }
 
 /* ── LEFT-SIDE SEARCH DRAWER ───────────────────────────── */
 .mobile-search {
@@ -622,7 +603,7 @@
 /* ── MOBILE < 992px ───────────────────────────────────── */
 @media (max-width: 991.98px) {
 
-  /* Hide the tagline row on mobile */
+  /* Hide socials + tagline row on mobile */
   .nav-row-1 { display: none; }
 
   /* Row 2 layout */
@@ -642,12 +623,11 @@
 
   .nav-call { display: none !important; }
 
-  /* ── ROW 3 — SHOW ON MOBILE, HORIZONTAL SCROLL ─────── */
+  /* ── ROW 3 — SHOW, HORIZONTAL SCROLL ───────────────── */
   .nav-row-3 {
     display: block !important;
   }
 
-  /* Keep the glass green full-bleed */
   .nav-row-3::before {
     background: linear-gradient(135deg,
       rgba(10, 61, 31, 0.92) 0%,
@@ -657,35 +637,35 @@
     -webkit-backdrop-filter: blur(14px) saturate(160%);
   }
 
-  /* Horizontal scroll container — no visible scrollbar */
+  /* Scroll container — no visible scrollbar */
   .cat-links-scroll {
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;                 /* Firefox */
-    -ms-overflow-style: none;              /* IE/Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
   .cat-links-scroll::-webkit-scrollbar {
-    display: none;                          /* Chrome, Safari, Opera */
+    display: none;
     width: 0;
     height: 0;
   }
 
-  /* Left-align the pills on mobile (they scroll, not center) */
+  /* Left-align pills for scroll (not centered) */
   .cat-links {
     justify-content: flex-start;
     padding: var(--space-2) var(--space-3);
     gap: var(--space-2);
   }
 
-  /* Bigger, easier-to-tap pills on mobile */
+  /* Slightly bigger tap targets on mobile */
   .cat-link {
     padding: var(--space-2) var(--space-4);
     font-size: var(--fs-sm);
     font-weight: 800;
   }
 
-  /* Glass on the sticky row 2 for mobile */
+  /* Glass on sticky row 2 (mobile) */
   .site-header.is-stuck .nav-row-2 {
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(20px) saturate(180%);
@@ -822,7 +802,7 @@
     font-size: var(--fs-base) !important;
   }
 
-  /* Hide the old mobile 2-link row entirely */
+  /* Old mobile 2-link row — gone */
   .nav-row-3-mobile { display: none !important; }
 }
 
@@ -831,12 +811,13 @@
   .nav-container { padding: 0 0.5rem; }
   .nav-phone-icon, .nav-search-btn, .nav-toggler { width: 2.5rem; height: 2.5rem; }
   .brand-logo { height: clamp(60px, 15vw, 80px); max-width: clamp(160px, 50vw, 220px); }
-  .cat-link { font-size: var(--fs-xs); padding: var(--space-1) var(--space-3); }
+  .cat-link { font-size: var(--fs-xs); padding: var(--space-2) var(--space-3); }
 }
 @media (max-width: 380px) {
   .nav-container { padding: 0 0.375rem; }
   .brand-logo { height: clamp(54px, 14vw, 70px); max-width: 54vw; }
   .nav-phone-icon, .nav-search-btn, .nav-toggler { width: 2.3rem; height: 2.3rem; }
+  .cat-link { font-size: 0.7rem; }
 }
 
 /* ── Backdrop ──────────────────────────────────────────── */
