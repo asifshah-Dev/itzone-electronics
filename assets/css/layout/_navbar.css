@@ -1,9 +1,10 @@
 /* assets/css/layout/_navbar.css
    ─────────────────────────────────────────────────────────
-   Navbar v4 — WHITE background, GREEN category bar.
-   Row 1: socials + tagline (white)
-   Rows 2+3 (JS-sticky): search·phone·LOGO·call·hamburger (white)
-                         + category bar (green)
+   Navbar v5 — white background, green category bar.
+   - No chip background behind logo (logo has its own white)
+   - Bolder icons and text
+   - No bottom border on row 1
+   - Consistent brand-green hover colors
    ───────────────────────────────────────────────────────── */
 
 .nav-backdrop[hidden] { display: none !important; }
@@ -14,21 +15,20 @@
   background: transparent;
 }
 
-/* ── ROW 1 — WHITE ─────────────────────────────────────── */
+/* ── ROW 1 — WHITE, no bottom border ───────────────────── */
 .nav-row-1 {
   background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  /* removed the bottom border */
 }
 
-/* ── ROWS 2+3 sticky wrapper ───────────────────────────── */
+/* ── Sticky wrapper ────────────────────────────────────── */
 .nav-sticky {
   background: #ffffff;
   z-index: var(--z-sticky);
   transition: box-shadow var(--dur-base) var(--ease-out);
 }
 .site-header.is-stuck .nav-sticky {
-  box-shadow: 0 8px 24px -10px rgba(10, 15, 13, 0.15);
-  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 8px 24px -12px rgba(10, 15, 13, 0.18);
 }
 
 /* ── Container ─────────────────────────────────────────── */
@@ -51,8 +51,8 @@
 .nav-row-1 {
   justify-content: space-between;
   gap: var(--space-4);
-  padding-block: var(--space-2);
-  min-height: 40px;
+  padding-block: var(--space-3);
+  min-height: 48px;
 }
 .nav-row-1 > .nav-container {
   flex-direction: row;
@@ -63,7 +63,7 @@
 .nav-socials {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 .social-link {
   display: inline-flex;
@@ -72,7 +72,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: var(--radius-sm);
-  color: #334155;
+  color: #0f172a;                         /* dark, bold */
   transition: color .12s ease, background-color .12s ease;
 }
 .social-link:hover {
@@ -80,14 +80,18 @@
   background: var(--brand-primary-soft);
 }
 .social-link .lucide,
-.social-link svg { width: 1.1rem; height: 1.1rem; }
+.social-link svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  stroke-width: 2.5;                       /* bolder icons */
+}
 
 .nav-tagline {
   margin: 0;
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-medium);
-  letter-spacing: 0.02em;
-  color: #64748b;
+  font-size: var(--fs-sm);                 /* larger */
+  font-weight: var(--fw-semibold);         /* bolder */
+  letter-spacing: 0.01em;
+  color: #334155;
   text-align: center;
   flex: 1 1 auto;
   white-space: nowrap;
@@ -100,7 +104,7 @@
   height: 2rem;
 }
 
-/* ── ROW 2 — WHITE, dark text ──────────────────────────── */
+/* ── ROW 2 ─────────────────────────────────────────────── */
 .nav-row-2 {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -120,14 +124,18 @@
   display: none;
   align-items: center;
   justify-content: center;
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: var(--radius-pill);
   border: 1.5px solid #e2e8f0;
   background: #ffffff;
   color: #0f172a;
   cursor: pointer;
   flex-shrink: 0;
+  transition:
+    border-color .14s ease,
+    color .14s ease,
+    background-color .14s ease;
 }
 .nav-search-btn:hover {
   border-color: var(--brand-primary);
@@ -135,7 +143,7 @@
   background: var(--brand-primary-soft);
 }
 .nav-search-btn .lucide,
-.nav-search-btn svg { width: 1.15rem; height: 1.15rem; }
+.nav-search-btn svg { width: 1.25rem; height: 1.25rem; stroke-width: 2.5; }
 
 .nav-search {
   flex: 1 1 auto;
@@ -156,7 +164,10 @@
 }
 .nav-search-icon {
   color: var(--brand-primary);
-  width: 1rem; height: 1rem; flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  stroke-width: 2.5;
+  flex-shrink: 0;
 }
 .nav-search-input {
   flex: 1 1 auto;
@@ -165,32 +176,39 @@
   background: transparent;
   font-family: var(--font-sans);
   font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
   color: #0f172a;
   min-width: 0;
   width: 100%;
 }
-.nav-search-input::placeholder { color: #94a3b8; }
+.nav-search-input::placeholder { color: #94a3b8; font-weight: 500; }
 
+/* ── Phone icon — MATCHES call button (brand green) ───── */
 .nav-phone-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 2.75rem;
+  height: 2.75rem;
   flex-shrink: 0;
   border-radius: var(--radius-pill);
-  border: 1.5px solid #e2e8f0;
-  background: #ffffff;
-  color: var(--brand-accent);
+  border: 1.5px solid var(--brand-primary);
+  background: transparent;
+  color: var(--brand-primary);
+  transition:
+    background-color .14s ease,
+    border-color .14s ease,
+    color .14s ease;
 }
 .nav-phone-icon:hover {
-  background: var(--brand-accent);
-  border-color: var(--brand-accent);
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
   color: #ffffff;
 }
 .nav-phone-icon .lucide,
-.nav-phone-icon svg { width: 1.15rem; height: 1.15rem; }
+.nav-phone-icon svg { width: 1.2rem; height: 1.2rem; stroke-width: 2.5; }
 
+/* ── Logo — NO white chip ──────────────────────────────── */
 .brand {
   justify-self: center;
   display: inline-flex;
@@ -199,22 +217,23 @@
   text-decoration: none;
   flex-shrink: 0;
   line-height: 0;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 6px 20px -8px rgba(10, 15, 13, 0.25);
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  padding: 5px;
+  background: transparent;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  transition: transform var(--dur-base) var(--ease-out);
 }
+.brand:hover { transform: scale(1.03); }
+
 .brand-logo {
   display: block;
   height: clamp(60px, 6.5vw, 84px);
   width: auto;
   max-width: clamp(180px, 20vw, 280px);
   object-fit: contain;
-  border-radius: 10px;
 }
 
+/* ── Actions ───────────────────────────────────────────── */
 .nav-actions {
   justify-self: end;
   display: flex;
@@ -223,7 +242,7 @@
   flex-shrink: 0;
 }
 
-/* Call button — light green/white in navbar */
+/* Call button — SAME brand green as phone icon */
 .nav-call {
   display: inline-flex;
   align-items: center;
@@ -236,30 +255,41 @@
   text-decoration: none;
   white-space: nowrap;
   font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-  transition: background-color .14s ease, color .14s ease;
+  font-weight: var(--fw-bold);           /* bolder */
+  transition:
+    background-color .14s ease,
+    color .14s ease,
+    border-color .14s ease;
 }
 .nav-call:hover {
   background: var(--brand-primary);
   color: #ffffff;
 }
 .nav-call .lucide,
-.nav-call svg { width: 1.1rem; height: 1.1rem; flex-shrink: 0; }
-.nav-call strong { font-weight: var(--fw-bold); color: var(--brand-accent); margin-left: 4px; }
+.nav-call svg { width: 1.15rem; height: 1.15rem; stroke-width: 2.5; flex-shrink: 0; }
+.nav-call strong {
+  font-weight: 800;
+  color: var(--brand-primary);
+  margin-left: 4px;
+}
 .nav-call:hover strong { color: #ffffff; }
 
 .nav-toggler {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: var(--radius-pill);
   border: 1.5px solid #e2e8f0;
   background: #ffffff;
   color: #0f172a;
   cursor: pointer;
   flex-shrink: 0;
+  transition:
+    border-color .14s ease,
+    color .14s ease,
+    background-color .14s ease;
 }
 .nav-toggler:hover {
   border-color: var(--brand-primary);
@@ -267,7 +297,7 @@
   background: var(--brand-primary-soft);
 }
 .nav-toggler .lucide,
-.nav-toggler svg { width: 1.25rem; height: 1.25rem; }
+.nav-toggler svg { width: 1.35rem; height: 1.35rem; stroke-width: 2.5; }
 
 /* ═══════════════════════════════════════════════════════
    ROW 3 — GREEN CATEGORY BAR
@@ -296,7 +326,7 @@
   justify-content: center;
   gap: var(--space-1);
   flex-wrap: nowrap;
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
   min-width: max-content;
 }
 
@@ -305,8 +335,8 @@
   align-items: center;
   padding: var(--space-2) var(--space-4);
   font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-  color: rgba(255, 255, 255, 0.88);
+  font-weight: var(--fw-bold);           /* bolder */
+  color: rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-md);
   white-space: nowrap;
   text-decoration: none;
@@ -318,14 +348,14 @@
 }
 .cat-link:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.16);
 }
 .cat-link.is-active {
   color: var(--brand-primary);
   background: #ffffff;
 }
 
-/* ── Mobile 2-link row ────────────────────────────────── */
+/* Mobile 2-link row */
 .nav-row-3-mobile {
   display: none;
   width: 100%;
@@ -341,14 +371,14 @@
   gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
   font-size: var(--fs-base);
-  font-weight: var(--fw-semibold);
+  font-weight: var(--fw-bold);
   color: var(--brand-primary);
   text-decoration: none;
   border-radius: var(--radius-md);
 }
 .mobile-link:hover { background: var(--brand-primary-soft); }
 .mobile-link .lucide,
-.mobile-link svg { width: 1.15rem; height: 1.15rem; }
+.mobile-link svg { width: 1.2rem; height: 1.2rem; stroke-width: 2.5; }
 
 /* ── LEFT-SIDE SEARCH DRAWER ───────────────────────────── */
 .mobile-search {
@@ -409,7 +439,10 @@
 }
 .mobile-search-icon {
   color: rgba(255, 255, 255, 0.88);
-  width: 1rem; height: 1rem; flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  stroke-width: 2.5;
+  flex-shrink: 0;
 }
 .mobile-search-input {
   flex: 1 1 auto;
@@ -418,6 +451,7 @@
   background: transparent;
   font-family: var(--font-sans);
   font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
   color: #ffffff;
   min-width: 0;
   width: 100%;
@@ -437,7 +471,7 @@
 }
 .mobile-search-clear:hover { background: rgba(255, 255, 255, 0.16); color: #ffffff; }
 .mobile-search-clear .lucide,
-.mobile-search-clear svg { width: .9rem; height: .9rem; }
+.mobile-search-clear svg { width: .95rem; height: .95rem; stroke-width: 2.5; }
 
 .mobile-search-close {
   display: inline-flex;
@@ -453,16 +487,16 @@
 }
 .mobile-search-close:hover { border-color: var(--brand-highlight); color: var(--brand-highlight); }
 .mobile-search-close .lucide,
-.mobile-search-close svg { width: 1.2rem; height: 1.2rem; }
+.mobile-search-close svg { width: 1.25rem; height: 1.25rem; stroke-width: 2.5; }
 
 .mobile-search-body { padding: var(--space-4) 0; }
 .mobile-search-title {
   padding: 0 var(--space-5) var(--space-2);
   font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
+  font-weight: var(--fw-bold);
   letter-spacing: var(--ls-wider);
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6);
   margin: 0;
 }
 .mobile-cats { list-style: none; padding: 0; margin: 0; }
@@ -473,6 +507,7 @@
   width: 100%;
   padding: var(--space-3) var(--space-5);
   font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
   color: rgba(255, 255, 255, 0.9);
   background: transparent;
   border: none;
@@ -482,7 +517,7 @@
 }
 .mobile-cat:hover { background: rgba(255, 255, 255, 0.08); color: #ffffff; }
 .mobile-cat .lucide,
-.mobile-cat svg { width: 1.1rem; height: 1.1rem; color: var(--brand-highlight); }
+.mobile-cat svg { width: 1.15rem; height: 1.15rem; stroke-width: 2.5; color: var(--brand-highlight); }
 
 /* ── Right drawer ─────────────────────────────────────── */
 .nav-links { display: none; }
@@ -507,7 +542,6 @@
 /* ── MOBILE < 992px ───────────────────────────────────── */
 @media (max-width: 991.98px) {
 
-  /* Hide socials row on mobile */
   .nav-row-1 { display: none; }
 
   .nav-row-2 {
@@ -518,7 +552,7 @@
   .nav-search-btn { display: inline-flex !important; }
   .nav-phone-icon { display: inline-flex !important; }
 
-  .brand { padding: 4px; }
+  .brand { padding: 0; }
   .brand-logo {
     height: clamp(60px, 15vw, 84px);
     max-width: clamp(170px, 52vw, 240px);
@@ -533,7 +567,6 @@
     width: auto;
   }
 
-  /* Right menu drawer */
   .nav-links {
     display: flex !important;
     position: fixed;
@@ -584,10 +617,8 @@
     align-items: center;
     text-decoration: none;
     line-height: 0;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #ffffff;
-    padding: 4px;
+    background: transparent;
+    padding: 0;
   }
   .drawer-logo {
     display: block;
@@ -603,14 +634,14 @@
     justify-content: center;
     width: 2.5rem; height: 2.5rem;
     border-radius: var(--radius-pill);
-    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     cursor: pointer;
   }
   .drawer-close:hover { border-color: var(--brand-highlight); color: var(--brand-highlight); }
   .drawer-close .lucide,
-  .drawer-close svg { width: 1.25rem; height: 1.25rem; }
+  .drawer-close svg { width: 1.3rem; height: 1.3rem; stroke-width: 2.5; }
 
   .nav-link {
     display: inline-flex;
@@ -618,22 +649,22 @@
     gap: var(--space-3);
     padding: var(--space-3) var(--space-5) !important;
     font-size: var(--fs-lg);
-    color: rgba(255, 255, 255, 0.92);
-    font-weight: var(--fw-medium);
+    font-weight: var(--fw-semibold);
+    color: rgba(255, 255, 255, 0.95);
     text-decoration: none;
   }
   .nav-link:hover { background: rgba(255, 255, 255, 0.1); color: #ffffff; }
   .nav-link .lucide,
-  .nav-link svg { width: 1.35rem; height: 1.35rem; }
+  .nav-link svg { width: 1.4rem; height: 1.4rem; stroke-width: 2.5; }
 
   .drawer-cats-header {
     display: block !important;
     padding: var(--space-4) var(--space-5) var(--space-2);
     font-size: var(--fs-xs);
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-bold);
     letter-spacing: var(--ls-wider);
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.6);
     border-top: 1px solid rgba(255, 255, 255, 0.12);
     margin-top: var(--space-2);
   }
@@ -642,7 +673,8 @@
     width: 100%;
     padding: var(--space-2) var(--space-5);
     font-size: var(--fs-base);
-    color: rgba(255, 255, 255, 0.85);
+    font-weight: var(--fw-medium);
+    color: rgba(255, 255, 255, 0.88);
     background: transparent;
     border: none;
     text-align: left;
@@ -696,7 +728,6 @@
   .nav-backdrop:not([hidden]) { display: block; }
 }
 
-/* ── Reduced motion ───────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .site-header, .brand-logo, .nav-links, .nav-backdrop,
   .nav-toggler, .drawer-close, .nav-call, .brand,

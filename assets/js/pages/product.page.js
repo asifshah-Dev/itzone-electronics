@@ -3,6 +3,7 @@
    Product detail page.
    URL: /pages/product.html?id=<id>&from=laptops|pcs
    Primary CTA: Order on WhatsApp (official SVG glyph).
+   Price colored to match brand (green).
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -12,7 +13,6 @@
   const PHONE_DISPLAY = '03265974741';
   const PHONE_TEL     = 'tel:+923265974741';
 
-  /* Official WhatsApp glyph (24x24) — inherits currentColor */
   function whatsappSvg(size) {
     const s = size || 18;
     return (
@@ -163,12 +163,10 @@
   function buildPage(item, related, from) {
     const fragment = document.createDocumentFragment();
 
-    /* Breadcrumb */
     const bc = document.createElement('div');
     bc.innerHTML = breadcrumb(item, from);
     fragment.appendChild(bc.firstElementChild);
 
-    /* Top grid: image + info */
     const priceFormatted = new Intl.NumberFormat('en-PK').format(item.price);
     const waUrl = NS.WhatsApp.productDetailUrl(item);
 
@@ -206,7 +204,6 @@
       '</div>';
     fragment.appendChild(grid);
 
-    /* Full specs section */
     const specs = document.createElement('section');
     specs.className = 'product-detail-specs';
     specs.setAttribute('aria-labelledby', 'specs-heading');
@@ -215,7 +212,6 @@
       '<div class="spec-table">' + specRows(item) + '</div>';
     fragment.appendChild(specs);
 
-    /* Related section — DOM-built */
     if (related.length) {
       const relSection = document.createElement('section');
       relSection.className = 'related-section';
