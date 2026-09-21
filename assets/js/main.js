@@ -41,62 +41,31 @@
     pcs:       () => window.ITZone.pcsPage?.init(),
     product:   () => window.ITZone.productPage?.init(),
     contact:   () => window.ITZone.contactPage?.init(),
+    '404':     () => window.ITZone.page404?.init(),
   };
 
   function boot() {
     const page = document.body.dataset.page || 'home';
     const vendors = vendorStatus();
 
-    /* ── Diagnostic banner ─────────────────────────────── */
-    console.group('[IT Zone] Boot — ' + page);
-    console.log('Data:',        typeof ITZone.Data);
-    console.log('WhatsApp:',    typeof ITZone.WhatsApp);
-    console.log('Cursor:',      typeof ITZone.Cursor);
-    console.log('Navbar:',      typeof ITZone.Navbar);
-    console.log('Footer:',      typeof ITZone.Footer);
-    console.log('Hero:',        typeof ITZone.Hero);
-    console.log('Reviews:',     typeof ITZone.Reviews);
-    console.log('ProductCard:', typeof ITZone.ProductCard);
-    console.log('ProductGrid:', typeof ITZone.ProductGrid);
-    console.log('SortBar:',     typeof ITZone.SortBar);
-    console.log('homePage:',    typeof ITZone.homePage);
-    console.log('inventoryPage:', typeof ITZone.inventoryPage);
-    console.log('pcsPage:',     typeof ITZone.pcsPage);
-    console.log('productPage:', typeof ITZone.productPage);
-    console.log('contactPage:', typeof ITZone.contactPage);
-    console.groupEnd();
+    try { ITZone.Navbar?.mount(); } catch (e) { console.error('Navbar:', e); }
+    try { ITZone.Footer?.mount(); } catch (e) { console.error('Footer:', e); }
+    try { ITZone.Cursor?.init(); } catch (e) { console.error('Cursor:', e); }
 
-    /* ── Chrome ────────────────────────────────────────── */
-    try { ITZone.Navbar?.mount(); } catch (e) { console.error('Navbar mount:', e); }
-    try { ITZone.Footer?.mount(); } catch (e) { console.error('Footer mount:', e); }
-    try { ITZone.Cursor?.init(); } catch (e) { console.error('Cursor init:', e); }
-
-    /* ── Reviews — mount on ANY page that has a slot ───── */
     try {
       if (ITZone.Reviews && typeof ITZone.Reviews.mount === 'function') {
-        const hasSlot = document.getElementById('reviews-slot');
-        if (hasSlot) {
-          console.info('[IT Zone] Mounting reviews into #reviews-slot...');
-          ITZone.Reviews.mount();
-        }
-      } else {
-        console.warn('[IT Zone] Reviews module not loaded.');
+        if (document.getElementById('reviews-slot')) ITZone.Reviews.mount();
       }
-    } catch (e) { console.error('Reviews mount:', e); }
+    } catch (e) { console.error('Reviews:', e); }
 
-    /* ── Focus target for skip link ───────────────────── */
     const main = document.getElementById('main');
     if (main && !main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
 
-    /* ── Icons ─────────────────────────────────────────── */
     ITZone.renderIcons();
 
-    /* ── Route ─────────────────────────────────────────── */
     const route = ROUTES[page];
     if (route) {
       try { route(); } catch (e) { console.error(`Route "${page}" error:`, e); }
-    } else {
-      console.warn('[IT Zone] No route registered for page="' + page + '"');
     }
 
     const ok = (b) => b ? '✓' : '✗';

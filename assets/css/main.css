@@ -22,6 +22,7 @@
 @import url("components/_reviews.css");
 @import url("components/_cursor.css");
 @import url("components/_contact.css");
+@import url("components/_404.css");
 
 /* 5. Bootstrap overrides — MUST be last */
 @import url("utilities/_overrides.css");
