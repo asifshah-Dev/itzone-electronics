@@ -1,9 +1,7 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
-   Navbar — 3 rows.
-   Row 1 (not sticky): socials · tagline
-   Rows 2+3 (JS-sticky): search·phone·LOGO·call·hamburger + categories
-   No cart.
+   Navbar — white background, green category bar.
+   Categories reduced to high-interest picks in priority order.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -23,13 +21,19 @@
   const SOCIALS = [
     { name: 'Facebook',  href: 'https://facebook.com/',      icon: 'facebook' },
     { name: 'Instagram', href: 'https://instagram.com/',     icon: 'instagram' },
-    { name: 'WhatsApp',  href: 'https://wa.me/923265974741', icon: 'message-circle' },
+    { name: 'WhatsApp',  href: 'https://wa.me/923265974741', icon: 'whatsapp' },
     { name: 'Twitter',   href: 'https://twitter.com/',       icon: 'twitter' },
   ];
 
+  /* ── Reduced category list — client priority order ───────
+     1. Price bands (most common filter)
+     2. CPU tiers
+     3. Top brands
+     4. Workstation / specialty
+     Max 8-10 items to fit the bar without scrolling. */
   function buildCategories(data) {
-    const laptops = Array.isArray(data.laptops) ? data.laptops : [];
-    const pcs     = data.pcs || {};
+    const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
+    const pcs      = data.pcs || {};
     const desktops = pcs.desktops || [];
     const tiny     = pcs.tiny     || [];
     const monitors = pcs.monitors || [];
@@ -39,24 +43,23 @@
     const hay = (i) => ((i.model || '') + ' ' + (i.extras || '') + ' ' + (i.gpu || '')).toLowerCase();
 
     const candidates = [
+      /* ── PRICE (most used) ─────────────────────────────── */
       { id: 'upto-30k',   label: 'Upto 30k',
-        test: i => Number(i.price) > 0 && Number(i.price) <= 30000 },
+        test: i => { const p = Number(i.price); return p > 0 && p <= 30000; } },
       { id: '30k-50k',    label: '30k to 50k',
-        test: i => Number(i.price) > 30000 && Number(i.price) <= 50000 },
+        test: i => { const p = Number(i.price); return p > 30000 && p <= 50000; } },
       { id: '50k-70k',    label: '50k to 70k',
-        test: i => Number(i.price) > 50000 && Number(i.price) <= 70000 },
+        test: i => { const p = Number(i.price); return p > 50000 && p <= 70000; } },
       { id: '70k-plus',   label: '70k Plus',
         test: i => Number(i.price) > 70000 },
 
+      /* ── CPU (targeted buyers) ─────────────────────────── */
       { id: 'i5',         label: 'Core i5',
         test: i => (i.cpu || '').toLowerCase().includes('i5') },
       { id: 'i7',         label: 'Core i7',
         test: i => (i.cpu || '').toLowerCase().includes('i7') },
-      { id: 'xeon',       label: 'Xeon',
-        test: i => (i.cpu || '').toLowerCase().includes('xeon') },
-      { id: 'ryzen',      label: 'Ryzen',
-        test: i => /ryzen|r5|r7/i.test(i.cpu || '') },
 
+      /* ── BRAND (brand loyalty) ─────────────────────────── */
       { id: 'dell',       label: 'Dell',
         test: i => i.brand === 'DELL' },
       { id: 'hp',         label: 'HP',
@@ -64,8 +67,7 @@
       { id: 'lenovo',     label: 'Lenovo',
         test: i => i.brand === 'LENOVO' },
 
-      { id: 'touch',      label: 'Touch',
-        test: i => hay(i).includes('touch') || hay(i).includes('2in1') || hay(i).includes('2-in-1') },
+      /* ── SPECIALTY (niche) ─────────────────────────────── */
       { id: 'gaming',     label: 'Gaming / Workstation',
         test: i => {
           if (i.gpu && String(i.gpu).trim() !== '') return true;
@@ -76,15 +78,13 @@
                  h.includes('xeon') || h.includes('quadro') ||
                  h.includes('dedicated') || h.includes('graphic');
         } },
-
-      { id: 'desktops',  label: 'Desktops',
-        test: i => desktops.includes(i) },
-      { id: 'tiny-pcs',  label: 'Tiny PCs',
-        test: i => tiny.includes(i) },
-      { id: 'monitors',  label: 'Monitors',
+      { id: 'monitors',   label: 'Monitors',
         test: i => monitors.includes(i) },
+      { id: 'desktops',   label: 'Desktops',
+        test: i => desktops.includes(i) },
     ];
 
+    /* Keep only categories with at least 2 matching items */
     return candidates
       .map(c => Object.assign({}, c, { _count: combined.filter(c.test).length }))
       .filter(c => c._count >= 2)
@@ -115,6 +115,16 @@
     window.location.href = url;
   }
 
+  /* Official WhatsApp SVG path — 24x24 filled brand glyph */
+  function whatsappSvg(size) {
+    const s = size || 18;
+    return (
+      '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">' +
+        '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />' +
+      '</svg>'
+    );
+  }
+
   function inlineLogoSVG(cls) {
     return `
       <svg class="${cls || 'brand-logo'}" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
@@ -138,21 +148,24 @@
   function template() {
     const logoSrc = r('assets/img/logo.svg');
 
-    const socialLinks = SOCIALS.map(s =>
-      `<a href="${s.href}" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="${s.name}"><i data-lucide="${s.icon}"></i></a>`
-    ).join('');
+    const socialLinks = SOCIALS.map(function (s) {
+      const icon = s.icon === 'whatsapp' ? whatsappSvg(16) : '<i data-lucide="' + s.icon + '"></i>';
+      return '<a href="' + s.href + '" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="' + s.name + '">' +
+        icon +
+      '</a>';
+    }).join('');
 
-    const catButtons = CATEGORIES.map(c =>
-      `<button type="button" class="cat-link" data-cat="${c.id}">${c.label}</button>`
-    ).join('');
+    const catButtons = CATEGORIES.map(function (c) {
+      return '<button type="button" class="cat-link" data-cat="' + c.id + '">' + c.label + '</button>';
+    }).join('');
 
-    const drawerCatButtons = CATEGORIES.map(c =>
-      `<li><button type="button" class="drawer-cat" data-cat="${c.id}">${c.label}</button></li>`
-    ).join('');
+    const drawerCatButtons = CATEGORIES.map(function (c) {
+      return '<li><button type="button" class="drawer-cat" data-cat="' + c.id + '">' + c.label + '</button></li>';
+    }).join('');
 
-    const mobileCatButtons = CATEGORIES.map(c =>
-      `<li><button type="button" class="mobile-cat" data-cat="${c.id}"><i data-lucide="tag"></i><span>${c.label}</span></button></li>`
-    ).join('');
+    const mobileCatButtons = CATEGORIES.map(function (c) {
+      return '<li><button type="button" class="mobile-cat" data-cat="' + c.id + '"><i data-lucide="tag"></i><span>' + c.label + '</span></button></li>';
+    }).join('');
 
     return `
       <nav class="site-nav" aria-label="Primary">
@@ -210,11 +223,11 @@
             </div>
 
             <div class="nav-row nav-row-3-mobile">
-              ${NAV_ITEMS.map(item =>
-                `<a class="mobile-link" href="${r(item.href)}">
-                   <i data-lucide="${item.icon}"></i><span>${item.label}</span>
-                 </a>`
-              ).join('')}
+              ${NAV_ITEMS.map(function (item) {
+                return '<a class="mobile-link" href="' + r(item.href) + '">' +
+                  '<i data-lucide="' + item.icon + '"></i><span>' + item.label + '</span>' +
+                '</a>';
+              }).join('')}
             </div>
 
           </div>
@@ -252,9 +265,11 @@
             <i data-lucide="x"></i>
           </button>
         </li>
-        ${NAV_ITEMS.map(item =>
-          `<li><a class="nav-link" href="${r(item.href)}"><i data-lucide="${item.icon}"></i><span>${item.label}</span></a></li>`
-        ).join('')}
+        ${NAV_ITEMS.map(function (item) {
+          return '<li><a class="nav-link" href="' + r(item.href) + '">' +
+            '<i data-lucide="' + item.icon + '"></i><span>' + item.label + '</span>' +
+          '</a></li>';
+        }).join('')}
         <li class="drawer-cats-header">Quick filters</li>
         ${drawerCatButtons}
         <li class="drawer-call-wrap">
@@ -268,8 +283,8 @@
   }
 
   function attachLogoFallback(root) {
-    root.querySelectorAll('img.brand-logo, img.drawer-logo').forEach(img => {
-      img.addEventListener('error', () => {
+    root.querySelectorAll('img.brand-logo, img.drawer-logo').forEach(function (img) {
+      img.addEventListener('error', function () {
         const wrapper = document.createElement('div');
         const cls = img.classList.contains('drawer-logo') ? 'drawer-logo' : 'brand-logo';
         wrapper.innerHTML = inlineLogoSVG(cls).trim();
@@ -279,10 +294,10 @@
   }
 
   function wire(root) {
-    const toggler    = root.querySelector('#nav-toggler');
-    const menu       = root.querySelector('#primary-menu');
-    const backdrop   = root.querySelector('#nav-backdrop');
-    const closeBtn   = root.querySelector('#drawer-close');
+    const toggler  = root.querySelector('#nav-toggler');
+    const menu     = root.querySelector('#primary-menu');
+    const backdrop = root.querySelector('#nav-backdrop');
+    const closeBtn = root.querySelector('#drawer-close');
 
     const searchOpen  = root.querySelector('#mobile-search-open');
     const searchPanel = root.querySelector('#mobile-search');
@@ -290,9 +305,9 @@
     const searchInput = root.querySelector('#mobile-search-input');
     const searchClear = root.querySelector('#mobile-search-clear');
 
-    const lockScroll = (on) => { document.documentElement.style.overflow = on ? 'hidden' : ''; };
+    const lockScroll = function (on) { document.documentElement.style.overflow = on ? 'hidden' : ''; };
 
-    root.addEventListener('click', (e) => {
+    root.addEventListener('click', function (e) {
       const btn = e.target.closest('[data-cat]');
       if (btn) { e.preventDefault(); gotoTag(btn.dataset.cat); }
     });
@@ -302,9 +317,12 @@
       backdrop.classList.remove('is-open');
       backdrop.hidden = true;
 
-      const setIcon = (el, name) => { el.innerHTML = `<i data-lucide="${name}"></i>`; NS.renderIcons?.(el); };
+      const setIcon = function (el, name) {
+        el.innerHTML = '<i data-lucide="' + name + '"></i>';
+        NS.renderIcons?.(el);
+      };
 
-      const openMenu = () => {
+      const openMenu = function () {
         closeSearch();
         menu.classList.add('is-open');
         backdrop.hidden = false;
@@ -314,30 +332,30 @@
         setIcon(toggler, 'x');
         lockScroll(true);
       };
-      const closeMenu = () => {
+      const closeMenu = function () {
         menu.classList.remove('is-open');
         backdrop.classList.remove('is-open');
         toggler.setAttribute('aria-expanded', 'false');
         setIcon(toggler, 'menu');
         lockScroll(false);
-        window.setTimeout(() => { backdrop.hidden = true; }, 250);
+        window.setTimeout(function () { backdrop.hidden = true; }, 250);
       };
 
       if (toggler.dataset.bound !== 'true') {
         toggler.dataset.bound = 'true';
-        toggler.addEventListener('click', e => {
+        toggler.addEventListener('click', function (e) {
           e.preventDefault();
           menu.classList.contains('is-open') ? closeMenu() : openMenu();
         });
       }
-      if (closeBtn) closeBtn.addEventListener('click', e => { e.preventDefault(); closeMenu(); toggler.focus(); });
+      if (closeBtn) closeBtn.addEventListener('click', function (e) { e.preventDefault(); closeMenu(); toggler.focus(); });
       backdrop.addEventListener('click', closeMenu);
-      document.addEventListener('keydown', e => {
+      document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && menu.classList.contains('is-open')) { closeMenu(); toggler.focus(); }
       });
 
       const mq = window.matchMedia('(min-width: 992px)');
-      const mqHandler = e => {
+      const mqHandler = function (e) {
         if (e.matches) {
           if (menu.classList.contains('is-open')) closeMenu();
           if (searchPanel.classList.contains('is-open')) closeSearch();
@@ -350,40 +368,40 @@
     function openSearch() {
       searchPanel.classList.add('is-open');
       searchPanel.setAttribute('aria-hidden', 'false');
-      searchOpen && searchOpen.setAttribute('aria-expanded', 'true');
+      if (searchOpen) searchOpen.setAttribute('aria-expanded', 'true');
       lockScroll(true);
-      window.setTimeout(() => searchInput && searchInput.focus(), 220);
+      window.setTimeout(function () { if (searchInput) searchInput.focus(); }, 220);
     }
     function closeSearch() {
       searchPanel.classList.remove('is-open');
       searchPanel.setAttribute('aria-hidden', 'true');
-      searchOpen && searchOpen.setAttribute('aria-expanded', 'false');
+      if (searchOpen) searchOpen.setAttribute('aria-expanded', 'false');
       if (!menu || !menu.classList.contains('is-open')) lockScroll(false);
     }
 
     if (searchOpen) {
-      searchOpen.addEventListener('click', e => {
+      searchOpen.addEventListener('click', function (e) {
         e.preventDefault();
         searchPanel.classList.contains('is-open') ? closeSearch() : openSearch();
       });
     }
-    if (searchClose) searchClose.addEventListener('click', e => { e.preventDefault(); closeSearch(); });
+    if (searchClose) searchClose.addEventListener('click', function (e) { e.preventDefault(); closeSearch(); });
 
-    document.addEventListener('click', e => {
+    document.addEventListener('click', function (e) {
       if (!searchPanel.classList.contains('is-open')) return;
       if (searchPanel.contains(e.target)) return;
       if (searchOpen && searchOpen.contains(e.target)) return;
       closeSearch();
     });
-    document.addEventListener('keydown', e => {
+    document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && searchPanel.classList.contains('is-open')) {
         closeSearch();
-        searchOpen && searchOpen.focus();
+        if (searchOpen) searchOpen.focus();
       }
     });
 
     if (searchInput) {
-      searchInput.addEventListener('keydown', e => {
+      searchInput.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter') return;
         e.preventDefault();
         const q = searchInput.value.trim();
@@ -399,14 +417,14 @@
       });
     }
     if (searchClear) {
-      searchClear.addEventListener('click', () => {
+      searchClear.addEventListener('click', function () {
         if (searchInput) { searchInput.value = ''; searchInput.focus(); }
       });
     }
 
     const desktopSearch = root.querySelector('#nav-search-input');
     if (desktopSearch) {
-      desktopSearch.addEventListener('keydown', e => {
+      desktopSearch.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter') return;
         e.preventDefault();
         const q = desktopSearch.value.trim();
@@ -474,7 +492,7 @@
     measure();
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', () => {
+    window.addEventListener('resize', function () {
       if (sticky.dataset.fixed === 'true') measure();
     });
   }
@@ -487,10 +505,10 @@
 
     try {
       const [laptops, pcs] = await Promise.all([
-        NS.Data?.laptops ? NS.Data.laptops().catch(() => []) : [],
-        NS.Data?.pcs     ? NS.Data.pcs().catch(() => ({})) : {},
+        NS.Data?.laptops ? NS.Data.laptops().catch(function () { return []; }) : [],
+        NS.Data?.pcs     ? NS.Data.pcs().catch(function () { return {}; }) : {},
       ]);
-      CATEGORIES = buildCategories({ laptops, pcs });
+      CATEGORIES = buildCategories({ laptops: laptops, pcs: pcs });
     } catch (e) {
       console.warn('[IT Zone] Navbar: category computation failed.', e);
       CATEGORIES = [];
@@ -500,7 +518,9 @@
     attachLogoFallback(host);
     wire(host);
     NS.renderIcons?.(host);
+
+    console.info('[IT Zone] Navbar: ' + CATEGORIES.length + ' categories loaded.');
   }
 
-  NS.Navbar = { mount };
+  NS.Navbar = { mount: mount };
 })();

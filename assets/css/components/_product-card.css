@@ -918,3 +918,20 @@
   .product-loading .lucide,
   .product-loading svg { animation: none; }
 }
+
+/* ── WhatsApp glyph — inline SVG, inherits color ──────── */
+.wa-glyph {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.product-order-wa .wa-glyph {
+  width: 1rem;
+  height: 1rem;
+}
+.btn-whatsapp .wa-glyph {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+/* Make sure any lucide icon remnant inside Order button is gone */
+.product-order-wa .lucide { display: none !important; }

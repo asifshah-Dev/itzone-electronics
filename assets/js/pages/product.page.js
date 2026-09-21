@@ -2,7 +2,7 @@
 /* ─────────────────────────────────────────────────────────
    Product detail page.
    URL: /pages/product.html?id=<id>&from=laptops|pcs
-   Primary CTA: Order on WhatsApp.
+   Primary CTA: Order on WhatsApp (official SVG glyph).
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -12,6 +12,16 @@
   const PHONE_DISPLAY = '03265974741';
   const PHONE_TEL     = 'tel:+923265974741';
 
+  /* Official WhatsApp glyph (24x24) — inherits currentColor */
+  function whatsappSvg(size) {
+    const s = size || 18;
+    return (
+      '<svg class="wa-glyph" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">' +
+        '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />' +
+      '</svg>'
+    );
+  }
+
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
 
   function r(href) {
@@ -19,6 +29,12 @@
     if (/^https?:|^tel:|^mailto:/.test(href)) return href;
     if (isInPagesDir()) return href.startsWith('pages/') ? href.replace('pages/', '') : `../${href}`;
     return href;
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   function readParams() {
@@ -43,32 +59,32 @@
       } catch (e) { /* ignore */ }
     }
 
-    return { id, from: from || 'laptops' };
+    return { id: id, from: from || 'laptops' };
   }
 
   function findItem(id, from, laptops, pcs) {
     if (!id) return null;
     if (from === 'pcs') {
       const all = []
-        .concat(pcs?.desktops || [])
-        .concat(pcs?.tiny     || [])
-        .concat(pcs?.monitors || []);
-      return all.find(x => String(x.id) === String(id)) || null;
+        .concat(pcs && pcs.desktops || [])
+        .concat(pcs && pcs.tiny     || [])
+        .concat(pcs && pcs.monitors || []);
+      return all.find(function (x) { return String(x.id) === String(id); }) || null;
     }
-    return (laptops || []).find(x => String(x.id) === String(id)) || null;
+    return (laptops || []).find(function (x) { return String(x.id) === String(id); }) || null;
   }
 
   function findRelated(item, laptops, pcs) {
     if (!item) return [];
     const fromPC = /^(pc-|mon-)/.test(item.id);
     const pool = fromPC
-      ? [].concat(pcs?.desktops || [], pcs?.tiny || [], pcs?.monitors || [])
+      ? [].concat(pcs && pcs.desktops || [], pcs && pcs.tiny || [], pcs && pcs.monitors || [])
       : (laptops || []).slice();
 
     const price = Number(item.price) || 0;
     return pool
-      .filter(x => String(x.id) !== String(item.id))
-      .sort((a, b) => {
+      .filter(function (x) { return String(x.id) !== String(item.id); })
+      .sort(function (a, b) {
         const aBrand = a.brand === item.brand ? 1 : 0;
         const bBrand = b.brand === item.brand ? 1 : 0;
         if (aBrand !== bBrand) return bBrand - aBrand;
@@ -83,7 +99,7 @@
                : item.hdd ? 'cpu'
                : 'laptop';
     if (src) {
-      return '<img src="' + src + '" alt="' + item.brand + ' ' + item.model + '" ' +
+      return '<img src="' + esc(src) + '" alt="' + esc(item.brand + ' ' + item.model) + '" ' +
              'loading="eager" decoding="async">';
     }
     return '<i data-lucide="' + icon + '"></i>';
@@ -106,12 +122,12 @@
     rows.push(['Warranty', '1 year']);
     rows.push(['Delivery', 'Nationwide (2\u20134 business days)']);
 
-    return rows.map(r =>
-      '<div class="spec-row">' +
-        '<span class="spec-key">' + r[0] + '</span>' +
-        '<span class="spec-value">' + r[1] + '</span>' +
-      '</div>'
-    ).join('');
+    return rows.map(function (r) {
+      return '<div class="spec-row">' +
+        '<span class="spec-key">' + esc(r[0]) + '</span>' +
+        '<span class="spec-value">' + esc(r[1]) + '</span>' +
+      '</div>';
+    }).join('');
   }
 
   function quickPills(item) {
@@ -124,9 +140,10 @@
     if (item.gpu)             pills.push({ icon: 'zap',          text: item.gpu });
     if (item.resolution)      pills.push({ icon: 'monitor',      text: item.resolution });
     if (item.size)            pills.push({ icon: 'maximize',     text: item.size });
-    return pills.map(p =>
-      '<span class="product-pill"><i data-lucide="' + p.icon + '"></i>' + p.text + '</span>'
-    ).join('');
+
+    return pills.map(function (p) {
+      return '<span class="product-pill"><i data-lucide="' + p.icon + '"></i>' + esc(p.text) + '</span>';
+    }).join('');
   }
 
   function breadcrumb(item, from) {
@@ -138,7 +155,7 @@
         '<span class="sep">/</span>' +
         '<a href="' + listHref + '">' + listLabel + '</a>' +
         '<span class="sep">/</span>' +
-        '<span class="current">' + item.brand + ' ' + item.model + '</span>' +
+        '<span class="current">' + esc(item.brand) + ' ' + esc(item.model) + '</span>' +
       '</nav>'
     );
   }
@@ -160,8 +177,8 @@
     grid.innerHTML =
       '<div class="product-detail-image">' + imageBlock(item) + '</div>' +
       '<div class="product-detail-info">' +
-        '<span class="product-detail-brand">' + item.brand + '</span>' +
-        '<h1 class="product-detail-title">' + item.model + '</h1>' +
+        '<span class="product-detail-brand">' + esc(item.brand) + '</span>' +
+        '<h1 class="product-detail-title">' + esc(item.model) + '</h1>' +
         '<div class="product-detail-price">' +
           '<span class="product-detail-price-label">PKR</span>' +
           '<span class="product-detail-price-value">' + priceFormatted + '</span>' +
@@ -169,11 +186,15 @@
         '<div class="product-detail-quick">' + quickPills(item) + '</div>' +
         '<div class="product-detail-ctas">' +
           '<a href="' + waUrl + '" ' +
+             'data-cursor="Order" ' +
              'target="_blank" rel="noopener noreferrer" ' +
              'class="btn btn-whatsapp">' +
-            '<i data-lucide="message-circle"></i><span>Order on WhatsApp</span>' +
+            whatsappSvg(18) +
+            '<span>Order on WhatsApp</span>' +
           '</a>' +
-          '<a href="' + PHONE_TEL + '" class="btn btn-accent">' +
+          '<a href="' + PHONE_TEL + '" ' +
+             'data-cursor="Call" ' +
+             'class="btn btn-accent">' +
             '<i data-lucide="phone"></i><span>Call ' + PHONE_DISPLAY + '</span>' +
           '</a>' +
         '</div>' +
@@ -194,7 +215,7 @@
       '<div class="spec-table">' + specRows(item) + '</div>';
     fragment.appendChild(specs);
 
-    /* Related section — DOM-built, not innerHTML */
+    /* Related section — DOM-built */
     if (related.length) {
       const relSection = document.createElement('section');
       relSection.className = 'related-section';
@@ -247,7 +268,15 @@
       '</div>';
     NS.renderIcons?.(host);
 
-    const { id, from } = readParams();
+    const params = readParams();
+    const id = params.id;
+    const from = params.from;
+
+    console.group('[IT Zone] Product page boot');
+    console.log('URL:', window.location.href);
+    console.log('search:', window.location.search);
+    console.log('id:', JSON.stringify(id));
+    console.log('from:', JSON.stringify(from));
 
     try {
       sessionStorage.removeItem('itz.pendingProductId');
@@ -258,18 +287,25 @@
     let laptops = [];
     let pcs = {};
     try {
-      [laptops, pcs] = await Promise.all([
-        NS.Data.laptops().catch(() => []),
-        NS.Data.pcs().catch(() => ({})),
+      const results = await Promise.all([
+        NS.Data.laptops().catch(function () { return []; }),
+        NS.Data.pcs().catch(function () { return {}; }),
       ]);
+      laptops = results[0];
+      pcs = results[1];
+      console.log('Data loaded — laptops:', laptops.length, '| pcs keys:', Object.keys(pcs));
     } catch (err) {
       console.error('[IT Zone] Failed to load data:', err);
       host.innerHTML = notFound();
       NS.renderIcons?.(host);
+      console.groupEnd();
       return;
     }
 
     const item = findItem(id, from, laptops, pcs);
+    console.log('Item found:', item ? (item.brand + ' ' + item.model) : 'NONE');
+    console.groupEnd();
+
     if (!item) {
       host.innerHTML = notFound();
       NS.renderIcons?.(host);
