@@ -1,9 +1,9 @@
 /* assets/css/layout/_navbar.css
    ─────────────────────────────────────────────────────────
-   Navbar v11 — glass morphism.
+   Navbar v12 — glass morphism.
    Row 1: white
    Row 2: white → glass when sticky
-   Row 3: always glass morphism green
+   Row 3: glass morphism green, SHARP BOLD text
    ───────────────────────────────────────────────────────── */
 
 .nav-backdrop[hidden] { display: none !important; }
@@ -27,8 +27,7 @@
   z-index: var(--z-sticky);
   transition:
     background-color var(--dur-base) var(--ease-out),
-    box-shadow       var(--dur-base) var(--ease-out),
-    backdrop-filter  var(--dur-base) var(--ease-out);
+    box-shadow       var(--dur-base) var(--ease-out);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -43,9 +42,6 @@
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
     0 8px 32px -12px rgba(13, 74, 38, 0.15);
 }
-
-/* Sticky wrapper itself becomes transparent so the glass
-   in row 2 is what you see */
 .site-header.is-stuck .nav-sticky {
   background: transparent;
   box-shadow: none;
@@ -182,7 +178,6 @@
   border-color: var(--brand-primary);
   box-shadow: 0 0 0 3px rgba(13, 74, 38, 0.12);
 }
-/* When glass is active, make the search field itself glassier */
 .site-header.is-stuck .nav-search {
   background: rgba(255, 255, 255, 0.55);
   border-color: rgba(255, 255, 255, 0.7);
@@ -234,7 +229,6 @@
 .nav-phone-icon .lucide,
 .nav-phone-icon svg { width: 1.2rem; height: 1.2rem; stroke-width: 2.5; }
 
-/* Logo — no chip, bigger */
 .brand {
   justify-self: center;
   display: inline-flex;
@@ -320,8 +314,9 @@
 .nav-toggler svg { width: 1.35rem; height: 1.35rem; stroke-width: 2.5; }
 
 /* ═══════════════════════════════════════════════════════
-   ROW 3 — GLASS MORPHISM GREEN
-   Always glassy. Even before sticky.
+   ROW 3 — GLASS MORPHISM GREEN (text stays sharp)
+   Blur is applied to a separate backdrop layer, text sits
+   above it fully opaque and bold.
    ═══════════════════════════════════════════════════════ */
 .nav-row-3 {
   display: block;
@@ -331,41 +326,37 @@
   background: transparent;
   padding: 0;
   position: relative;
+  isolation: isolate;
 }
 
 .nav-row-3::before {
   content: "";
   position: absolute;
   inset: 0;
-  /* Glass morphism green — semi-transparent gradient + heavy blur */
   background: linear-gradient(135deg,
-    rgba(13, 74, 38, 0.72) 0%,
-    rgba(10, 61, 31, 0.78) 50%,
-    rgba(20, 107, 56, 0.72) 100%);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  /* Glass edge highlight */
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  /* Inner top shine — hallmark of glass */
+    rgba(10, 61, 31, 0.88) 0%,
+    rgba(13, 74, 38, 0.92) 50%,
+    rgba(10, 61, 31, 0.88) 100%);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.25) inset,
-    0 -1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 1px 0 rgba(255, 255, 255, 0.2) inset,
     0 8px 32px -12px rgba(10, 15, 13, 0.35);
   z-index: 0;
   pointer-events: none;
 }
 
-/* Subtle diagonal light streak for extra glass depth */
 .nav-row-3::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(115deg,
     rgba(255, 255, 255, 0) 30%,
-    rgba(255, 255, 255, 0.08) 45%,
-    rgba(255, 255, 255, 0.14) 50%,
-    rgba(255, 255, 255, 0.08) 55%,
+    rgba(255, 255, 255, 0.06) 45%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.06) 55%,
     rgba(255, 255, 255, 0) 70%);
   z-index: 0;
   pointer-events: none;
@@ -379,6 +370,9 @@
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 .cat-links-scroll::-webkit-scrollbar { display: none; }
 
@@ -390,45 +384,44 @@
   flex-wrap: nowrap;
   padding: var(--space-3) var(--space-4);
   min-width: max-content;
+  filter: none !important;
 }
 
-/* Category pills — frosted glass look */
+/* Category pills — SHARP BOLD white text */
 .cat-link {
   display: inline-flex;
   align-items: center;
   padding: var(--space-2) var(--space-4);
+  font-family: var(--font-sans);
   font-size: var(--fs-sm);
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--radius-pill);
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
-  font-family: inherit;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-  /* Inner top shine */
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
-  transition: all .18s ease;
+  text-shadow: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.35));
+  transition: all .16s ease;
 }
 .cat-link:hover {
   color: var(--brand-primary);
-  background: rgba(255, 255, 255, 0.98);
+  background: #ffffff;
   border-color: #ffffff;
-  text-shadow: none;
+  filter: none;
   transform: translateY(-1px);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.5) inset,
-    0 8px 20px -8px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.4);
 }
 .cat-link.is-active {
   color: var(--brand-primary);
   background: #ffffff;
   border-color: #ffffff;
-  text-shadow: none;
+  filter: none;
 }
 .cat-link:focus-visible {
   outline: 2px solid #ffffff;
@@ -654,7 +647,6 @@
     width: auto;
   }
 
-  /* Mobile glass on the sticky row 2 */
   .site-header.is-stuck .nav-row-2 {
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(20px) saturate(180%);
