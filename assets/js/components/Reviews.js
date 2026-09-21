@@ -1,63 +1,25 @@
- 
 // assets/js/components/Reviews.js
 /* ─────────────────────────────────────────────────────────
-   Reviews section for the home page.
+   Reviews section.
    Renders review cards + Trustindex badge + JSON-LD schema.
+   Verbose logging so mount issues are visible in console.
    ───────────────────────────────────────────────────────── */
 
 (function () {
   'use strict';
   const NS = (window.ITZone = window.ITZone || {});
 
+  console.info('[IT Zone] Reviews: module booting...');
+
   const REVIEWS = [
-    {
-      name: 'Saleem Sarwar',
-      rating: 5,
-      date: '12 months ago',
-      text: 'Very nice laptop I am very impressed. I will recommend IT Zone to everyone looking for quality machines at fair prices.',
-    },
-    {
-      name: 'Ammar Butt',
-      rating: 5,
-      date: '12 months ago',
-      text: 'I highly recommend IT Zone to anyone looking for quality laptops at fair prices. This was hands down one of the best online shopping experiences I\'ve had in Pakistan. The dealing was clean and quick.',
-    },
-    {
-      name: 'Zarar Khan',
-      rating: 5,
-      date: '12 months ago',
-      text: 'I recently purchased an HP ProBook from IT Zone and I\'m really satisfied. The product was exactly as described, well-packed, and delivered on time. The laptop works perfectly. What I liked the most was their professional dealing and genuine recommendations.',
-    },
-    {
-      name: 'Harris Bhatti',
-      rating: 5,
-      date: '1 year ago',
-      text: 'Highly recommend. Reasonable prices and good quality products every time.',
-    },
-    {
-      name: 'Measum Zulfiqar',
-      rating: 5,
-      date: '1 year ago',
-      text: 'Very professional treatment. Bought an HP Z Firefly from them. Amazing quality & service for testing everything before the purchase. Do visit them for top-class systems from HP & Dell.',
-    },
-    {
-      name: 'Mohsin Ali',
-      rating: 5,
-      date: '1 year ago',
-      text: 'Wide range of laptops. I recently bought 2 laptops — HP and Lenovo — and I am satisfied with the overall experience.',
-    },
-    {
-      name: 'Arjmand Ismail',
-      rating: 5,
-      date: '1 year ago',
-      text: 'Professionally dealing and the device is really in range of prices. Recommended.',
-    },
-    {
-      name: 'Tanveer Fahad',
-      rating: 5,
-      date: '1 year ago',
-      text: 'Excellent service and authentic products. The staff provided professional guidance in selecting the right laptop, and the entire purchasing process was smooth and transparent. Highly recommended for anyone seeking quality and reliability.',
-    },
+    { name: 'Saleem Sarwar',   rating: 5, date: '12 months ago', text: 'Very nice laptop I am very impressed. I will recommend IT Zone to everyone looking for quality machines at fair prices.' },
+    { name: 'Ammar Butt',      rating: 5, date: '12 months ago', text: 'I highly recommend IT Zone to anyone looking for quality laptops at fair prices. Hands down one of the best online shopping experiences I\'ve had in Pakistan. The dealing was clean and quick.' },
+    { name: 'Zarar Khan',      rating: 5, date: '12 months ago', text: 'I recently purchased an HP ProBook from IT Zone and I\'m really satisfied. The product was exactly as described, well-packed, and delivered on time. The laptop works perfectly.' },
+    { name: 'Harris Bhatti',   rating: 5, date: '1 year ago',    text: 'Highly recommend. Reasonable prices and good quality products every time.' },
+    { name: 'Measum Zulfiqar', rating: 5, date: '1 year ago',    text: 'Very professional treatment. Bought an HP Z Firefly from them. Amazing quality & service for testing everything before the purchase.' },
+    { name: 'Mohsin Ali',      rating: 5, date: '1 year ago',    text: 'Wide range of laptops. I recently bought 2 laptops — HP and Lenovo — and I am satisfied with the overall experience.' },
+    { name: 'Arjmand Ismail',  rating: 5, date: '1 year ago',    text: 'Professionally dealing and the device is really in range of prices. Recommended.' },
+    { name: 'Tanveer Fahad',   rating: 5, date: '1 year ago',    text: 'Excellent service and authentic products. The staff provided professional guidance in selecting the right laptop.' },
   ];
 
   function stars(rating) {
@@ -83,11 +45,9 @@
             '</div>' +
           '</div>' +
         '</header>' +
-
         '<blockquote class="review-text">' +
           '\u201C' + r.text + '\u201D' +
         '</blockquote>' +
-
         '<footer class="review-footer">' +
           '<span class="review-source">' +
             '<i data-lucide="badge-check"></i>' +
@@ -100,13 +60,6 @@
   }
 
   function buildSchema() {
-    const reviewNodes = REVIEWS.map(r => ({
-      '@type': 'Review',
-      author: { '@type': 'Person', name: r.name },
-      reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
-      reviewBody: r.text,
-    }));
-
     return {
       '@context': 'https://schema.org',
       '@type': 'Organization',
@@ -118,7 +71,12 @@
         bestRating: '5',
         worstRating: '1',
       },
-      review: reviewNodes,
+      review: REVIEWS.map(r => ({
+        '@type': 'Review',
+        author: { '@type': 'Person', name: r.name },
+        reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
+        reviewBody: r.text,
+      })),
     };
   }
 
@@ -154,15 +112,26 @@
   }
 
   function mount() {
+    console.info('[IT Zone] Reviews.mount() called');
     const host = document.getElementById('reviews-slot');
-    if (!host) return;
-    if (host.dataset.mounted === 'true') return;
+    if (!host) {
+      console.warn('[IT Zone] Reviews: no #reviews-slot found on this page.');
+      return;
+    }
+    if (host.dataset.mounted === 'true') {
+      console.info('[IT Zone] Reviews: already mounted.');
+      return;
+    }
     host.dataset.mounted = 'true';
 
-    host.innerHTML = template();
-    NS.renderIcons?.(host);
+    try {
+      host.innerHTML = template();
+      NS.renderIcons?.(host);
+    } catch (e) {
+      console.error('[IT Zone] Reviews: render failed.', e);
+      return;
+    }
 
-    /* Inject JSON-LD for rich search results */
     if (!document.getElementById('reviews-schema')) {
       const s = document.createElement('script');
       s.id = 'reviews-schema';
@@ -170,7 +139,10 @@
       s.textContent = JSON.stringify(buildSchema());
       document.head.appendChild(s);
     }
+
+    console.info('[IT Zone] Reviews: mounted ' + REVIEWS.length + ' reviews.');
   }
 
-  NS.Reviews = { mount, count: REVIEWS.length };
+  NS.Reviews = { mount: mount, count: REVIEWS.length };
+  console.info('[IT Zone] Reviews: module loaded ✓');
 })();
