@@ -1,0 +1,9 @@
+{
+  "name": "itzone-electronics",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IT Zone Electronics — laptop & PC catalog",
+  "scripts": {
+    "download-images": "node scripts/download-images.js"
+  }
+}
