@@ -78,26 +78,42 @@
     return 'laptop';
   }
 
-  /* ✅ Read images[] array — falls back to item.image, then to placeholder */
-  function primaryImage(item) {
-    if (Array.isArray(item.images) && item.images.length) return item.images[0];
-    if (item.image) return item.image;
-    return '';
+  /* ✅ Get all images array (with fallback to single `image` field) */
+  function imagesOf(item) {
+    if (Array.isArray(item.images) && item.images.length) {
+      return item.images.map(r);
+    }
+    if (item.image) return [r(item.image)];
+    return [];
   }
 
   function imageBlock(item) {
-    const src = primaryImage(item);
+    const imgs = imagesOf(item);
     const icon = categoryIcon(item);
+    const alt = esc(item.brand + ' ' + item.model);
 
-    if (src) {
-      return '<div class="product-image">' +
-        '<img src="' + esc(r(src)) + '" alt="' + esc(item.brand + ' ' + item.model) + '" ' +
-             'loading="lazy" decoding="async" width="400" height="300" ' +
-             'onerror="this.onerror=null;this.parentNode.classList.add(\'product-image--placeholder\');this.parentNode.innerHTML=\'<i data-lucide=&quot;' + icon + '&quot;></i>\';if(window.lucide)window.lucide.createIcons();">' +
+    if (!imgs.length) {
+      return '<div class="product-image product-image--placeholder" aria-hidden="true">' +
+        '<i data-lucide="' + icon + '"></i>' +
       '</div>';
     }
-    return '<div class="product-image product-image--placeholder" aria-hidden="true">' +
-      '<i data-lucide="' + icon + '"></i>' +
+
+    const primary = imgs[0];
+    const hover = imgs[1] || '';   /* second image = hover effect */
+
+    const primaryImg =
+      '<img class="pi-primary" src="' + esc(primary) + '" alt="' + alt + '" ' +
+           'loading="lazy" decoding="async" width="400" height="300" ' +
+           'onerror="this.onerror=null;this.parentNode.classList.add(\'product-image--placeholder\');this.parentNode.innerHTML=\'<i data-lucide=&quot;' + icon + '&quot;></i>\';if(window.lucide)window.lucide.createIcons();">';
+
+    const hoverImg = hover
+      ? '<img class="pi-hover" src="' + esc(hover) + '" alt="" ' +
+             'loading="lazy" decoding="async" width="400" height="300" ' +
+             'onerror="this.style.display=\'none\';">'
+      : '';
+
+    return '<div class="product-image' + (hover ? ' has-hover' : '') + '">' +
+      primaryImg + hoverImg +
     '</div>';
   }
 

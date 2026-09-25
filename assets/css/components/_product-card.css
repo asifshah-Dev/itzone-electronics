@@ -347,19 +347,43 @@
   aspect-ratio: 4 / 3;
   background: var(--bg-subtle);
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
 }
+
+/* Both images stack absolutely — primary visible, hover hidden */
 .product-image img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform var(--dur-slow) var(--ease-out);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
 }
-.product-card:hover .product-image img { transform: scale(1.04); }
+
+.product-image .pi-primary {
+  opacity: 1;
+  z-index: 1;
+}
+.product-image .pi-hover {
+  opacity: 0;
+  z-index: 2;
+}
+
+/* Subtle zoom on primary when no hover image */
+.product-image:not(.has-hover) .pi-primary {
+  position: relative;
+  inset: auto;
+}
+.product-card:hover .product-image:not(.has-hover) .pi-primary {
+  transform: scale(1.04);
+}
+
+/* Hover image swap */
+.product-image.has-hover:hover .pi-primary { opacity: 0; }
+.product-image.has-hover:hover .pi-hover   { opacity: 1; transform: scale(1.02); }
 .product-image--placeholder {
   background: linear-gradient(135deg, var(--brand-primary-soft) 0%, #ffffff 100%);
   color: var(--brand-primary);
