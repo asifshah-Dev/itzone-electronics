@@ -7,7 +7,12 @@
     "gen": "10TH",
     "ram": 32,
     "ssd": 512,
-    "price": 78000
+    "price": 78000,
+    "images": [
+      "assets/img/products/lap-001-1.jpg",
+      "assets/img/products/lap-001-2.jpg",
+      "assets/img/products/lap-001-3.jpg"
+    ]
   },
   {
     "id": "lap-002",
@@ -17,7 +22,12 @@
     "gen": "11TH",
     "ram": 16,
     "ssd": 256,
-    "price": 66000
+    "price": 66000,
+    "images": [
+      "assets/img/products/lap-002-1.jpg",
+      "assets/img/products/lap-002-2.jpg",
+      "assets/img/products/lap-002-3.jpg"
+    ]
   },
   {
     "id": "lap-003",
@@ -49,7 +59,12 @@
     "gen": "11TH",
     "ram": 16,
     "ssd": 512,
-    "price": 66000
+    "price": 66000,
+    "images": [
+      "assets/img/products/lap-004-1.jpg",
+      "assets/img/products/lap-004-2.jpg",
+      "assets/img/products/lap-004-3.jpg"
+    ]
   },
   {
     "id": "lap-005",
@@ -59,7 +74,12 @@
     "gen": "8TH",
     "ram": 8,
     "ssd": 256,
-    "price": 42000
+    "price": 42000,
+    "images": [
+      "assets/img/products/lap-005-1.jpg",
+      "assets/img/products/lap-005-2.jpg",
+      "assets/img/products/lap-005-3.jpg"
+    ]
   },
   {
     "id": "lap-006",
@@ -69,7 +89,12 @@
     "gen": "6TH",
     "ram": 4,
     "ssd": 128,
-    "price": 26000
+    "price": 26000,
+    "images": [
+      "assets/img/products/lap-006-1.jpg",
+      "assets/img/products/lap-006-2.jpg",
+      "assets/img/products/lap-006-3.jpg"
+    ]
   },
   {
     "id": "lap-007",
@@ -79,7 +104,12 @@
     "gen": "6TH",
     "ram": 8,
     "ssd": 128,
-    "price": 35000
+    "price": 35000,
+    "images": [
+      "assets/img/products/lap-007-1.jpg",
+      "assets/img/products/lap-007-2.jpg",
+      "assets/img/products/lap-007-3.jpg"
+    ]
   },
   {
     "id": "lap-008",
@@ -89,7 +119,11 @@
     "gen": "12TH",
     "ram": 8,
     "ssd": 256,
-    "price": 62000
+    "price": 62000,
+    "images": [
+      "assets/img/products/lap-008-1.jpg",
+      "assets/img/products/lap-008-2.jpg"
+    ]
   },
   {
     "id": "lap-009",
@@ -440,7 +474,12 @@
     "gen": "7TH",
     "ram": 8,
     "ssd": 128,
-    "price": 35000
+    "price": 35000,
+    "images": [
+      "assets/img/products/lap-025-1.jpg",
+      "assets/img/products/lap-025-2.jpg",
+      "assets/img/products/lap-025-3.jpg"
+    ]
   },
   {
     "id": "lap-026",
