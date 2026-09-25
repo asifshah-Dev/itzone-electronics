@@ -100,7 +100,7 @@
     return [];
   }
 
-  /* ✅ Gallery with main image + thumbnails */
+  /* ✅ Gallery — horizontal slider with thumbnails */
   function imageGallery(item) {
     const imgs = imagesOf(item);
     const icon = item.resolution ? 'monitor'
@@ -111,14 +111,21 @@
       return '<div class="product-detail-image"><i data-lucide="' + icon + '"></i></div>';
     }
 
-    const main = imgs[0];
+    /* All images side by side in a horizontal track */
+    const slides = imgs.map(function (src, i) {
+      return '<div class="pd-slide" data-index="' + i + '">' +
+        '<img src="' + esc(src) + '" alt="' +
+             esc(item.brand + ' ' + item.model + ' — view ' + (i + 1)) + '" ' +
+             (i === 0 ? 'loading="eager"' : 'loading="lazy"') + ' decoding="async">' +
+      '</div>';
+    }).join('');
 
     const thumbs = imgs.length > 1
       ? '<div class="pd-thumbs" role="tablist">' +
           imgs.map(function (src, i) {
             return '<button type="button" class="pd-thumb' + (i === 0 ? ' is-active' : '') + '"' +
-                     ' data-src="' + esc(src) + '"' +
-                     ' aria-label="Image ' + (i + 1) + ' of ' + imgs.length + '">' +
+                     ' data-index="' + i + '"' +
+                     ' aria-label="Show image ' + (i + 1) + ' of ' + imgs.length + '">' +
                      '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async">' +
                    '</button>';
           }).join('') +
@@ -127,10 +134,8 @@
 
     return (
       '<div class="product-detail-image-wrap">' +
-        '<div class="product-detail-image">' +
-          '<img id="pd-main-img" src="' + esc(main) + '" alt="' +
-            esc(item.brand + ' ' + item.model) + '" ' +
-            'loading="eager" decoding="async">' +
+        '<div class="product-detail-image" id="pd-viewport">' +
+          '<div class="pd-track" id="pd-track">' + slides + '</div>' +
         '</div>' +
         thumbs +
       '</div>'
@@ -376,17 +381,43 @@
     host.appendChild(buildPage(item, related, from));
     NS.renderIcons?.(host);
 
-    /* ✅ Thumbnail click → swap main image */
-    host.addEventListener('click', function (e) {
-      const thumb = e.target.closest('.pd-thumb');
-      if (!thumb) return;
-      const main = host.querySelector('#pd-main-img');
-      if (!main) return;
-      main.src = thumb.dataset.src;
-      host.querySelectorAll('.pd-thumb').forEach(function (t) {
-        t.classList.toggle('is-active', t === thumb);
+    /* ✅ Thumbnail click → slide the track to the target image */
+    const track = host.querySelector('#pd-track');
+    const thumbs = host.querySelectorAll('.pd-thumb');
+
+    if (track && thumbs.length) {
+      /* Start at index 0 */
+      let currentIndex = 0;
+
+      const goTo = function (index) {
+        if (index < 0) index = 0;
+        if (index >= thumbs.length) index = thumbs.length - 1;
+        if (index === currentIndex) return;
+
+        currentIndex = index;
+
+        /* Translate the track — CSS transition makes it slide */
+        track.style.transform = 'translateX(-' + (index * 100) + '%)';
+
+        /* Update thumb highlighting */
+        thumbs.forEach(function (t, i) {
+          t.classList.toggle('is-active', i === index);
+        });
+      };
+
+      host.addEventListener('click', function (e) {
+        const thumb = e.target.closest('.pd-thumb');
+        if (!thumb) return;
+        const idx = parseInt(thumb.dataset.index, 10) || 0;
+        goTo(idx);
       });
-    });
+
+      /* Optional: arrow keys for accessibility */
+      host.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft')  goTo(currentIndex - 1);
+        if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+      });
+    }
 
     console.info('[IT Zone] Product loaded:', item.brand, item.model,
                  '| Images:', imagesOf(item).length,
