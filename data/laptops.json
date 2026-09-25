@@ -1,32 +1,585 @@
 [
-  { "id": "lap-001", "brand": "DELL",   "model": "LATITUDE 7410 2IN1",  "cpu": "I7",  "gen": "10TH", "ram": 32, "ssd": 512, "price": 78000 },
-  { "id": "lap-002", "brand": "DELL",   "model": "LATITUDE 7420",       "cpu": "I7",  "gen": "11TH", "ram": 16, "ssd": 256, "price": 66000 },
-  { "id": "lap-003", "brand": "DELL",   "model": "LATITUDE 7420",       "cpu": "I7",  "gen": "11TH", "ram": 32, "ssd": 512, "price": 83000 },
-  { "id": "lap-004", "brand": "DELL",   "model": "LATITUDE 7420",       "cpu": "I5",  "gen": "11TH", "ram": 16, "ssd": 512, "price": 66000 },
-  { "id": "lap-005", "brand": "DELL",   "model": "LATITUDE 3500",       "cpu": "I5",  "gen": "8TH",  "ram": 8,  "ssd": 256, "price": 42000 },
-  { "id": "lap-006", "brand": "DELL",   "model": "LATITUDE 5470",       "cpu": "I3",  "gen": "6TH",  "ram": 4,  "ssd": 128, "price": 26000 },
-  { "id": "lap-007", "brand": "DELL",   "model": "LATITUDE 5570",       "cpu": "I5",  "gen": "6TH",  "ram": 8,  "ssd": 128, "price": 35000 },
-  { "id": "lap-008", "brand": "DELL",   "model": "LATITUDE 5430",       "cpu": "I5",  "gen": "12TH", "ram": 8,  "ssd": 256, "price": 62000 },
-  { "id": "lap-009", "brand": "DELL",   "model": "LATITUDE 5420",       "cpu": "I5",  "gen": "11TH", "ram": 8,  "ssd": 256, "price": 55000 },
-  { "id": "lap-010", "brand": "DELL",   "model": "LATITUDE 3320",       "cpu": "I5",  "gen": "11TH", "ram": 8,  "ssd": 256, "price": 50000 },
-  { "id": "lap-011", "brand": "DELL",   "model": "LATITUDE 3510",       "cpu": "I5",  "gen": "10TH", "ram": 8,  "ssd": 256, "price": 52000 },
-  { "id": "lap-012", "brand": "DELL",   "model": "LATITUDE 3420",       "cpu": "I5",  "gen": "11TH", "ram": 8,  "ssd": 256, "price": 55000 },
-  { "id": "lap-013", "brand": "DELL",   "model": "VOSTRO 15",           "cpu": "I5",  "gen": "10TH", "ram": 8,  "ssd": 256, "price": 52000 },
-  { "id": "lap-014", "brand": "HP",     "model": "250 G9",              "cpu": "I5",  "gen": "12TH", "ram": 16, "ssd": 512, "price": 75000 },
-  { "id": "lap-015", "brand": "HP",     "model": "250 G8",              "cpu": "I5",  "gen": "11TH", "ram": 8,  "ssd": 256, "price": 58000 },
-  { "id": "lap-016", "brand": "HP",     "model": "250 G7",              "cpu": "I5",  "gen": "10TH", "ram": 8,  "ssd": 256, "price": 52000 },
-  { "id": "lap-017", "brand": "HP",     "model": "250 G8",              "cpu": "I5",  "gen": "11TH", "ram": 16, "ssd": 512, "price": 65000 },
-  { "id": "lap-018", "brand": "HP",     "model": "445 G9",              "cpu": "RYZEN 5 5650U", "gen": "", "ram": 8, "ssd": 256, "price": 60000 },
-  { "id": "lap-019", "brand": "HP",     "model": "Z BOOK FIREFLY 14 G7","cpu": "I7",  "gen": "10TH", "ram": 16, "ssd": 512, "price": 80000 },
-  { "id": "lap-020", "brand": "HP",     "model": "Z BOOK FIREFLY 14 G7","cpu": "I5",  "gen": "10TH", "ram": 16, "ssd": 256, "price": 72000 },
-  { "id": "lap-021", "brand": "HP",     "model": "Z BOOK FIREFLY 14 G7","cpu": "I7",  "gen": "10TH", "ram": 16, "ssd": 256, "price": 80000, "extras": "4GB NVIDIA Quadro P520" },
-  { "id": "lap-022", "brand": "LENOVO", "model": "X390",                "cpu": "I5",  "gen": "8TH",  "ram": 8,  "ssd": 256, "price": 40000 },
-  { "id": "lap-023", "brand": "LENOVO", "model": "L13 GEN 3",           "cpu": "I5",  "gen": "12TH", "ram": 16, "ssd": 256, "price": 65000 },
-  { "id": "lap-024", "brand": "LENOVO", "model": "L590",                "cpu": "I5",  "gen": "8TH",  "ram": 8,  "ssd": 256, "price": 43000 },
-  { "id": "lap-025", "brand": "LENOVO", "model": "E470",                "cpu": "I5",  "gen": "7TH",  "ram": 8,  "ssd": 128, "price": 35000 },
-  { "id": "lap-026", "brand": "LENOVO", "model": "P51",                 "cpu": "XEON E3-1505M V6", "gen": "", "ram": 16, "ssd": 256, "price": 60000, "extras": "4GB NVIDIA Quadro" },
-  { "id": "lap-027", "brand": "LENOVO", "model": "P14s GEN 1",          "cpu": "I7",  "gen": "10TH", "ram": 8,  "ssd": 256, "price": 65500 },
-  { "id": "lap-028", "brand": "LENOVO", "model": "L14 GEN 3",           "cpu": "I5",  "gen": "12TH", "ram": 8,  "ssd": 256, "price": 70000 },
-  { "id": "lap-029", "brand": "LENOVO", "model": "L14 GEN 1",           "cpu": "I5",  "gen": "10TH", "ram": 8,  "ssd": 256, "price": 50000 },
-  { "id": "lap-030", "brand": "LENOVO", "model": "L14 GEN 1",           "cpu": "R5 4650U", "gen": "", "ram": 8, "ssd": 256, "price": 50000 }
+  {
+    "id": "lap-001",
+    "brand": "DELL",
+    "model": "LATITUDE 7410 2IN1",
+    "cpu": "I7",
+    "gen": "10TH",
+    "ram": 32,
+    "ssd": 512,
+    "price": 78000
+  },
+  {
+    "id": "lap-002",
+    "brand": "DELL",
+    "model": "LATITUDE 7420",
+    "cpu": "I7",
+    "gen": "11TH",
+    "ram": 16,
+    "ssd": 256,
+    "price": 66000
+  },
+  {
+  "id": "lap-003",
+  "brand": "DELL",
+  "model": "LATITUDE 7420",
+  "cpu": "I7",
+  "gen": "11TH",
+  "ram": 32,
+  "ssd": 512,
+  "price": 66000,
+  "screen": "14 inch",
+  "features": [
+    "Face Unlock",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Type-C charging port"
+  ],
+  "images": [
+    "assets/img/products/lap-003-1.jpg",
+    "assets/img/products/lap-003-2.jpg",
+    "assets/img/products/lap-003-3.jpg"
+  ]
+},
+  {
+    "id": "lap-004",
+    "brand": "DELL",
+    "model": "LATITUDE 7420",
+    "cpu": "I5",
+    "gen": "11TH",
+    "ram": 16,
+    "ssd": 512,
+    "price": 66000
+  },
+  {
+    "id": "lap-005",
+    "brand": "DELL",
+    "model": "LATITUDE 3500",
+    "cpu": "I5",
+    "gen": "8TH",
+    "ram": 8,
+    "ssd": 256,
+    "price": 42000
+  },
+  {
+    "id": "lap-006",
+    "brand": "DELL",
+    "model": "LATITUDE 5470",
+    "cpu": "I3",
+    "gen": "6TH",
+    "ram": 4,
+    "ssd": 128,
+    "price": 26000
+  },
+  {
+    "id": "lap-007",
+    "brand": "DELL",
+    "model": "LATITUDE 5570",
+    "cpu": "I5",
+    "gen": "6TH",
+    "ram": 8,
+    "ssd": 128,
+    "price": 35000
+  },
+  {
+    "id": "lap-008",
+    "brand": "DELL",
+    "model": "LATITUDE 5430",
+    "cpu": "I5",
+    "gen": "12TH",
+    "ram": 8,
+    "ssd": 256,
+    "price": 62000
+  },
+  {
+  "id": "lap-009",
+  "brand": "DELL",
+  "model": "LATITUDE 5420",
+  "cpu": "I5",
+  "gen": "11TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 55000,
+  "screen": "14 inch",
+  "features": [
+    "Backlight keyboard",
+    "Type-C charging port",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-009-1.jpg",
+    "assets/img/products/lap-009-2.jpg",
+    "assets/img/products/lap-009-3.jpg"
+  ]
+},
+ {
+  "id": "lap-010",
+  "brand": "DELL",
+  "model": "LATITUDE 3320",
+  "cpu": "I5",
+  "gen": "11TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 50000,
+  "screen": "13.3 inch",
+  "features": [
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-010-1.jpg",
+    "assets/img/products/lap-010-2.jpg",
+    "assets/img/products/lap-010-3.jpg"
+  ]
+},
+  {
+  "id": "lap-011",
+  "brand": "DELL",
+  "model": "LATITUDE 3510",
+  "cpu": "I5",
+  "gen": "10TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 52000,
+  "screen": "15.6 inch",
+  "features": [
+    "Numeric pad",
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-011-1.jpg",
+    "assets/img/products/lap-011-2.jpg",
+    "assets/img/products/lap-011-3.jpg"
+  ]
+},
+  {
+  "id": "lap-012",
+  "brand": "DELL",
+  "model": "LATITUDE 3420",
+  "cpu": "I5",
+  "gen": "11TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 55000,
+  "screen": "14 inch",
+  "features": [
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-012-1.jpg",
+    "assets/img/products/lap-012-2.jpg",
+    "assets/img/products/lap-012-3.jpg"
+  ]
+},
+  {
+  "id": "lap-013",
+  "brand": "DELL",
+  "model": "VOSTRO 3590",
+  "cpu": "I5",
+  "gen": "10TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 52000,
+  "screen": "15.6 inch",
+  "features": [
+    "Numeric pad",
+    "Backlight keyboard"
+  ],
+  "images": [
+    "assets/img/products/lap-013-1.jpg",
+    "assets/img/products/lap-013-2.jpg",
+    "assets/img/products/lap-013-3.jpg"
+  ]
+},
+  {
+  "id": "lap-014",
+  "brand": "HP",
+  "model": "250 G9",
+  "cpu": "I5",
+  "gen": "12TH",
+  "ram": 16,
+  "ssd": 512,
+  "price": 75000,
+  "screen": "15.6 inch",
+  "features": [
+    "Numeric pad",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-014-1.jpg",
+    "assets/img/products/lap-014-2.jpg",
+    "assets/img/products/lap-014-3.jpg"
+  ]
+},
+  {
+  "id": "lap-015",
+  "brand": "HP",
+  "model": "250 G8",
+  "cpu": "I5",
+  "gen": "11TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 58000,
+  "screen": "15.6 inch",
+  "features": [
+    "Numeric pad",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-015-1.jpg",
+    "assets/img/products/lap-015-2.jpg",
+    "assets/img/products/lap-015-3.jpg"
+  ]
+},
+  {
+  "id": "lap-016",
+  "brand": "HP",
+  "model": "250 G7",
+  "cpu": "I5",
+  "gen": "10TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 52000,
+  "screen": "15.6 inch",
+  "features": [
+    "Numeric pad",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-016-1.jpg",
+    "assets/img/products/lap-016-2.jpg",
+    "assets/img/products/lap-016-3.jpg"
+  ]
+},
+  {
+  "id": "lap-017",
+  "brand": "HP",
+  "model": "250 G8",
+  "cpu": "I5",
+  "gen": "11TH",
+  "ram": 16,
+  "ssd": 512,
+  "price": 65000,
+  "screen": "15.6 inch",
+  "features": [
+    "Numeric pad",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-017-1.jpg",
+    "assets/img/products/lap-017-2.jpg",
+    "assets/img/products/lap-017-3.jpg"
+  ]
+},
+  {
+  "id": "lap-018",
+  "brand": "HP",
+  "model": "445 G9",
+  "cpu": "RYZEN 5 5625U",
+  "gen": "",
+  "ram": 8,
+  "ssd": 256,
+  "price": 60000,
+  "screen": "14 inch",
+  "features": [
+    "Face Unlock",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-018-1.jpg",
+    "assets/img/products/lap-018-2.jpg",
+    "assets/img/products/lap-018-3.jpg"
+  ]
+},
+  {
+  "id": "lap-019",
+  "brand": "HP",
+  "model": "Z BOOK FIREFLY 14 G7",
+  "cpu": "I7",
+  "gen": "10TH",
+  "ram": 16,
+  "ssd": 512,
+  "price": 80000,
+  "screen": "14 inch",
+  "features": [
+    "Face Unlock",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-019-1.jpg",
+    "assets/img/products/lap-019-2.jpg",
+    "assets/img/products/lap-019-3.jpg"
+  ]
+},
+  {
+  "id": "lap-020",
+  "brand": "HP",
+  "model": "Z BOOK FIREFLY 14 G7",
+  "cpu": "I5",
+  "gen": "10TH",
+  "ram": 16,
+  "ssd": 256,
+  "price": 72000,
+  "screen": "14 inch",
+  "features": [
+    "Face Unlock",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-020-1.jpg",
+    "assets/img/products/lap-020-2.jpg",
+    "assets/img/products/lap-020-3.jpg"
+  ]
+},
+  {
+  "id": "lap-021",
+  "brand": "HP",
+  "model": "Z BOOK FIREFLY 14 G7",
+  "cpu": "I7",
+  "gen": "10TH",
+  "ram": 16,
+  "ssd": 512,
+  "gpu": "4GB NVIDIA Quadro P520",
+  "price": 90000,
+  "screen": "14 inch",
+  "features": [
+    "Face Unlock",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Light weight",
+    "4GB NVIDIA Quadro P520 graphics"
+  ],
+  "images": [
+    "assets/img/products/lap-021-1.jpg",
+    "assets/img/products/lap-021-2.jpg",
+    "assets/img/products/lap-021-3.jpg"
+  ]
+},
+  {
+  "id": "lap-022",
+  "brand": "LENOVO",
+  "model": "X390",
+  "cpu": "I5",
+  "gen": "8TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 43000,
+  "screen": "14 inch",
+  "features": [
+    "Fingerprint sensor",
+    "Backlight keyboard"
+  ],
+  "images": [
+    "assets/img/products/lap-022-1.jpg",
+    "assets/img/products/lap-022-2.jpg",
+    "assets/img/products/lap-022-3.jpg"
+  ]
+},
+  {
+  "id": "lap-023",
+  "brand": "LENOVO",
+  "model": "L13 GEN 3",
+  "cpu": "I5",
+  "gen": "12TH",
+  "ram": 16,
+  "ssd": 256,
+  "price": 65000,
+  "screen": "13.3 inch",
+  "features": [
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Type-C charging port"
+  ],
+  "images": [
+    "assets/img/products/lap-023-1.jpg",
+    "assets/img/products/lap-023-2.jpg",
+    "assets/img/products/lap-023-3.jpg"
+  ]
+},
+  {
+  "id": "lap-024",
+  "brand": "LENOVO",
+  "model": "L590",
+  "cpu": "I5",
+  "gen": "8TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 45000,
+  "screen": "15.6 inch",
+  "features": [
+    "Numeric pad",
+    "Backlight keyboard"
+  ],
+  "images": [
+    "assets/img/products/lap-024-1.jpg",
+    "assets/img/products/lap-024-2.jpg",
+    "assets/img/products/lap-024-3.jpg"
+  ]
+},
+  {
+    "id": "lap-025",
+    "brand": "LENOVO",
+    "model": "E470",
+    "cpu": "I5",
+    "gen": "7TH",
+    "ram": 8,
+    "ssd": 128,
+    "price": 35000
+  },
+  {
+  "id": "lap-026",
+  "brand": "LENOVO",
+  "model": "P51",
+  "cpu": "XEON E3-1505M V6",
+  "gen": "",
+  "ram": 16,
+  "ssd": 256,
+  "gpu": "4GB NVIDIA Quadro M2200",
+  "price": 65000,
+  "screen": "15.6 inch 4K",
+  "features": [
+    "Workstation",
+    "4K resolution",
+    "Numeric pad",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "4GB NVIDIA Quadro M2200 graphics"
+  ],
+  "images": [
+    "assets/img/products/lap-026-1.jpg",
+    "assets/img/products/lap-026-2.jpg",
+    "assets/img/products/lap-026-3.jpg"
+  ]
+},
+  {
+  "id": "lap-027",
+  "brand": "LENOVO",
+  "model": "P14s GEN 1",
+  "cpu": "I7",
+  "gen": "10TH",
+  "ram": 8,
+  "ssd": 256,
+  "gpu": "2GB NVIDIA Quadro P520",
+  "price": 70000,
+  "screen": "14 inch",
+  "features": [
+    "Face Unlock",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Type-C charging port",
+    "Light weight",
+    "2GB NVIDIA Quadro P520 graphics"
+  ],
+  "images": [
+    "assets/img/products/lap-027-1.jpg",
+    "assets/img/products/lap-027-2.jpg",
+    "assets/img/products/lap-027-3.jpg"
+  ]
+},
+  {
+  "id": "lap-028",
+  "brand": "LENOVO",
+  "model": "L14 GEN 3",
+  "cpu": "I5",
+  "gen": "12TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 70000,
+  "screen": "14 inch",
+  "features": [
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Face Unlock",
+    "Type-C charging port"
+  ],
+  "images": [
+    "assets/img/products/lap-028-1.jpg",
+    "assets/img/products/lap-028-2.jpg",
+    "assets/img/products/lap-028-3.jpg"
+  ]
+},
+ {
+  "id": "lap-029",
+  "brand": "LENOVO",
+  "model": "L14 GEN 1",
+  "cpu": "I5",
+  "gen": "10TH",
+  "ram": 8,
+  "ssd": 256,
+  "price": 50000,
+  "screen": "14 inch",
+  "features": [
+    "Face Unlock",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Type-C charging port"
+  ],
+  "images": [
+    "assets/img/products/lap-029-1.jpg",
+    "assets/img/products/lap-029-2.jpg",
+    "assets/img/products/lap-029-3.jpg"
+  ]
+},
+  {
+  "id": "lap-030",
+  "brand": "LENOVO",
+  "model": "L14 GEN 1",
+  "cpu": "RYZEN 5 4650U",
+  "gen": "",
+  "ram": 8,
+  "ssd": 256,
+  "price": 50000,
+  "screen": "14 inch",
+  "features": [
+    "Face Unlock",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Type-C charging port"
+  ],
+  "images": [
+    "assets/img/products/lap-030-1.jpg",
+    "assets/img/products/lap-030-2.jpg",
+    "assets/img/products/lap-030-3.jpg"
+  ]
+},
+  {
+  "id": "lap-031",
+  "brand": "DELL",
+  "model": "LATITUDE 7420",
+  "cpu": "I7",
+  "gen": "11TH",
+  "ram": 32,
+  "ssd": 512,
+  "price": 83000,
+  "screen": "14 inch",
+  "features": [
+    "Face Unlock",
+    "Fingerprint sensor",
+    "Backlight keyboard",
+    "Type-C charging port",
+    "Light weight"
+  ],
+  "images": [
+    "assets/img/products/lap-031-1.jpg",
+    "assets/img/products/lap-031-2.jpg",
+    "assets/img/products/lap-031-3.jpg"
+  ]
+}
+  
 ]

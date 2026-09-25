@@ -1,14 +1,13 @@
 // assets/js/components/ProductCard.js
 /* ─────────────────────────────────────────────────────────
-   Product card — with official WhatsApp icon.
+   Product card — reads images[] array.
+   Falls back to placeholder icon if no images.
    ───────────────────────────────────────────────────────── */
 
 (function () {
   'use strict';
 
   const NS = (window.ITZone = window.ITZone || {});
-
-  console.info('[IT Zone] ProductCard: booting...');
 
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
 
@@ -26,7 +25,6 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
-  /* Official WhatsApp glyph (24x24) */
   function whatsappSvg(size) {
     const s = size || 16;
     return (
@@ -80,16 +78,26 @@
     return 'laptop';
   }
 
+  /* ✅ Read images[] array — falls back to item.image, then to placeholder */
+  function primaryImage(item) {
+    if (Array.isArray(item.images) && item.images.length) return item.images[0];
+    if (item.image) return item.image;
+    return '';
+  }
+
   function imageBlock(item) {
-    const src = item.image || '';
+    const src = primaryImage(item);
+    const icon = categoryIcon(item);
+
     if (src) {
       return '<div class="product-image">' +
-        '<img src="' + esc(src) + '" alt="' + esc(item.brand + ' ' + item.model) + '" ' +
-             'loading="lazy" decoding="async" width="400" height="300">' +
+        '<img src="' + esc(r(src)) + '" alt="' + esc(item.brand + ' ' + item.model) + '" ' +
+             'loading="lazy" decoding="async" width="400" height="300" ' +
+             'onerror="this.onerror=null;this.parentNode.classList.add(\'product-image--placeholder\');this.parentNode.innerHTML=\'<i data-lucide=&quot;' + icon + '&quot;></i>\';if(window.lucide)window.lucide.createIcons();">' +
       '</div>';
     }
     return '<div class="product-image product-image--placeholder" aria-hidden="true">' +
-      '<i data-lucide="' + categoryIcon(item) + '"></i>' +
+      '<i data-lucide="' + icon + '"></i>' +
     '</div>';
   }
 
@@ -173,6 +181,4 @@
     render: render,
     formatPKR: function (n) { return 'PKR ' + new Intl.NumberFormat('en-PK').format(n); }
   };
-
-  console.info('[IT Zone] ProductCard: loaded \u2713');
 })();

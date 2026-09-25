@@ -1,9 +1,8 @@
 // assets/js/pages/product.page.js
 /* ─────────────────────────────────────────────────────────
    Product detail page.
-   URL: /pages/product.html?id=<id>&from=laptops|pcs
-   Primary CTA: Order on WhatsApp (official SVG glyph).
-   Price colored to match brand (green).
+   Shows image gallery (3 images + thumbnails),
+   full spec table, and a features badges section.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -54,7 +53,6 @@
           url.searchParams.set('id', id);
           url.searchParams.set('from', from);
           window.history.replaceState({}, '', url);
-          console.info('[IT Zone] Recovered product from sessionStorage:', id, '|', from);
         }
       } catch (e) { /* ignore */ }
     }
@@ -93,16 +91,50 @@
       .slice(0, 4);
   }
 
-  function imageBlock(item) {
-    const src = item.image || '';
+  /* ✅ Get all images (array or single) */
+  function imagesOf(item) {
+    if (Array.isArray(item.images) && item.images.length) {
+      return item.images.map(r);
+    }
+    if (item.image) return [r(item.image)];
+    return [];
+  }
+
+  /* ✅ Gallery with main image + thumbnails */
+  function imageGallery(item) {
+    const imgs = imagesOf(item);
     const icon = item.resolution ? 'monitor'
                : item.hdd ? 'cpu'
                : 'laptop';
-    if (src) {
-      return '<img src="' + esc(src) + '" alt="' + esc(item.brand + ' ' + item.model) + '" ' +
-             'loading="eager" decoding="async">';
+
+    if (!imgs.length) {
+      return '<div class="product-detail-image"><i data-lucide="' + icon + '"></i></div>';
     }
-    return '<i data-lucide="' + icon + '"></i>';
+
+    const main = imgs[0];
+
+    const thumbs = imgs.length > 1
+      ? '<div class="pd-thumbs" role="tablist">' +
+          imgs.map(function (src, i) {
+            return '<button type="button" class="pd-thumb' + (i === 0 ? ' is-active' : '') + '"' +
+                     ' data-src="' + esc(src) + '"' +
+                     ' aria-label="Image ' + (i + 1) + ' of ' + imgs.length + '">' +
+                     '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async">' +
+                   '</button>';
+          }).join('') +
+        '</div>'
+      : '';
+
+    return (
+      '<div class="product-detail-image-wrap">' +
+        '<div class="product-detail-image">' +
+          '<img id="pd-main-img" src="' + esc(main) + '" alt="' +
+            esc(item.brand + ' ' + item.model) + '" ' +
+            'loading="eager" decoding="async">' +
+        '</div>' +
+        thumbs +
+      '</div>'
+    );
   }
 
   function specRows(item) {
@@ -115,6 +147,7 @@
     if (item.ssd)        rows.push(['Storage (SSD)', item.ssd + ' GB SSD']);
     if (item.hdd)        rows.push(['Storage', item.hdd]);
     if (item.gpu)        rows.push(['Graphics', item.gpu]);
+    if (item.screen)     rows.push(['Screen size', item.screen]);
     if (item.resolution) rows.push(['Resolution', item.resolution]);
     if (item.size)       rows.push(['Size', item.size]);
     if (item.extras)     rows.push(['Notes', item.extras]);
@@ -122,10 +155,10 @@
     rows.push(['Warranty', '1 year']);
     rows.push(['Delivery', 'Nationwide (2\u20134 business days)']);
 
-    return rows.map(function (r) {
+    return rows.map(function (row) {
       return '<div class="spec-row">' +
-        '<span class="spec-key">' + esc(r[0]) + '</span>' +
-        '<span class="spec-value">' + esc(r[1]) + '</span>' +
+        '<span class="spec-key">' + esc(row[0]) + '</span>' +
+        '<span class="spec-value">' + esc(row[1]) + '</span>' +
       '</div>';
     }).join('');
   }
@@ -138,12 +171,47 @@
     if (item.ssd)             pills.push({ icon: 'hard-drive',   text: item.ssd + 'GB SSD' });
     if (item.hdd)             pills.push({ icon: 'hard-drive',   text: item.hdd });
     if (item.gpu)             pills.push({ icon: 'zap',          text: item.gpu });
+    if (item.screen)          pills.push({ icon: 'monitor',      text: item.screen });
     if (item.resolution)      pills.push({ icon: 'monitor',      text: item.resolution });
     if (item.size)            pills.push({ icon: 'maximize',     text: item.size });
 
     return pills.map(function (p) {
       return '<span class="product-pill"><i data-lucide="' + p.icon + '"></i>' + esc(p.text) + '</span>';
     }).join('');
+  }
+
+  /* ✅ Feature badges with icons */
+  function featureBadges(item) {
+    if (!Array.isArray(item.features) || !item.features.length) return '';
+
+    const iconFor = function (feature) {
+      const f = feature.toLowerCase();
+      if (f.indexOf('face unlock') !== -1)     return 'scan-face';
+      if (f.indexOf('fingerprint') !== -1)     return 'fingerprint';
+      if (f.indexOf('backlight') !== -1)       return 'lightbulb';
+      if (f.indexOf('type-c') !== -1)          return 'plug';
+      if (f.indexOf('numeric') !== -1)         return 'calculator';
+      if (f.indexOf('light weight') !== -1)    return 'feather';
+      if (f.indexOf('4k') !== -1)              return 'monitor-play';
+      if (f.indexOf('workstation') !== -1)     return 'cpu';
+      if (f.indexOf('graphics') !== -1)        return 'zap';
+      if (f.indexOf('warranty') !== -1)        return 'shield-check';
+      return 'check-circle';
+    };
+
+    return (
+      '<div class="product-features">' +
+        '<h2 class="product-features-title">Features</h2>' +
+        '<ul class="product-features-list">' +
+          item.features.map(function (f) {
+            return '<li class="product-feature">' +
+              '<i data-lucide="' + iconFor(f) + '"></i>' +
+              '<span>' + esc(f) + '</span>' +
+            '</li>';
+          }).join('') +
+        '</ul>' +
+      '</div>'
+    );
   }
 
   function breadcrumb(item, from) {
@@ -173,7 +241,7 @@
     const grid = document.createElement('div');
     grid.className = 'product-detail-grid';
     grid.innerHTML =
-      '<div class="product-detail-image">' + imageBlock(item) + '</div>' +
+      imageGallery(item) +
       '<div class="product-detail-info">' +
         '<span class="product-detail-brand">' + esc(item.brand) + '</span>' +
         '<h1 class="product-detail-title">' + esc(item.model) + '</h1>' +
@@ -182,6 +250,7 @@
           '<span class="product-detail-price-value">' + priceFormatted + '</span>' +
         '</div>' +
         '<div class="product-detail-quick">' + quickPills(item) + '</div>' +
+        featureBadges(item) +
         '<div class="product-detail-ctas">' +
           '<a href="' + waUrl + '" ' +
              'data-cursor="Order" ' +
@@ -268,12 +337,6 @@
     const id = params.id;
     const from = params.from;
 
-    console.group('[IT Zone] Product page boot');
-    console.log('URL:', window.location.href);
-    console.log('search:', window.location.search);
-    console.log('id:', JSON.stringify(id));
-    console.log('from:', JSON.stringify(from));
-
     try {
       sessionStorage.removeItem('itz.pendingProductId');
       sessionStorage.removeItem('itz.pendingProductFrom');
@@ -289,18 +352,14 @@
       ]);
       laptops = results[0];
       pcs = results[1];
-      console.log('Data loaded — laptops:', laptops.length, '| pcs keys:', Object.keys(pcs));
     } catch (err) {
       console.error('[IT Zone] Failed to load data:', err);
       host.innerHTML = notFound();
       NS.renderIcons?.(host);
-      console.groupEnd();
       return;
     }
 
     const item = findItem(id, from, laptops, pcs);
-    console.log('Item found:', item ? (item.brand + ' ' + item.model) : 'NONE');
-    console.groupEnd();
 
     if (!item) {
       host.innerHTML = notFound();
@@ -317,7 +376,21 @@
     host.appendChild(buildPage(item, related, from));
     NS.renderIcons?.(host);
 
-    console.info('[IT Zone] Product loaded:', item.brand, item.model, '| Related:', related.length);
+    /* ✅ Thumbnail click → swap main image */
+    host.addEventListener('click', function (e) {
+      const thumb = e.target.closest('.pd-thumb');
+      if (!thumb) return;
+      const main = host.querySelector('#pd-main-img');
+      if (!main) return;
+      main.src = thumb.dataset.src;
+      host.querySelectorAll('.pd-thumb').forEach(function (t) {
+        t.classList.toggle('is-active', t === thumb);
+      });
+    });
+
+    console.info('[IT Zone] Product loaded:', item.brand, item.model,
+                 '| Images:', imagesOf(item).length,
+                 '| Related:', related.length);
   }
 
   NS.productPage = { init: init };
