@@ -8,7 +8,11 @@
       "ram": 8,
       "hdd": "256GB SSD",
       "gpu": "",
-      "price": 65000
+      "price": 65000,
+      "images": [
+        "assets/img/products/pc-d-01-1.jpg",
+        "assets/img/products/pc-d-01-2.jpg"
+      ]
     },
     {
       "id": "pc-d-02",
@@ -18,7 +22,11 @@
       "ram": 8,
       "hdd": "128GB SSD",
       "gpu": "",
-      "price": 35000
+      "price": 35000,
+      "images": [
+        "assets/img/products/pc-d-02-1.jpg",
+        "assets/img/products/pc-d-02-2.jpg"
+      ]
     },
     {
       "id": "pc-d-03",
@@ -28,7 +36,11 @@
       "ram": 8,
       "hdd": "256GB SSD",
       "gpu": "",
-      "price": 115000
+      "price": 115000,
+      "images": [
+        "assets/img/products/pc-d-03-1.jpg",
+        "assets/img/products/pc-d-03-2.jpg"
+      ]
     },
     {
       "id": "pc-d-04",
@@ -38,7 +50,11 @@
       "ram": 8,
       "hdd": "256GB SSD",
       "gpu": "",
-      "price": 45000
+      "price": 45000,
+      "images": [
+        "assets/img/products/pc-d-04-1.jpg",
+        "assets/img/products/pc-d-04-2.jpg"
+      ]
     },
     {
       "id": "pc-d-05",
@@ -48,7 +64,11 @@
       "ram": 8,
       "hdd": "256GB SSD",
       "gpu": "",
-      "price": 45000
+      "price": 45000,
+      "images": [
+        "assets/img/products/pc-d-05-1.jpg",
+        "assets/img/products/pc-d-05-2.jpg"
+      ]
     },
     {
       "id": "pc-d-06",
@@ -58,7 +78,11 @@
       "ram": 8,
       "hdd": "1TB",
       "gpu": "2GB NVIDIA DDR3",
-      "price": 30000
+      "price": 30000,
+      "images": [
+        "assets/img/products/pc-d-06-1.jpg",
+        "assets/img/products/pc-d-06-2.jpg"
+      ]
     },
     {
       "id": "pc-d-07",
@@ -68,7 +92,11 @@
       "ram": 8,
       "hdd": "128GB SSD",
       "gpu": "",
-      "price": 23000
+      "price": 23000,
+      "images": [
+        "assets/img/products/pc-d-07-1.jpg",
+        "assets/img/products/pc-d-07-2.jpg"
+      ]
     },
     {
       "id": "pc-d-08",
@@ -78,7 +106,11 @@
       "ram": 32,
       "hdd": "256GB SSD",
       "gpu": "4GB RADEON DDR5",
-      "price": 85000
+      "price": 85000,
+      "images": [
+        "assets/img/products/pc-d-08-1.jpg",
+        "assets/img/products/pc-d-08-2.jpg"
+      ]
     },
     {
       "id": "pc-d-09",
@@ -88,7 +120,11 @@
       "ram": 16,
       "hdd": "256GB SSD",
       "gpu": "2GB NVIDIA DDR3",
-      "price": 52000
+      "price": 52000,
+      "images": [
+        "assets/img/products/pc-d-09-1.jpg",
+        "assets/img/products/pc-d-09-2.jpg"
+      ]
     },
     {
       "id": "pc-d-10",
@@ -98,7 +134,11 @@
       "ram": 32,
       "hdd": "256GB SSD",
       "gpu": "",
-      "price": 75000
+      "price": 75000,
+      "images": [
+        "assets/img/products/pc-d-10-1.jpg",
+        "assets/img/products/pc-d-10-2.jpg"
+      ]
     },
     {
       "id": "pc-d-11",
@@ -108,7 +148,11 @@
       "ram": 12,
       "hdd": "1TB",
       "gpu": "4GB NVIDIA DDR3",
-      "price": 40000
+      "price": 40000,
+      "images": [
+        "assets/img/products/pc-d-11-1.jpg",
+        "assets/img/products/pc-d-11-2.jpg"
+      ]
     }
   ],
   "tiny": [
