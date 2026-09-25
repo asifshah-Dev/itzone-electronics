@@ -1,6 +1,9 @@
 /* assets/css/components/_product-card.css
    ─────────────────────────────────────────────────────────
-   Product card + detail page (with gallery + feature badges).
+   Product card + detail page.
+   - Laptops / Desktops → object-fit: cover (fills card)
+   - Tiny PCs / Monitors → object-fit: contain (full product)
+   - Hover: slow crossfade + subtle zoom + soft darkening
    ───────────────────────────────────────────────────────── */
 
 /* ═══════════════════════════════════════════════════════
@@ -177,7 +180,7 @@
 }
 #product-grid > *, #pcs-grid > * { min-width: 0; max-width: 100%; }
 
-/* List view */
+/* ── List view ───────────────────────────────────────── */
 #product-grid.is-list,
 #pcs-grid.is-list { grid-template-columns: 1fr !important; }
 
@@ -342,99 +345,117 @@
 .product-link:hover { color: inherit; }
 
 /* ═══════════════════════════════════════════════════════
-   PRODUCT CARD IMAGE — smooth hover swap
-   Both images stack; on hover the second crossfades in
-   with a soft scale for a cinematic feel.
+   PRODUCT CARD IMAGE
+   ─────────────────────────────────────────────────────
+   Laptops / Desktops → object-fit: cover (fills card)
+   Tiny PCs / Monitors → object-fit: contain (full product)
+   Hover: slow crossfade + subtle zoom + soft darkening
    ═══════════════════════════════════════════════════════ */
 .product-image {
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 3;
-  background: var(--bg-subtle);
+  background: #ffffff;
   overflow: hidden;
   flex-shrink: 0;
-  /* Isolate so transforms on children don't affect siblings */
   isolation: isolate;
 }
 
+/* Tiny PCs get a square container */
+.product-image.product-image--tiny {
+  aspect-ratio: 1 / 1;
+}
+
+/* Both images stack absolutely */
 .product-image img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
+  background: #ffffff;
   will-change: opacity, transform;
-  transform: translateZ(0);      /* GPU acceleration */
-  backface-visibility: hidden;   /* Prevents flicker in Safari */
+  transform: translateZ(0);
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  transition:
+    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Primary image — visible by default */
+/* ── Category-specific object-fit ────────────────────── */
+
+/* Laptops + Desktops → cover: fills the card, no white bands */
+.product-image.product-image--laptop img,
+.product-image.product-image--desktop img {
+  object-fit: cover;
+  padding: 0;
+}
+
+/* Tiny PCs → contain: full product visible, generous padding */
+.product-image.product-image--tiny img {
+  object-fit: contain;
+  padding: 6%;
+}
+
+/* Monitors → contain: full monitor visible */
+.product-image.product-image--monitor img {
+  object-fit: contain;
+  padding: 6%;
+}
+
+/* ── Primary image — visible by default ──────────────── */
 .product-image .pi-primary {
   z-index: 1;
   opacity: 1;
   transform: scale(1);
-  transition:
-    opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hover image — hidden, faded out, slightly zoomed */
+/* ── Hover image — hidden underneath ─────────────────── */
 .product-image .pi-hover {
   z-index: 2;
   opacity: 0;
-  transform: scale(1.08);
-  transition:
-    opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* On card hover:
-   - primary fades out slowly
-   - hover image fades in AND scales back down (1.08 → 1)
-   - creates a gentle "pull-in" motion */
-.product-image.has-hover:hover .pi-primary {
-  opacity: 0;
-  transform: scale(0.96);
-}
-
-.product-image.has-hover:hover .pi-hover {
-  opacity: 1;
   transform: scale(1);
 }
 
-/* Cards with only ONE image: smooth zoom instead of swap */
-.product-image:not(.has-hover) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ── Soft darkening overlay on card hover ────────────── */
+.product-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 15, 13, 0);
+  z-index: 3;
+  pointer-events: none;
+  transition: background 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.product-image:not(.has-hover) img.pi-primary {
-  position: relative;
-  inset: auto;
-  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+.product-card:hover .product-image::after {
+  background: rgba(10, 15, 13, 0.18);
 }
-.product-card:hover .product-image:not(.has-hover) img.pi-primary {
+
+/* ── Hover behaviour ─────────────────────────────────── */
+
+/* Two images → crossfade + slow zoom on both */
+.product-image.has-hover:hover .pi-primary {
+  opacity: 0;
+  transform: scale(1.06);
+}
+.product-image.has-hover:hover .pi-hover {
+  opacity: 1;
   transform: scale(1.06);
 }
 
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .product-image img {
-    transition: opacity 0.2s linear !important;
-  }
-  .product-image.has-hover:hover .pi-primary,
-  .product-image.has-hover:hover .pi-hover {
-    transform: none !important;
-  }
-  .product-card:hover .product-image:not(.has-hover) img.pi-primary {
-    transform: none !important;
-  }
+/* One image → no swap, just gentle zoom */
+.product-image:not(.has-hover):hover .pi-primary {
+  transform: scale(1.06);
 }
+
+/* ── Broken-image placeholder ────────────────────────── */
 .product-image--placeholder {
   background: linear-gradient(135deg, var(--brand-primary-soft) 0%, #ffffff 100%);
   color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .product-image--placeholder .lucide,
 .product-image--placeholder svg {
@@ -627,7 +648,6 @@
   }
 }
 
-/* ✅ Image gallery wrapper */
 .product-detail-image-wrap {
   display: flex;
   flex-direction: column;
@@ -650,7 +670,9 @@
 .product-detail-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 6%;
 }
 .product-detail-image .lucide,
 .product-detail-image svg {
@@ -662,14 +684,13 @@
   opacity: 0.5;
 }
 
-/* ✅ Thumbnails */
+/* Thumbnails */
 .pd-thumbs {
   display: flex;
   gap: var(--space-2);
   flex-wrap: wrap;
   justify-content: center;
 }
-
 .pd-thumb {
   width: 72px;
   height: 72px;
@@ -685,8 +706,10 @@
 .pd-thumb img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #ffffff;
   display: block;
+  padding: 4px;
 }
 .pd-thumb:hover {
   border-color: var(--brand-primary);
@@ -773,7 +796,7 @@
 .product-pill .lucide,
 .product-pill svg { width: 1rem; height: 1rem; color: var(--brand-primary); stroke-width: 2.5; }
 
-/* ✅ Feature badges */
+/* Feature badges */
 .product-features {
   margin-top: var(--space-2);
   padding-top: var(--space-4);
@@ -976,13 +999,20 @@
 
 @media (prefers-reduced-motion: reduce) {
   .product-card, .product-order-wa, .filter-btn,
-  .sort-select, .view-btn, .product-image img,
-  .pd-thumb {
+  .sort-select, .view-btn, .pd-thumb {
     transition: none !important;
   }
   .product-card:hover, .product-order-wa:hover { transform: none; }
-  .product-card:hover .product-image img { transform: none; }
   .pd-thumb:hover { transform: none; }
   .product-loading .lucide,
   .product-loading svg { animation: none; }
+  .product-image img,
+  .product-image::after {
+    transition: opacity 0.2s linear !important;
+  }
+  .product-image.has-hover:hover .pi-primary,
+  .product-image.has-hover:hover .pi-hover,
+  .product-image:not(.has-hover):hover .pi-primary {
+    transform: none !important;
+  }
 }

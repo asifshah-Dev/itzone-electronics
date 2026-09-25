@@ -92,14 +92,20 @@
     const icon = categoryIcon(item);
     const alt = esc(item.brand + ' ' + item.model);
 
+    /* Add a category class so CSS can pick different object-fit */
+    let subtypeClass = ' product-image--laptop';           /* default: laptops */
+    if (item._subtype === 'tiny')    subtypeClass = ' product-image--tiny';
+    if (item._subtype === 'desktop') subtypeClass = ' product-image--desktop';
+    if (item._subtype === 'monitor' || item.resolution) subtypeClass = ' product-image--monitor';
+
     if (!imgs.length) {
-      return '<div class="product-image product-image--placeholder" aria-hidden="true">' +
+      return '<div class="product-image product-image--placeholder' + subtypeClass + '" aria-hidden="true">' +
         '<i data-lucide="' + icon + '"></i>' +
       '</div>';
     }
 
     const primary = imgs[0];
-    const hover = imgs[1] || '';   /* second image = hover effect */
+    const hover = imgs[1] || '';
 
     const primaryImg =
       '<img class="pi-primary" src="' + esc(primary) + '" alt="' + alt + '" ' +
@@ -112,7 +118,7 @@
              'onerror="this.style.display=\'none\';">'
       : '';
 
-    return '<div class="product-image' + (hover ? ' has-hover' : '') + '">' +
+    return '<div class="product-image' + subtypeClass + (hover ? ' has-hover' : '') + '">' +
       primaryImg + hoverImg +
     '</div>';
   }
