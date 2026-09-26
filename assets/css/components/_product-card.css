@@ -1377,12 +1377,13 @@
 /* The Bootstrap row inside gets small side padding so cards
    don't touch the physical screen edge by 1-2px */
 #home-grid {
-  --bs-gutter-x: 0.5rem;          /* horizontal gap between cards */
-  --bs-gutter-y: 0.5rem;          /* vertical gap between rows */
+  --bs-gutter-x: 0.5rem;          /* gap between cards */
+  --bs-gutter-y: 0.5rem;          /* gap between rows */
   margin-left: 0;
   margin-right: 0;
-  padding-left: 0.25rem;          /* ~4px breathing room from edge */
-  padding-right: 0.25rem;
+  padding-left: 0.85rem;          /* ~12px from left edge */
+  padding-right: 0.85rem;         /* ~12px from right edge */
+  width: 100%;
 }
 
 /* Remove Bootstrap's default column padding */
@@ -1528,4 +1529,24 @@
   grid-column: unset;
   flex: 0 0 100%;
   width: 100%;
+}
+
+/* Ensure the full-bleed wrapper has zero padding */
+.products-bleed,
+.products-bleed-grid {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Keep the heading + sort bar inside its own container */
+.products-bleed > .container {
+  padding-left: clamp(1rem, 3vw, 2rem) !important;
+  padding-right: clamp(1rem, 3vw, 2rem) !important;
+  max-width: 1440px !important;
+  margin-left: auto;
+  margin-right: auto;
 }
