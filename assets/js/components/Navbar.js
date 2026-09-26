@@ -1,7 +1,7 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
    Navbar — white rows 1 & 2, glass green row 3.
-   Row 3: brand dropdowns (Dell, HP, Lenovo) + price/CPU pills.
+   Row 3: brand dropdowns + JSON-driven category pills.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -12,7 +12,6 @@
   const PHONE_DISPLAY = '03265974741';
   const PHONE_TEL     = 'tel:+923265974741';
 
-  /* ── NEW TAGLINE ───────────────────────────────────────── */
   const TAGLINE = 'Certified business laptops \u00b7 Genuine quality, honest prices';
 
   const NAV_ITEMS = [
@@ -27,7 +26,7 @@
     { name: 'TikTok',    href: 'https://tiktok.com/',         icon: 'tiktok' }
   ];
 
-  /* ── TikTok SVG (official glyph, filled) ───────────────── */
+  /* ── TikTok SVG ────────────────────────────────────────── */
   function tiktokSvg(size) {
     const s = size || 16;
     return (
@@ -37,7 +36,7 @@
     );
   }
 
-  /* ── Build brand → models map from JSON ────────────────── */
+  /* ── Brand → models map ────────────────────────────────── */
   function buildBrandModels(data) {
     const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
     const pcs      = data.pcs || {};
@@ -52,7 +51,6 @@
         return (i.brand || '').toUpperCase() === brand;
       });
 
-      /* Group by normalized model name */
       const groups = {};
       items.forEach(function (i) {
         const key = (i.model || '').toUpperCase().trim();
@@ -71,7 +69,72 @@
     return map;
   }
 
+  /* ── JSON-driven category pills ────────────────────────── */
+  function buildCategories(data) {
+    const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
+    const pcs      = data.pcs || {};
+    const desktops = pcs.desktops || [];
+    const tiny     = pcs.tiny     || [];
+    const monitors = pcs.monitors || [];
+    const allPCs   = [].concat(desktops, tiny, monitors);
+    const combined = laptops.concat(allPCs);
+
+    const hay = function (i) {
+      return ((i.model || '') + ' ' + (i.extras || '') + ' ' + (i.gpu || '')).toLowerCase();
+    };
+
+    const candidates = [
+      { id: 'laptops',   label: 'Laptops',
+        test: function (i) { return laptops.indexOf(i) !== -1; } },
+      { id: 'desktops',  label: 'Desktops',
+        test: function (i) { return desktops.indexOf(i) !== -1; } },
+      { id: 'tiny-pcs',  label: 'Tiny PCs',
+        test: function (i) { return tiny.indexOf(i) !== -1; } },
+      { id: 'monitors',  label: 'Monitors',
+        test: function (i) { return monitors.indexOf(i) !== -1; } },
+      { id: 'gaming',    label: 'Workstations',
+        test: function (i) {
+          if (i.gpu && String(i.gpu).trim() !== '') return true;
+          const h = hay(i);
+          return h.indexOf('p51') !== -1 || h.indexOf('p14') !== -1 ||
+                 h.indexOf('z book') !== -1 || h.indexOf('zbook') !== -1 ||
+                 h.indexOf('z2') !== -1 || h.indexOf('xps') !== -1 ||
+                 h.indexOf('xeon') !== -1 || h.indexOf('quadro') !== -1 ||
+                 h.indexOf('workstation') !== -1;
+        } },
+      { id: 'touch',     label: 'Touch / 2-in-1',
+        test: function (i) {
+          const h = hay(i);
+          return h.indexOf('touch') !== -1 || h.indexOf('2in1') !== -1 || h.indexOf('2-in-1') !== -1;
+        } },
+      { id: 'i7',        label: 'Core i7',
+        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i7') !== -1; } },
+      { id: 'i5',        label: 'Core i5',
+        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i5') !== -1; } },
+      { id: 'i3',        label: 'Core i3',
+        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i3') !== -1; } },
+      { id: 'ryzen',     label: 'Ryzen',
+        test: function (i) { return /ryzen|r5|r7/i.test(i.cpu || ''); } },
+      { id: '12th-gen',  label: '12th Gen',
+        test: function (i) { return (i.gen || '').toLowerCase().indexOf('12th') !== -1; } },
+      { id: '11th-gen',  label: '11th Gen',
+        test: function (i) { return (i.gen || '').toLowerCase().indexOf('11th') !== -1; } },
+      { id: '10th-gen',  label: '10th Gen',
+        test: function (i) { return (i.gen || '').toLowerCase().indexOf('10th') !== -1; } }
+    ];
+
+    return candidates
+      .map(function (c) {
+        return Object.assign({}, c, {
+          _count: combined.filter(c.test).length
+        });
+      })
+      .filter(function (c) { return c._count >= 2; })
+      .map(function (c) { delete c._count; return c; });
+  }
+
   let BRAND_MODELS = {};
+  let CATEGORIES   = [];
 
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
 
@@ -95,7 +158,6 @@
     window.location.href = url;
   }
 
-  /* ── WhatsApp SVG ──────────────────────────────────────── */
   function whatsappSvg(size) {
     const s = size || 16;
     return (
@@ -125,11 +187,11 @@
       </svg>`;
   }
 
-  /* ── Row 3: brand dropdowns + price/CPU pills ──────────── */
+  /* ── Row 3 builder ─────────────────────────────────────── */
   function buildRow3() {
     const parts = [];
 
-    /* Brand dropdowns (Dell, HP, Lenovo) */
+    /* Brand dropdowns */
     ['DELL', 'HP', 'LENOVO'].forEach(function (brand) {
       const models = BRAND_MODELS[brand] || [];
       if (!models.length) return;
@@ -139,7 +201,6 @@
                        : 'Lenovo';
 
       const modelItems = models.map(function (m) {
-        /* tag slug = brand id + model slug */
         const modelSlug = m.label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         const tag = brand.toLowerCase() + '-' + modelSlug;
         return (
@@ -165,18 +226,10 @@
       );
     });
 
-    /* Regular pills */
-    const regularPills = [
-      { id: '30k-50k', label: '30k to 50k' },
-      { id: '50k-70k', label: '50k to 70k' },
-      { id: '70k-plus', label: '70k Plus' },
-      { id: 'i5',      label: 'Core i5' },
-      { id: 'i7',      label: 'Core i7' }
-    ];
-
-    regularPills.forEach(function (p) {
+    /* JSON-driven category pills */
+    CATEGORIES.forEach(function (c) {
       parts.push(
-        '<button type="button" class="cat-link" data-cat="' + p.id + '">' + p.label + '</button>'
+        '<button type="button" class="cat-link" data-cat="' + c.id + '">' + c.label + '</button>'
       );
     });
 
@@ -199,29 +252,18 @@
 
     const row3Content = buildRow3();
 
-    const drawerCatButtons = [
-      { id: '30k-50k', label: '30k to 50k' },
-      { id: '50k-70k', label: '50k to 70k' },
-      { id: '70k-plus', label: '70k Plus' },
-      { id: 'i5',      label: 'Core i5' },
-      { id: 'i7',      label: 'Core i7' },
-      { id: 'dell',    label: 'Dell' },
-      { id: 'hp',      label: 'HP' },
-      { id: 'lenovo',  label: 'Lenovo' }
-    ].map(function (c) {
+    /* Drawer + mobile categories: brands + JSON categories */
+    const drawerCatList = [
+      { id: 'dell',   label: 'Dell' },
+      { id: 'hp',     label: 'HP' },
+      { id: 'lenovo', label: 'Lenovo' }
+    ].concat(CATEGORIES);
+
+    const drawerCatButtons = drawerCatList.map(function (c) {
       return '<li><button type="button" class="drawer-cat" data-cat="' + c.id + '">' + c.label + '</button></li>';
     }).join('');
 
-    const mobileCatButtons = [
-      { id: '30k-50k', label: '30k to 50k' },
-      { id: '50k-70k', label: '50k to 70k' },
-      { id: '70k-plus', label: '70k Plus' },
-      { id: 'i5',      label: 'Core i5' },
-      { id: 'i7',      label: 'Core i7' },
-      { id: 'dell',    label: 'Dell' },
-      { id: 'hp',      label: 'HP' },
-      { id: 'lenovo',  label: 'Lenovo' }
-    ].map(function (c) {
+    const mobileCatButtons = drawerCatList.map(function (c) {
       return '<li><button type="button" class="mobile-cat" data-cat="' + c.id + '"><i data-lucide="tag"></i><span>' + c.label + '</span></button></li>';
     }).join('');
 
@@ -357,17 +399,21 @@
 
     const lockScroll = function (on) { document.documentElement.style.overflow = on ? 'hidden' : ''; };
 
-    /* Category clicks (regular pills + dropdown items) */
+    function closeAllDropdowns() {
+      root.querySelectorAll('.cat-dropdown.is-open').forEach(function (dd) {
+        dd.classList.remove('is-open');
+        const b = dd.querySelector('.cat-link--dropdown');
+        if (b) b.setAttribute('aria-expanded', 'false');
+      });
+      document.body.classList.remove('dropdown-open');
+    }
+
+    /* Category clicks */
     root.addEventListener('click', function (e) {
       const btn = e.target.closest('[data-cat]');
       if (btn) {
         e.preventDefault();
-        /* Close any open dropdowns */
-        root.querySelectorAll('.cat-dropdown.is-open').forEach(function (dd) {
-          dd.classList.remove('is-open');
-          const b = dd.querySelector('.cat-link--dropdown');
-          if (b) b.setAttribute('aria-expanded', 'false');
-        });
+        closeAllDropdowns();
         gotoTag(btn.dataset.cat);
       }
     });
@@ -380,38 +426,26 @@
         e.preventDefault();
         e.stopPropagation();
 
-        /* Close all other dropdowns */
-        root.querySelectorAll('.cat-dropdown').forEach(function (other) {
-          if (other !== dd) {
-            other.classList.remove('is-open');
-            const b = other.querySelector('.cat-link--dropdown');
-            if (b) b.setAttribute('aria-expanded', 'false');
-          }
-        });
+        const wasOpen = dd.classList.contains('is-open');
+        closeAllDropdowns();
 
-        const nowOpen = dd.classList.toggle('is-open');
-        trigger.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
+        if (!wasOpen) {
+          dd.classList.add('is-open');
+          trigger.setAttribute('aria-expanded', 'true');
+          document.body.classList.add('dropdown-open');
+        }
       });
     });
 
-    /* Close dropdowns on outside click */
+    /* Outside click closes dropdowns */
     document.addEventListener('click', function (e) {
       if (e.target.closest('.cat-dropdown')) return;
-      root.querySelectorAll('.cat-dropdown.is-open').forEach(function (dd) {
-        dd.classList.remove('is-open');
-        const b = dd.querySelector('.cat-link--dropdown');
-        if (b) b.setAttribute('aria-expanded', 'false');
-      });
+      closeAllDropdowns();
     });
 
-    /* Close on Escape */
+    /* Escape closes dropdowns */
     document.addEventListener('keydown', function (e) {
-      if (e.key !== 'Escape') return;
-      root.querySelectorAll('.cat-dropdown.is-open').forEach(function (dd) {
-        dd.classList.remove('is-open');
-        const b = dd.querySelector('.cat-link--dropdown');
-        if (b) b.setAttribute('aria-expanded', 'false');
-      });
+      if (e.key === 'Escape') closeAllDropdowns();
     });
 
     /* Right drawer */
@@ -427,6 +461,7 @@
 
       const openMenu = function () {
         closeSearch();
+        closeAllDropdowns();
         menu.classList.add('is-open');
         backdrop.hidden = false;
         void backdrop.offsetWidth;
@@ -470,6 +505,7 @@
 
     /* Mobile search drawer */
     function openSearch() {
+      closeAllDropdowns();
       searchPanel.classList.add('is-open');
       searchPanel.setAttribute('aria-hidden', 'false');
       if (searchOpen) searchOpen.setAttribute('aria-expanded', 'true');
@@ -554,11 +590,8 @@
     const header = document.querySelector('.site-header');
     if (!sticky || !placeholder || !row1 || !header) return;
 
-    let spacerHeight = 0;
-
     function measure() {
-      spacerHeight = sticky.offsetHeight;
-      placeholder.style.height = spacerHeight + 'px';
+      placeholder.style.height = sticky.offsetHeight + 'px';
     }
 
     function onScroll() {
@@ -614,9 +647,11 @@
         NS.Data?.pcs     ? NS.Data.pcs().catch(function () { return {}; }) : {},
       ]);
       BRAND_MODELS = buildBrandModels({ laptops: laptops, pcs: pcs });
+      CATEGORIES   = buildCategories({ laptops: laptops, pcs: pcs });
     } catch (e) {
       console.warn('[IT Zone] Navbar: category computation failed.', e);
       BRAND_MODELS = {};
+      CATEGORIES   = [];
     }
 
     host.innerHTML = template();
@@ -627,8 +662,9 @@
     const totalModels = Object.keys(BRAND_MODELS).reduce(function (sum, b) {
       return sum + BRAND_MODELS[b].length;
     }, 0);
-    console.info('[IT Zone] Navbar: ' + totalModels + ' models loaded across ' +
-                 Object.keys(BRAND_MODELS).length + ' brands.');
+    console.info('[IT Zone] Navbar: ' + totalModels + ' models across ' +
+                 Object.keys(BRAND_MODELS).length + ' brands · ' +
+                 CATEGORIES.length + ' category pills.');
   }
 
   NS.Navbar = { mount: mount };

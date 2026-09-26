@@ -1,20 +1,49 @@
 /* assets/css/layout/_navbar.css
    ─────────────────────────────────────────────────────────
-   Navbar v16 — full-bleed glass morphism with brand dropdowns.
-   Row 1: white (hidden on mobile)
-   Row 2: white → glass when sticky
-   Row 3: glass green with brand dropdowns + pills
+   Navbar v17 — full-bleed glass morphism with brand dropdowns.
+   Dropdowns are guaranteed to appear above all page content.
    ───────────────────────────────────────────────────────── */
 
 .nav-backdrop[hidden] { display: none !important; }
 
+/* ═══════════════════════════════════════════════════════
+   NUCLEAR FIX — dropdowns must never be clipped
+   ═══════════════════════════════════════════════════════ */
+.site-header,
+.site-header > *,
+.site-nav,
+.nav-sticky,
+.nav-container,
+.nav-row,
+.nav-row-3,
+.cat-links-scroll,
+.cat-links,
+.cat-dropdown {
+  overflow: visible !important;
+}
+
+/* Keep horizontal scroll on mobile for pills */
+@media (max-width: 991.98px) {
+  .cat-links-scroll {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════ */
 .site-header {
   width: 100%;
   background: transparent;
   position: relative;
+  z-index: 1000;
+}
+body.dropdown-open .site-header {
+  z-index: 2147483600;
 }
 
-/* ROW 1 — WHITE */
+/* ROW 1 */
 .nav-row-1 {
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
@@ -41,8 +70,8 @@
     0 8px 32px -12px rgba(13, 74, 38, 0.15);
 }
 .site-header.is-stuck .nav-row-2 { background: transparent; }
+body.dropdown-open .nav-sticky { z-index: 2147483601; }
 
-/* Container */
 .nav-container {
   width: 100%;
   max-width: 100%;
@@ -69,7 +98,6 @@
   justify-content: space-between;
   align-items: center;
 }
-
 .nav-socials {
   display: inline-flex;
   align-items: center;
@@ -91,7 +119,6 @@
 }
 .social-link .lucide,
 .social-link svg { width: 1.15rem; height: 1.15rem; stroke-width: 2.5; }
-
 .nav-tagline {
   margin: 0;
   font-size: var(--fs-sm);
@@ -120,14 +147,12 @@
   background: #ffffff;
   transition: background-color var(--dur-base) var(--ease-out);
 }
-
 .nav-left {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
 }
-
 .nav-search-btn {
   display: none;
   align-items: center;
@@ -149,7 +174,6 @@
 }
 .nav-search-btn .lucide,
 .nav-search-btn svg { width: 1.25rem; height: 1.25rem; stroke-width: 2.5; }
-
 .nav-search {
   flex: 1 1 auto;
   min-width: 0;
@@ -171,10 +195,6 @@
 .site-header.is-stuck .nav-search {
   background: rgba(255, 255, 255, 0.55);
   border-color: rgba(255, 255, 255, 0.75);
-}
-.site-header.is-stuck .nav-search:focus-within {
-  background: #ffffff;
-  border-color: var(--brand-primary);
 }
 .nav-search-icon {
   color: var(--brand-primary);
@@ -252,7 +272,6 @@
   gap: var(--space-2);
   flex-shrink: 0;
 }
-
 .nav-call {
   display: inline-flex;
   align-items: center;
@@ -310,7 +329,7 @@
 .nav-toggler svg { width: 1.35rem; height: 1.35rem; stroke-width: 2.5; }
 
 /* ═══════════════════════════════════════════════════════
-   ROW 3 — GLASS MORPHISM GREEN + DROPDOWNS
+   ROW 3 — GLASS GREEN + DROPDOWNS
    ═══════════════════════════════════════════════════════ */
 .nav-row-3 {
   display: block;
@@ -358,8 +377,6 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -423,10 +440,14 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   DROPDOWN
+   DROPDOWN — guaranteed above all page content
    ═══════════════════════════════════════════════════════ */
 .cat-dropdown {
   position: relative;
+  z-index: 2147483600;
+}
+.cat-dropdown.is-open {
+  z-index: 2147483600;
 }
 .cat-dropdown.is-open .cat-link--dropdown {
   color: var(--brand-primary);
@@ -448,8 +469,7 @@
     0 12px 32px -8px rgba(10, 15, 13, 0.25),
     0 4px 12px -4px rgba(10, 15, 13, 0.1);
   padding: var(--space-2);
-  z-index: 9999;
-  /* Hidden by default */
+  z-index: 2147483647 !important;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-4px);
@@ -477,7 +497,6 @@
   display: flex;
   flex-direction: column;
 }
-
 .cat-dropdown-item {
   display: flex;
   align-items: center;
@@ -519,8 +538,6 @@
 .cat-dropdown-item:hover .cat-dropdown-count {
   background: #ffffff;
 }
-
-/* Custom scrollbar for the dropdown menu */
 .cat-dropdown-menu::-webkit-scrollbar { width: 6px; }
 .cat-dropdown-menu::-webkit-scrollbar-track { background: transparent; }
 .cat-dropdown-menu::-webkit-scrollbar-thumb {
@@ -700,11 +717,8 @@
   .nav-row-2 {
     grid-template-columns: 1fr auto 1fr;
     gap: var(--space-3);
-    /* Ensure nothing is hidden */
-    overflow: visible;
   }
 
-  /* ✅ Mobile fix: hide search box, show search icon */
   .nav-search    { display: none !important; }
   .nav-search-btn { display: inline-flex !important; }
   .nav-phone-icon { display: inline-flex !important; }
@@ -727,18 +741,9 @@
     -webkit-backdrop-filter: blur(14px) saturate(160%);
   }
 
-  .cat-links-scroll {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .cat-links-scroll::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
-  }
+  /* Mobile: hide dropdown menus — flat buttons */
+  .cat-dropdown-menu { display: none !important; }
+  .cat-dropdown-caret { display: none !important; }
 
   .cat-links {
     justify-content: flex-start;
@@ -750,18 +755,6 @@
     padding: var(--space-2) var(--space-4);
     font-size: var(--fs-sm);
     font-weight: 800;
-  }
-
-  /* On mobile, dropdowns become inline buttons — no menu */
-  .cat-dropdown-menu {
-    display: none !important;
-  }
-  .cat-dropdown-caret {
-    display: none !important;
-  }
-  .cat-link--dropdown {
-    /* Keep the visual, but clicking navigates to the brand tag */
-    padding-right: var(--space-4);
   }
 
   .site-header.is-stuck .nav-sticky {
