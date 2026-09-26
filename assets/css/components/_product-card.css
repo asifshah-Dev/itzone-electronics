@@ -63,33 +63,153 @@
 .filter-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
 /* ═══════════════════════════════════════════════════════
-   SORT BAR (with embedded tabs)
+   SORT BAR — responsive grid layout
+   Desktop: [tabs]  [sort] [view]
+   Mobile:  tabs on top row, sort + view below
+   Count is hidden everywhere.
    ═══════════════════════════════════════════════════════ */
 .sort-bar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
+  width: 100%;
   margin-bottom: var(--space-4);
   padding: var(--space-3) var(--space-4);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xs);
-  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
-/* Tabs inside the sort bar */
+/* Tabs */
 .sort-bar-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  min-width: 0;
   flex-shrink: 0;
 }
 
-/* Count gets pushed to the middle */
+/* Count — HIDDEN per client request */
 .sort-bar-count {
-  margin-left: auto;
+  display: none !important;
+}
+
+/* Controls */
+.sort-bar-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+/* ── TABLET (≤ 992px) ─────────────────────────────────── */
+@media (max-width: 992px) {
+  .sort-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .sort-bar-tabs {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .sort-bar-controls {
+    justify-content: flex-end;
+    width: 100%;
+  }
+}
+
+/* ── MOBILE (≤ 576px) ─────────────────────────────────── */
+@media (max-width: 576px) {
+  .sort-bar {
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+  }
+
+  /* Tabs — full width, 3 equal columns */
+  .sort-bar-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-1);
+    width: 100%;
+  }
+
+  .sort-bar-tabs .filter-btn {
+    width: 100%;
+    justify-content: center;
+    padding: var(--space-2) var(--space-2);
+    font-size: var(--fs-xs);
+    border-radius: var(--radius-md);
+  }
+
+  /* Controls — sort dropdown stretches, view toggle on the right */
+  .sort-bar-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sort-select {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: var(--space-2) var(--space-5) var(--space-2) var(--space-3);
+    font-size: var(--fs-xs);
+    background-position: right var(--space-2) center;
+    background-size: 10px;
+  }
+
+  .sort-bar-label {
+    display: none;
+  }
+
+  .view-toggle {
+    padding: 2px;
+    flex-shrink: 0;
+  }
+  .view-btn {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  .view-btn .lucide,
+  .view-btn svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+}
+
+/* ── SMALL PHONE (≤ 400px) ────────────────────────────── */
+@media (max-width: 400px) {
+  .sort-bar {
+    padding: var(--space-2);
+  }
+
+  .sort-bar-tabs .filter-btn {
+    padding: 6px 4px;
+    font-size: 0.7rem;
+  }
+
+  .sort-select {
+    padding: 6px var(--space-5) 6px var(--space-2);
+    font-size: 0.7rem;
+  }
+
+  .view-btn {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .view-btn .lucide,
+  .view-btn svg {
+    width: 0.7rem;
+    height: 0.7rem;
+  }
 }
 .sort-bar-count {
   display: inline-flex;
@@ -179,9 +299,18 @@
 #product-grid,
 #pcs-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));   /* 🔑 2 columns on mobile */
+  gap: var(--space-3);                                 /* tighter gap on mobile */
   min-width: 0;
+}
+@media (min-width: 768px) {
+  #product-grid, #pcs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+}
+@media (min-width: 992px) {
+  #product-grid, #pcs-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1280px) {
+  #product-grid, #pcs-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (min-width: 576px) {
   #product-grid, #pcs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1549,4 +1678,67 @@
   max-width: 1440px !important;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* ═══════════════════════════════════════════════════════
+   HOME GRID — 2 columns on mobile
+   Tighter card content so 2 cards fit comfortably.
+   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   HOME GRID — mobile view
+   - DEFAULT (no .is-grid class): 1 card per row (list)
+   - .is-grid class:              2 cards per row
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 576px) {
+
+  /* Reset all column widths on mobile — 100% by default */
+  #home-grid > [class*="col-"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Grid mode: override to 2 columns */
+  #home-grid.is-grid > [class*="col-"] {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+
+  /* Tighter card layout in 2-column grid mode */
+  #home-grid.is-grid .product-card-body {
+    padding: var(--space-2) var(--space-3);
+  }
+  #home-grid.is-grid .product-card-foot {
+    padding: var(--space-2) var(--space-3) var(--space-3);
+    gap: var(--space-1);
+  }
+  #home-grid.is-grid .product-model {
+    font-size: var(--fs-sm);
+  }
+  #home-grid.is-grid .product-specs li {
+    font-size: var(--fs-xs);
+  }
+  #home-grid.is-grid .product-price-value {
+    font-size: var(--fs-base);
+  }
+  #home-grid.is-grid .product-brand {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.5rem;
+  }
+  #home-grid.is-grid .product-order-wa {
+    padding: 4px var(--space-2);
+    font-size: 0.7rem;
+  }
+  #home-grid.is-grid .product-order-wa span {
+    display: none;
+  }
+  #home-grid.is-grid .product-order-wa .wa-glyph {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  /* Small side padding on the whole grid */
+  #home-grid {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
 }

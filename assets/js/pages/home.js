@@ -59,13 +59,20 @@
     NS.SortBar?.setCount?.(visible);
   }
 
-  function render(state, gridHost) {
+    function render(state, gridHost) {
+    /* Apply view classes FIRST — so CSS is active before cards render */
+    gridHost.classList.toggle('is-list', state.view === 'list');
+    gridHost.classList.toggle('is-grid', state.view === 'grid');
+
+    /* Filter by type */
     let items = allItems.slice();
     if (state.type === 'laptop') items = items.filter(function (i) { return i._type === 'laptop'; });
     if (state.type === 'pc')     items = items.filter(function (i) { return i._type === 'pc'; });
 
+    /* Sort */
     items = applySort(items, state.sort);
 
+    /* Render */
     if (!items.length) {
       gridHost.innerHTML =
         '<div class="product-empty" role="status">' +
@@ -83,12 +90,10 @@
       NS.renderIcons?.(gridHost);
     }
 
-    gridHost.classList.toggle('is-list', state.view === 'list');
-
     updateCount(items.length, allItems.length);
   }
 
-  async function init() {
+    async function init() {
     NS.Hero?.mount();
 
     const gridHost = document.getElementById('home-grid');
@@ -125,18 +130,34 @@
       return;
     }
 
+    /* Detect mobile */
+    const isMobile = window.matchMedia('(max-width: 576px)').matches;
+
+    /* On mobile: ALWAYS start in list view — ignore localStorage */
     const state = {
       type: 'all',
       sort: (NS.SortBar && NS.SortBar.getStoredSort) ? NS.SortBar.getStoredSort() : 'featured',
-      view: (NS.SortBar && NS.SortBar.getStoredView) ? NS.SortBar.getStoredView() : 'grid'
+      view: isMobile
+        ? 'list'
+        : ((NS.SortBar && NS.SortBar.getStoredView) ? NS.SortBar.getStoredView() : 'grid')
     };
+
+    /* Apply the initial view state immediately to the grid element,
+       before the first render, so CSS picks it up right away */
+    gridHost.classList.toggle('is-list', state.view === 'list');
+    gridHost.classList.toggle('is-grid', state.view === 'grid');
 
     function refresh() {
       render(state, gridHost);
     }
 
-    /* Mount SortBar with tabs inside */
+    /* Mount SortBar with tabs inside and pass initial view */
     if (sortHost && NS.SortBar && typeof NS.SortBar.mount === 'function') {
+      /* Clear any cached view on mobile so the toggle starts on "list" */
+      if (isMobile) {
+        try { localStorage.setItem('itz.view', 'list'); } catch (e) {}
+      }
+
       NS.SortBar.mount(sortHost, {
         initialView: state.view,
         tabs: TABS,
@@ -172,7 +193,7 @@
 
     refresh();
 
-    console.info('[IT Zone] Home: rendered ' + allItems.length + ' products.');
+    console.info('[IT Zone] Home: rendered ' + allItems.length + ' products. View: ' + state.view);
   }
 
   NS.homePage = { init: init };
