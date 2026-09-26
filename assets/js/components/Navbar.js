@@ -395,6 +395,81 @@
     });
 
     /* Dropdown toggles */
+    const isMobile = function () {
+      return window.matchMedia('(max-width: 991.98px)').matches;
+    };
+
+    /* Build the mobile dropdown sheet once */
+    let mobileSheet = document.getElementById('mobile-dropdown-sheet');
+    if (!mobileSheet) {
+      mobileSheet = document.createElement('div');
+      mobileSheet.id = 'mobile-dropdown-sheet';
+      mobileSheet.className = 'mobile-dropdown-sheet';
+      mobileSheet.setAttribute('aria-hidden', 'true');
+      mobileSheet.innerHTML =
+        '<div class="mobile-dropdown-backdrop" id="mobile-dropdown-backdrop"></div>' +
+        '<div class="mobile-dropdown-panel" role="dialog" aria-modal="true" aria-labelledby="mobile-dropdown-title">' +
+          '<header class="mobile-dropdown-head">' +
+            '<h3 class="mobile-dropdown-title" id="mobile-dropdown-title">Select a model</h3>' +
+            '<button type="button" class="mobile-dropdown-close" id="mobile-dropdown-close" aria-label="Close">' +
+              '<i data-lucide="x"></i>' +
+            '</button>' +
+          '</header>' +
+          '<ul class="mobile-dropdown-list" id="mobile-dropdown-list"></ul>' +
+        '</div>';
+      document.body.appendChild(mobileSheet);
+      NS.renderIcons?.(mobileSheet);
+    }
+
+    function openMobileSheet(brand, brandLabel, models) {
+      const titleEl = mobileSheet.querySelector('#mobile-dropdown-title');
+      const listEl  = mobileSheet.querySelector('#mobile-dropdown-list');
+
+      titleEl.textContent = brandLabel + ' \u2014 choose a model';
+
+      listEl.innerHTML = models.map(function (m) {
+        const modelSlug = m.label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const tag = brand.toLowerCase() + '-' + modelSlug;
+        return (
+          '<li>' +
+            '<button type="button" class="mobile-dropdown-item" data-cat="' + tag + '">' +
+              '<span class="mobile-dropdown-model">' + m.label + '</span>' +
+              '<span class="mobile-dropdown-count">' + m.count + '</span>' +
+            '</button>' +
+          '</li>'
+        );
+      }).join('');
+
+      mobileSheet.classList.add('is-open');
+      mobileSheet.setAttribute('aria-hidden', 'false');
+      document.documentElement.style.overflow = 'hidden';
+    }
+
+    function closeMobileSheet() {
+      mobileSheet.classList.remove('is-open');
+      mobileSheet.setAttribute('aria-hidden', 'true');
+      document.documentElement.style.overflow = '';
+    }
+
+    /* Close button */
+    mobileSheet.querySelector('#mobile-dropdown-close').addEventListener('click', closeMobileSheet);
+    mobileSheet.querySelector('#mobile-dropdown-backdrop').addEventListener('click', closeMobileSheet);
+
+    /* Model click inside the mobile sheet */
+    mobileSheet.querySelector('#mobile-dropdown-list').addEventListener('click', function (e) {
+      const btn = e.target.closest('[data-cat]');
+      if (!btn) return;
+      closeMobileSheet();
+      gotoTag(btn.dataset.cat);
+    });
+
+    /* Escape closes mobile sheet */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && mobileSheet.classList.contains('is-open')) {
+        closeMobileSheet();
+      }
+    });
+
     root.querySelectorAll('.cat-dropdown').forEach(function (dd) {
       const trigger = dd.querySelector('.cat-link--dropdown');
       if (!trigger) return;
@@ -402,6 +477,20 @@
         e.preventDefault();
         e.stopPropagation();
 
+        const brand = dd.dataset.brand;
+        const brandLabel = brand === 'DELL' ? 'Dell'
+                         : brand === 'HP'   ? 'HP'
+                         : 'Lenovo';
+        const models = BRAND_MODELS[brand] || [];
+
+        /* Mobile → bottom sheet */
+        if (isMobile()) {
+          if (!models.length) return;
+          openMobileSheet(brand, brandLabel, models);
+          return;
+        }
+
+        /* Desktop → dropdown menu */
         const wasOpen = dd.classList.contains('is-open');
         closeAllDropdowns();
 
