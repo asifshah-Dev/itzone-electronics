@@ -2,16 +2,14 @@
 /* ─────────────────────────────────────────────────────────
    Fixed social sidebar — right edge, desktop only.
    Each icon is colored by brand; hovering reveals the
-   platform name.
+   platform name on the LEFT side of the icon.
    ───────────────────────────────────────────────────────── */
 
 (function () {
   'use strict';
   const NS = (window.ITZone = window.ITZone || {});
 
-  /* ── Platforms with brand colors ────────────────────────
-     `bg` is the hover background, `color` is the icon color
-     when idle. On hover the icon turns white. */
+  /* ── Platforms with brand colors ──────────────────────── */
   const PLATFORMS = [
     {
       name: 'Facebook',
@@ -43,7 +41,7 @@
     }
   ];
 
-  /* ── Inline SVG icons (Lucide doesn't have some brands) ─ */
+  /* ── Inline SVG icons ──────────────────────────────────── */
   function brandIcon(name) {
     switch (name) {
       case 'facebook':
@@ -77,22 +75,20 @@
 
   function template() {
     return PLATFORMS.map(function (p) {
-      /* If `bg` is a gradient string, we set it inline; otherwise
-         we set a background-color so the CSS can transition. */
       const isGradient = p.bg.indexOf('gradient') !== -1;
       const styleAttr = isGradient
         ? 'style="--social-bg-image: ' + p.bg + ';"'
         : 'style="--social-bg-color: ' + p.bg + ';"';
 
+      /* NO data-cursor attribute — default cursor stays */
       return (
         '<a class="social-side-item' + (isGradient ? ' has-gradient' : '') + '"' +
         '   href="' + p.href + '"' +
         '   target="_blank" rel="noopener noreferrer"' +
         '   aria-label="' + p.label + '"' +
-        '   data-cursor="' + p.name + '"' +
         '   ' + styleAttr + '>' +
-          '<span class="social-side-icon">' + brandIcon(p.icon) + '</span>' +
           '<span class="social-side-label">' + p.name + '</span>' +
+          '<span class="social-side-icon">' + brandIcon(p.icon) + '</span>' +
         '</a>'
       );
     }).join('');
@@ -105,9 +101,6 @@
     host.dataset.mounted = 'true';
 
     host.innerHTML = template();
-
-    /* Use Lucide for any icons we didn't inline (none now,
-       but future-proofing) */
     NS.renderIcons?.(host);
   }
 

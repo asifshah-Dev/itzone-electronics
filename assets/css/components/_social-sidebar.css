@@ -1,11 +1,15 @@
 /* assets/css/components/_social-sidebar.css
    ─────────────────────────────────────────────────────────
-   Fixed social sidebar — pinned to the right edge.
-   Desktop only. Icons colored by brand; text reveals on hover.
+   Fixed social sidebar — pinned to the RIGHT edge.
+   Desktop only.
+   Each pill is ALWAYS filled with its own brand color.
+   Square corners (no rounding).
+   On hover: label appears on the LEFT of the icon and the
+   pill extends LEFT (toward the page), icon stays anchored
+   to the right edge.
    ───────────────────────────────────────────────────────── */
 
 .social-sidebar {
-  /* Hidden on tablet & mobile by default */
   display: none;
 }
 
@@ -16,12 +20,14 @@
   .social-sidebar {
     display: flex;
     flex-direction: column;
+    align-items: flex-end;      /* pills hug the right edge */
+    gap: 0;                     /* no space between pills */
     position: fixed;
     top: 50%;
     right: 0;
     transform: translateY(-50%);
     z-index: 1030;
-    pointer-events: none;   /* so it doesn't block page edges */
+    pointer-events: none;
   }
 
   .social-side-item {
@@ -29,28 +35,28 @@
 
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;  /* keep icon on the right */
 
-    /* Collapsed state: only the icon is visible; the label
-       is hidden by translateX + width=0 */
+    /* Collapsed: pill is exactly icon-width */
     width: 52px;
     height: 52px;
-    padding: 0 14px 0 14px;
-    margin: 0 0 6px 0;
+    padding: 0 14px;
+    margin: 0;
 
-    background: #ffffff;
-    color: var(--social-color, #0f172a);
-    border: 1px solid var(--border-color);
-    border-right: none;                /* flush with the screen edge */
-    border-top-left-radius: 14px;
-    border-bottom-left-radius: 14px;
+    /* Default fallback color; each brand overrides below */
+    background-color: var(--social-bg-color, #0f172a);
+    background-image: var(--social-bg-image, none);
+    color: #ffffff;
+    border: 1px solid transparent;
+    border-right: none;
+    /* No rounding — square edges */
 
     text-decoration: none;
     overflow: hidden;
     white-space: nowrap;
 
     box-shadow:
-      -4px 4px 14px -8px rgba(10, 15, 13, 0.15);
+      -4px 4px 14px -8px rgba(10, 15, 13, 0.25);
 
     transition:
       width .32s cubic-bezier(0.22, 1, 0.36, 1),
@@ -61,16 +67,7 @@
       box-shadow .28s ease;
   }
 
-  /* First and last rounded on the outer edge */
-  .social-side-item:first-child {
-    border-top-left-radius: 14px;
-  }
-  .social-side-item:last-child {
-    margin-bottom: 0;
-    border-bottom-left-radius: 14px;
-  }
-
-  /* ── Icon box ──────────────────────────────────────── */
+  /* ── Icon box — stays anchored on the RIGHT ────────── */
   .social-side-icon {
     display: inline-flex;
     align-items: center;
@@ -78,6 +75,7 @@
     width: 24px;
     height: 24px;
     flex-shrink: 0;
+    color: #ffffff;             /* white icon on brand bg */
     transition: color .22s ease;
   }
 
@@ -88,32 +86,32 @@
     fill: currentColor;
   }
 
-  /* ── Label (hidden by default) ─────────────────────── */
+  /* ── Label — hidden to the LEFT, slides in on hover ── */
   .social-side-label {
     font-family: var(--font-sans);
     font-size: var(--fs-sm);
     font-weight: var(--fw-semibold);
     letter-spacing: 0.01em;
     color: #ffffff;
-    margin-left: 12px;
+    margin-right: 12px;
     opacity: 0;
-    transform: translateX(-6px);
+
+    /* Starts pushed LEFT, beyond the pill's left edge.
+       Slides right (to 0) on hover. */
+    transform: translateX(-20px);
+
     transition:
       opacity .18s ease,
-      transform .28s cubic-bezier(0.22, 1, 0.36, 1);
+      transform .32s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* ═══════════════════════════════════════════════════════
-     HOVER — expand the row, reveal the label, color the bg
-     ═══════════════════════════════════════════════════════ */
+  /* ═══════════════════════════════════════════════════
+     HOVER — pill extends LEFT, label slides in from LEFT
+     ═══════════════════════════════════════════════════ */
   .social-side-item:hover {
-    width: 180px;
-    color: #ffffff;
-    border-color: transparent;
-    background-color: var(--social-bg-color, #0f172a);
-    background-image: var(--social-bg-image, none);
+    width: 180px;               /* grows LEFTWARD (right edge pinned) */
     box-shadow:
-      -8px 8px 24px -8px rgba(10, 15, 13, 0.3);
+      -8px 8px 24px -8px rgba(10, 15, 13, 0.4);
   }
 
   .social-side-item:hover .social-side-label {
@@ -121,28 +119,18 @@
     transform: translateX(0);
   }
 
-  /* Focus-visible = same as hover (for keyboard users) */
+  /* Keyboard focus = same as hover */
   .social-side-item:focus-visible {
     outline: none;
     width: 180px;
-    color: #ffffff;
-    border-color: transparent;
-    background-color: var(--social-bg-color, #0f172a);
-    background-image: var(--social-bg-image, none);
     box-shadow:
-      -8px 8px 24px -8px rgba(10, 15, 13, 0.3),
-      0 0 0 3px rgba(255, 255, 255, 0.5);
+      -8px 8px 24px -8px rgba(10, 15, 13, 0.4),
+      0 0 0 3px rgba(255, 255, 255, 0.55);
   }
   .social-side-item:focus-visible .social-side-label {
     opacity: 1;
     transform: translateX(0);
   }
-
-  /* Each icon's idle color = its brand color */
-  .social-side-item[href*="facebook"]  { --social-color: #1877F2; }
-  .social-side-item[href*="instagram"] { --social-color: #DD2A7B; }
-  .social-side-item[href*="youtube"]   { --social-color: #FF0000; }
-  .social-side-item[href*="tiktok"]    { --social-color: #000000; }
 }
 
 /* ═══════════════════════════════════════════════════════
