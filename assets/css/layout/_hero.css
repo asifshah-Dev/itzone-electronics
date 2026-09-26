@@ -1,104 +1,150 @@
 /* assets/css/layout/_hero.css
    ─────────────────────────────────────────────────────────
-   Home hero section.
-   Dark green→transparent gradient ties it to the navbar.
-   Two-column on desktop, stacked on mobile.
+   Home hero — banner image, no zoom, no green overlay.
+   Text is warm cream with a gold→coral gradient accent.
+   A soft dark scrim sits behind the text for readability.
    ───────────────────────────────────────────────────────── */
 
+/* ═══════════════════════════════════════════════════════
+   HERO WRAPPER
+   ═══════════════════════════════════════════════════════ */
 .hero-section {
   position: relative;
+  padding: 0;
+  background: #f7faf8;
   overflow: hidden;
-  padding-block: clamp(3rem, 6vw + 1rem, 6rem);
-  /* Extra horizontal padding — the hero copy needs air */
-  padding-left: clamp(0.5rem, 2vw, 1.5rem);
-  padding-right: clamp(0.5rem, 2vw, 1.5rem);
-  background:
-    radial-gradient(60% 55% at 80% 0%,
-      rgba(31, 160, 80, 0.12) 0%,
-      rgba(31, 160, 80, 0) 60%),
-    radial-gradient(40% 45% at 10% 10%,
-      rgba(245, 184, 28, 0.08) 0%,
-      rgba(245, 184, 28, 0) 60%),
-    var(--bg-page);
 }
 
-/* subtle decorative arc behind the illustration */
-.hero-section::before {
-  content: "";
-  position: absolute;
-  top: -20%;
-  right: -10%;
-  width: 620px;
-  height: 620px;
-  border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(13, 74, 38, 0.08) 0%,
-    rgba(13, 74, 38, 0) 65%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.hero-section .container {
+/* ═══════════════════════════════════════════════════════
+   BANNER — full-width image, no zoom
+   ═══════════════════════════════════════════════════════ */
+.hero-banner {
   position: relative;
-  z-index: 1;
-  /* extra safety: hero container gets its own generous gutters */
-  padding-left: clamp(1.5rem, 5vw, 4rem) !important;
-  padding-right: clamp(1.5rem, 5vw, 4rem) !important;
-}
-
-/* ── Layout ──────────────────────────────────────────── */
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(2rem, 4vw, 3.5rem);
+  width: 100%;
+  min-height: clamp(520px, 78vh, 760px);
+  display: flex;
   align-items: center;
+  overflow: hidden;
+  isolation: isolate;
 }
 
-@media (min-width: 992px) {
-  .hero-grid {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  }
+/* Background image — displayed at its natural fit, no zoom */
+.hero-banner-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+  /* no animation, no transform — keeps image at natural proportions */
 }
 
-/* ── Copy column ─────────────────────────────────────── */
-.hero-copy { max-width: 620px; }
+/* ── LOCALIZED SCRIM — darkens behind the text only ──── */
+/* Not a full-width green wash. Just enough contrast
+   on the left side so the text pops without dulling the image. */
+.hero-banner-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(
+      95deg,
+      rgba(10, 15, 13, 0.75) 0%,
+      rgba(10, 15, 13, 0.62) 30%,
+      rgba(10, 15, 13, 0.35) 55%,
+      rgba(10, 15, 13, 0) 75%
+    );
+  pointer-events: none;
+}
 
+/* ═══════════════════════════════════════════════════════
+   CONTENT — left-aligned on the scrim
+   ═══════════════════════════════════════════════════════ */
+.hero-banner-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 640px;
+  padding-block: clamp(3rem, 6vw, 5rem);
+  padding-left: clamp(1.5rem, 6vw, 5rem);
+  padding-right: clamp(1.5rem, 4vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ═══════════════════════════════════════════════════════
+   EYEBROW — cream pill with gold icon
+   ═══════════════════════════════════════════════════════ */
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
-  background: var(--brand-primary-soft);
-  color: var(--brand-primary);
+  background: rgba(255, 236, 200, 0.14);       /* warm tint */
+  border: 1px solid rgba(255, 236, 200, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff3dc;                               /* cream */
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
   margin-bottom: var(--space-5);
 }
 .hero-eyebrow .lucide,
-.hero-eyebrow svg { width: 1rem; height: 1rem; }
-
-.hero-title {
-  font-size: var(--fs-5xl);
-  font-weight: var(--fw-black);
-  line-height: 1.08;
-  letter-spacing: var(--ls-tight);
-  color: var(--text-primary);
-  margin: 0 0 var(--space-5);
-  text-wrap: balance;
+.hero-eyebrow svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 2.5;
+  color: #f5b81c;                               /* gold */
 }
 
+/* ═══════════════════════════════════════════════════════
+   TITLE — warm cream, with vivid gradient accent
+   ═══════════════════════════════════════════════════════ */
+.hero-title {
+  font-size: clamp(2rem, 5vw + 0.5rem, 3.5rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #fff8ec;                               /* warm cream */
+  margin: 0 0 var(--space-5);
+  text-wrap: balance;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Eye-catching gradient accent — gold → coral */
+.hero-title-accent {
+  background: linear-gradient(135deg,
+    #ffd166 0%,       /* warm gold */
+    #ffb347 30%,      /* amber */
+    #ff8a5b 60%,      /* coral */
+    #ff5e62 100%      /* rose coral */
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;                              /* shadow breaks the gradient */
+  filter: drop-shadow(0 2px 16px rgba(255, 138, 91, 0.35));
+}
+
+/* ═══════════════════════════════════════════════════════
+   SUBTITLE — soft cream, readable
+   ═══════════════════════════════════════════════════════ */
 .hero-subtitle {
-  font-size: var(--fs-lg);
-  line-height: var(--lh-base);
-  color: var(--text-secondary);
+  font-size: clamp(1rem, 1.5vw + 0.5rem, 1.2rem);
+  line-height: 1.6;
+  color: rgba(255, 244, 230, 0.9);              /* warm cream */
   margin: 0 0 var(--space-6);
   max-width: 52ch;
   text-wrap: pretty;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* ── CTAs ────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════
+   CTAs
+   ═══════════════════════════════════════════════════════ */
 .hero-ctas {
   display: flex;
   flex-wrap: wrap;
@@ -111,45 +157,53 @@
   font-weight: var(--fw-semibold);
 }
 
-.btn-outline-light {
-  background: transparent;
-  border: 1.5px solid var(--border-color);
-  color: var(--text-primary);
-  border-radius: var(--radius-pill);
+/* Outline button — glassy, tuned for the banner */
+.btn-outline-hero {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 244, 230, 0.55);
+  color: #fff8ec;
   text-decoration: none;
   white-space: nowrap;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition:
     background-color var(--dur-fast) var(--ease-out),
     border-color     var(--dur-fast) var(--ease-out),
     color            var(--dur-fast) var(--ease-out),
     transform        var(--dur-fast) var(--ease-out);
 }
-.btn-outline-light:hover {
-  background: var(--text-primary);
-  border-color: var(--text-primary);
-  color: #ffffff;
+.btn-outline-hero:hover {
+  background: #fff8ec;
+  border-color: #fff8ec;
+  color: var(--brand-primary);
   transform: translateY(-1px);
 }
-.btn-outline-light .lucide,
-.btn-outline-light svg { width: 1.15rem; height: 1.15rem; }
-.btn-outline-light:focus-visible {
+.btn-outline-hero .lucide,
+.btn-outline-hero svg { width: 1.15rem; height: 1.15rem; }
+.btn-outline-hero:focus-visible {
   outline: none;
-  box-shadow: var(--focus-ring);
+  box-shadow: 0 0 0 3px rgba(255, 248, 236, 0.5);
 }
 
-/* ── Trust badges ────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════
+   TRUST BADGES — cream text, gold icons
+   ═══════════════════════════════════════════════════════ */
 .hero-trust {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-5) var(--space-6);
+  gap: var(--space-4) var(--space-6);
   font-size: var(--fs-sm);
-  color: var(--text-secondary);
+  color: rgba(255, 244, 230, 0.9);
 }
 .hero-trust li {
   display: inline-flex;
@@ -161,63 +215,65 @@
 .hero-trust svg {
   width: 1.1rem;
   height: 1.1rem;
-  color: var(--brand-primary);
+  stroke-width: 2.5;
+  color: #ffd166;                                /* warm gold */
   flex-shrink: 0;
 }
 
-/* ── Illustration column ─────────────────────────────── */
-.hero-visual {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: var(--space-4);
-}
-
-.hero-art {
-  width: 100%;
-  max-width: 560px;
-  height: auto;
-  display: block;
-  animation: heroFloat 6s ease-in-out infinite;
-  will-change: transform;
-}
-
-@keyframes heroFloat {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-10px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-art { animation: none; }
-}
-
-/* ── Responsive tweaks ───────────────────────────────── */
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
 @media (max-width: 991.98px) {
-  .hero-grid { text-align: left; }
-  .hero-copy { max-width: none; }
-  .hero-title { font-size: var(--fs-4xl); }
-  .hero-subtitle { font-size: var(--fs-base); }
-  .hero-visual { order: -1; padding: var(--space-2); }
-  .hero-art { max-width: 420px; }
+  .hero-banner {
+    min-height: clamp(460px, 70vh, 620px);
+  }
+  .hero-banner-content {
+    max-width: 100%;
+    padding-inline: clamp(1.25rem, 5vw, 3rem);
+  }
 }
 
 @media (max-width: 576px) {
-  .hero-section {
-    padding-block: 2.5rem;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
+  .hero-banner {
+    min-height: 520px;
   }
-  .hero-section .container {
-    padding-left: 1.25rem !important;
-    padding-right: 1.25rem !important;
+  /* On mobile, a full-height scrim so text stays readable over any image */
+  .hero-banner-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(10, 15, 13, 0.55) 0%,
+      rgba(10, 15, 13, 0.72) 50%,
+      rgba(10, 15, 13, 0.85) 100%
+    );
   }
-  .hero-ctas { flex-direction: column; align-items: stretch; }
-  .hero-ctas .btn { justify-content: center; }
-  .hero-art { max-width: 320px; }
-  .hero-trust { gap: var(--space-3) var(--space-4); font-size: var(--fs-xs); }
+  .hero-ctas {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .hero-ctas .btn,
+  .hero-ctas .btn-outline-hero {
+    justify-content: center;
+    width: 100%;
+  }
+  .hero-trust {
+    gap: var(--space-3) var(--space-4);
+    font-size: var(--fs-xs);
+  }
 }
 
-/* ── CTA strip on the home page ───────────────────────── */
+/* ═══════════════════════════════════════════════════════
+   REDUCED MOTION — nothing to disable now, but keep for safety
+   ═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .btn-outline-hero:hover {
+    transform: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CTA STRIP (below the hero, on the home page)
+   ═══════════════════════════════════════════════════════ */
 .cta-strip {
   display: flex;
   flex-wrap: wrap;
