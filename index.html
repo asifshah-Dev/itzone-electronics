@@ -36,20 +36,23 @@
 
     <section id="hero-slot" class="hero-section"></section>
 
-    <section id="products" class="section" aria-labelledby="products-heading">
-      <div class="container">
+    <!-- Products — full-bleed -->
+    <section id="products" class="section products-bleed" aria-labelledby="products-heading">
 
+      <!-- Heading kept inside a container so it stays readable -->
+      <div class="container">
         <header class="mb-4">
           <h2 id="products-heading" class="section-title">All Products</h2>
           <p class="section-subtitle" id="home-count">Loading inventory…</p>
         </header>
-
-        <!-- Sort bar with embedded tabs (All / Laptops / PCs) -->
         <div id="home-sort"></div>
-
-        <div id="home-grid" class="row g-3" role="list"></div>
-
       </div>
+
+      <!-- Grid fills the full viewport width, edge to edge -->
+      <div class="products-bleed-grid">
+        <div id="home-grid" class="row g-2" role="list"></div>
+      </div>
+
     </section>
 
     <section id="inventory" class="section-tight" aria-labelledby="inventory-heading">
