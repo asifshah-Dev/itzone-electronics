@@ -1,7 +1,7 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
    Navbar — white rows 1 & 2, glass green row 3.
-   Categories visible on all screen sizes with horizontal scroll on mobile.
+   Row 3: brand dropdowns (Dell, HP, Lenovo) + price/CPU pills.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -11,7 +11,9 @@
 
   const PHONE_DISPLAY = '03265974741';
   const PHONE_TEL     = 'tel:+923265974741';
-  const TAGLINE = 'Free nationwide delivery \u00b7 1-year warranty on every laptop';
+
+  /* ── NEW TAGLINE ───────────────────────────────────────── */
+  const TAGLINE = 'Certified business laptops \u00b7 Genuine quality, honest prices';
 
   const NAV_ITEMS = [
     { id: 'inventory', label: 'Laptops',        href: 'pages/inventory.html', icon: 'laptop' },
@@ -19,49 +21,57 @@
   ];
 
   const SOCIALS = [
-    { name: 'Facebook',  href: 'https://facebook.com/',      icon: 'facebook' },
-    { name: 'Instagram', href: 'https://instagram.com/',     icon: 'instagram' },
-    { name: 'WhatsApp',  href: 'https://wa.me/923265974741', icon: 'whatsapp' },
-    { name: 'Twitter',   href: 'https://twitter.com/',       icon: 'twitter' },
+    { name: 'Facebook',  href: 'https://facebook.com/',       icon: 'facebook' },
+    { name: 'Instagram', href: 'https://instagram.com/',      icon: 'instagram' },
+    { name: 'WhatsApp',  href: 'https://wa.me/923265974741',  icon: 'whatsapp' },
+    { name: 'TikTok',    href: 'https://tiktok.com/',         icon: 'tiktok' }
   ];
 
-  function buildCategories(data) {
-    const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
-    const pcs      = data.pcs || {};
-    const desktops = pcs.desktops || [];
-    const tiny     = pcs.tiny     || [];
-    const monitors = pcs.monitors || [];
-    const allPCs   = [].concat(desktops, tiny, monitors);
-    const combined = laptops.concat(allPCs);
-
-    const candidates = [
-      { id: '30k-50k', label: '30k to 50k',
-        test: function (i) { const p = Number(i.price); return p > 30000 && p <= 50000; } },
-      { id: '50k-70k', label: '50k to 70k',
-        test: function (i) { const p = Number(i.price); return p > 50000 && p <= 70000; } },
-      { id: '70k-plus', label: '70k Plus',
-        test: function (i) { return Number(i.price) > 70000; } },
-      { id: 'i5', label: 'Core i5',
-        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i5') !== -1; } },
-      { id: 'i7', label: 'Core i7',
-        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i7') !== -1; } },
-      { id: 'dell', label: 'Dell',
-        test: function (i) { return i.brand === 'DELL'; } },
-      { id: 'hp', label: 'HP',
-        test: function (i) { return i.brand === 'HP'; } },
-      { id: 'lenovo', label: 'Lenovo',
-        test: function (i) { return i.brand === 'LENOVO'; } },
-    ];
-
-    return candidates
-      .map(function (c) {
-        return Object.assign({}, c, { _count: combined.filter(c.test).length });
-      })
-      .filter(function (c) { return c._count >= 2; })
-      .map(function (c) { delete c._count; return c; });
+  /* ── TikTok SVG (official glyph, filled) ───────────────── */
+  function tiktokSvg(size) {
+    const s = size || 16;
+    return (
+      '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">' +
+        '<path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/>' +
+      '</svg>'
+    );
   }
 
-  let CATEGORIES = [];
+  /* ── Build brand → models map from JSON ────────────────── */
+  function buildBrandModels(data) {
+    const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
+    const pcs      = data.pcs || {};
+    const allPCs   = [].concat(pcs.desktops || [], pcs.tiny || [], pcs.monitors || []);
+    const combined = laptops.concat(allPCs);
+
+    const brands = ['DELL', 'HP', 'LENOVO', 'LG', 'ACER'];
+    const map = {};
+
+    brands.forEach(function (brand) {
+      const items = combined.filter(function (i) {
+        return (i.brand || '').toUpperCase() === brand;
+      });
+
+      /* Group by normalized model name */
+      const groups = {};
+      items.forEach(function (i) {
+        const key = (i.model || '').toUpperCase().trim();
+        if (!key) return;
+        if (!groups[key]) groups[key] = { label: i.model, count: 0 };
+        groups[key].count++;
+      });
+
+      map[brand] = Object.keys(groups).map(function (k) {
+        return { label: groups[k].label, count: groups[k].count, brand: brand };
+      }).sort(function (a, b) {
+        return a.label.localeCompare(b.label);
+      });
+    });
+
+    return map;
+  }
+
+  let BRAND_MODELS = {};
 
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
 
@@ -85,6 +95,7 @@
     window.location.href = url;
   }
 
+  /* ── WhatsApp SVG ──────────────────────────────────────── */
   function whatsappSvg(size) {
     const s = size || 16;
     return (
@@ -114,25 +125,103 @@
       </svg>`;
   }
 
+  /* ── Row 3: brand dropdowns + price/CPU pills ──────────── */
+  function buildRow3() {
+    const parts = [];
+
+    /* Brand dropdowns (Dell, HP, Lenovo) */
+    ['DELL', 'HP', 'LENOVO'].forEach(function (brand) {
+      const models = BRAND_MODELS[brand] || [];
+      if (!models.length) return;
+
+      const brandLabel = brand === 'DELL' ? 'Dell'
+                       : brand === 'HP'   ? 'HP'
+                       : 'Lenovo';
+
+      const modelItems = models.map(function (m) {
+        /* tag slug = brand id + model slug */
+        const modelSlug = m.label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const tag = brand.toLowerCase() + '-' + modelSlug;
+        return (
+          '<li>' +
+            '<button type="button" class="cat-dropdown-item" data-cat="' + tag + '">' +
+              '<span class="cat-dropdown-model">' + m.label + '</span>' +
+              '<span class="cat-dropdown-count">' + m.count + '</span>' +
+            '</button>' +
+          '</li>'
+        );
+      }).join('');
+
+      parts.push(
+        '<div class="cat-dropdown" data-brand="' + brand + '">' +
+          '<button type="button" class="cat-link cat-link--dropdown" aria-haspopup="true" aria-expanded="false">' +
+            brandLabel +
+            '<i data-lucide="chevron-down" class="cat-dropdown-caret"></i>' +
+          '</button>' +
+          '<div class="cat-dropdown-menu" role="menu">' +
+            '<ul class="cat-dropdown-list">' + modelItems + '</ul>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    /* Regular pills */
+    const regularPills = [
+      { id: '30k-50k', label: '30k to 50k' },
+      { id: '50k-70k', label: '50k to 70k' },
+      { id: '70k-plus', label: '70k Plus' },
+      { id: 'i5',      label: 'Core i5' },
+      { id: 'i7',      label: 'Core i7' }
+    ];
+
+    regularPills.forEach(function (p) {
+      parts.push(
+        '<button type="button" class="cat-link" data-cat="' + p.id + '">' + p.label + '</button>'
+      );
+    });
+
+    return parts.join('');
+  }
+
   function template() {
     const logoSrc = r('assets/img/logo.png');
 
     const socialLinks = SOCIALS.map(function (s) {
-      const icon = s.icon === 'whatsapp' ? whatsappSvg(16) : '<i data-lucide="' + s.icon + '"></i>';
+      let icon;
+      if (s.icon === 'whatsapp')      icon = whatsappSvg(16);
+      else if (s.icon === 'tiktok')   icon = tiktokSvg(16);
+      else                            icon = '<i data-lucide="' + s.icon + '"></i>';
+
       return '<a href="' + s.href + '" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="' + s.name + '">' +
         icon +
       '</a>';
     }).join('');
 
-    const catButtons = CATEGORIES.map(function (c) {
-      return '<button type="button" class="cat-link" data-cat="' + c.id + '">' + c.label + '</button>';
-    }).join('');
+    const row3Content = buildRow3();
 
-    const drawerCatButtons = CATEGORIES.map(function (c) {
+    const drawerCatButtons = [
+      { id: '30k-50k', label: '30k to 50k' },
+      { id: '50k-70k', label: '50k to 70k' },
+      { id: '70k-plus', label: '70k Plus' },
+      { id: 'i5',      label: 'Core i5' },
+      { id: 'i7',      label: 'Core i7' },
+      { id: 'dell',    label: 'Dell' },
+      { id: 'hp',      label: 'HP' },
+      { id: 'lenovo',  label: 'Lenovo' }
+    ].map(function (c) {
       return '<li><button type="button" class="drawer-cat" data-cat="' + c.id + '">' + c.label + '</button></li>';
     }).join('');
 
-    const mobileCatButtons = CATEGORIES.map(function (c) {
+    const mobileCatButtons = [
+      { id: '30k-50k', label: '30k to 50k' },
+      { id: '50k-70k', label: '50k to 70k' },
+      { id: '70k-plus', label: '70k Plus' },
+      { id: 'i5',      label: 'Core i5' },
+      { id: 'i7',      label: 'Core i7' },
+      { id: 'dell',    label: 'Dell' },
+      { id: 'hp',      label: 'HP' },
+      { id: 'lenovo',  label: 'Lenovo' }
+    ].map(function (c) {
       return '<li><button type="button" class="mobile-cat" data-cat="' + c.id + '"><i data-lucide="tag"></i><span>' + c.label + '</span></button></li>';
     }).join('');
 
@@ -187,7 +276,7 @@
 
             <div class="nav-row nav-row-3">
               <div class="cat-links-scroll">
-                <div class="cat-links">${catButtons}</div>
+                <div class="cat-links">${row3Content}</div>
               </div>
             </div>
 
@@ -268,11 +357,64 @@
 
     const lockScroll = function (on) { document.documentElement.style.overflow = on ? 'hidden' : ''; };
 
+    /* Category clicks (regular pills + dropdown items) */
     root.addEventListener('click', function (e) {
       const btn = e.target.closest('[data-cat]');
-      if (btn) { e.preventDefault(); gotoTag(btn.dataset.cat); }
+      if (btn) {
+        e.preventDefault();
+        /* Close any open dropdowns */
+        root.querySelectorAll('.cat-dropdown.is-open').forEach(function (dd) {
+          dd.classList.remove('is-open');
+          const b = dd.querySelector('.cat-link--dropdown');
+          if (b) b.setAttribute('aria-expanded', 'false');
+        });
+        gotoTag(btn.dataset.cat);
+      }
     });
 
+    /* Dropdown toggles */
+    root.querySelectorAll('.cat-dropdown').forEach(function (dd) {
+      const trigger = dd.querySelector('.cat-link--dropdown');
+      if (!trigger) return;
+      trigger.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        /* Close all other dropdowns */
+        root.querySelectorAll('.cat-dropdown').forEach(function (other) {
+          if (other !== dd) {
+            other.classList.remove('is-open');
+            const b = other.querySelector('.cat-link--dropdown');
+            if (b) b.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        const nowOpen = dd.classList.toggle('is-open');
+        trigger.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
+      });
+    });
+
+    /* Close dropdowns on outside click */
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('.cat-dropdown')) return;
+      root.querySelectorAll('.cat-dropdown.is-open').forEach(function (dd) {
+        dd.classList.remove('is-open');
+        const b = dd.querySelector('.cat-link--dropdown');
+        if (b) b.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    /* Close on Escape */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      root.querySelectorAll('.cat-dropdown.is-open').forEach(function (dd) {
+        dd.classList.remove('is-open');
+        const b = dd.querySelector('.cat-link--dropdown');
+        if (b) b.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    /* Right drawer */
     if (toggler && menu && backdrop) {
       menu.classList.remove('is-open');
       backdrop.classList.remove('is-open');
@@ -326,6 +468,7 @@
       else if (mq.addListener) mq.addListener(mqHandler);
     }
 
+    /* Mobile search drawer */
     function openSearch() {
       searchPanel.classList.add('is-open');
       searchPanel.setAttribute('aria-hidden', 'false');
@@ -343,6 +486,7 @@
     if (searchOpen) {
       searchOpen.addEventListener('click', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         searchPanel.classList.contains('is-open') ? closeSearch() : openSearch();
       });
     }
@@ -469,10 +613,10 @@
         NS.Data?.laptops ? NS.Data.laptops().catch(function () { return []; }) : [],
         NS.Data?.pcs     ? NS.Data.pcs().catch(function () { return {}; }) : {},
       ]);
-      CATEGORIES = buildCategories({ laptops: laptops, pcs: pcs });
+      BRAND_MODELS = buildBrandModels({ laptops: laptops, pcs: pcs });
     } catch (e) {
       console.warn('[IT Zone] Navbar: category computation failed.', e);
-      CATEGORIES = [];
+      BRAND_MODELS = {};
     }
 
     host.innerHTML = template();
@@ -480,7 +624,11 @@
     wire(host);
     NS.renderIcons?.(host);
 
-    console.info('[IT Zone] Navbar: ' + CATEGORIES.length + ' categories loaded.');
+    const totalModels = Object.keys(BRAND_MODELS).reduce(function (sum, b) {
+      return sum + BRAND_MODELS[b].length;
+    }, 0);
+    console.info('[IT Zone] Navbar: ' + totalModels + ' models loaded across ' +
+                 Object.keys(BRAND_MODELS).length + ' brands.');
   }
 
   NS.Navbar = { mount: mount };
