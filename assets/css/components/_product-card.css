@@ -1742,3 +1742,80 @@
     padding-right: 0.75rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   IMAGE SHARPNESS
+   Forces the browser to scale images crisply instead of
+   smoothly blurring them. Works for both upscaled and
+   downscaled images.
+   ═══════════════════════════════════════════════════════ */
+
+/* Card images */
+.product-image img,
+.pd-slide img,
+.pd-thumb img,
+.product-detail-image img {
+  /* Modern property: choose the best scaling algorithm */
+  image-rendering: -webkit-optimize-contrast;   /* Chrome / Safari: sharp edges */
+  image-rendering: crisp-edges;                 /* Firefox */
+  image-rendering: high-quality;                /* Fallback */
+
+  /* Enhance sharpness when the image is being scaled DOWN */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+
+  /* Prevent browser from adding its own blur */
+  filter: contrast(1.02) saturate(1.03);
+}
+/* ═══════════════════════════════════════════════════════
+   RUNTIME IMAGE ENHANCEMENT
+   Sharp scaling + subtle contrast for low-quality photos.
+   ═══════════════════════════════════════════════════════ */
+
+.product-image img,
+.pd-slide img,
+.pd-thumb img,
+.product-detail-image img {
+  /* Force sharp scaling algorithm */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: high-quality;
+
+  /* GPU rendering often uses better filtering */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+
+  /* Subtle enhancements that hide JPEG artifacts */
+  filter:
+    contrast(1.03)
+    saturate(1.04)
+    brightness(1.01);
+}
+
+/* Thumbnails benefit from a bit more punch (smaller display = less artifact) */
+.pd-thumb img {
+  filter:
+    contrast(1.05)
+    saturate(1.06)
+    brightness(1.02);
+}
+
+/* Prevent white halo around images on colored cards */
+.product-image,
+.pd-slide,
+.pd-thumb,
+.product-detail-image {
+  background-clip: padding-box;
+}
+
+/* Reduced motion: no filters change on hover */
+@media (prefers-reduced-motion: reduce) {
+  .product-image img,
+  .pd-slide img,
+  .pd-thumb img,
+  .product-detail-image img {
+    filter: none;
+  }
+}
