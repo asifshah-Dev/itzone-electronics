@@ -156,7 +156,7 @@
     }
 
     if (sortHost && NS.SortBar && typeof NS.SortBar.mount === 'function') {
-      NS.SortBar.mount(sortHost, state.view);
+  NS.SortBar.mount(sortHost, { initialView: state.view });
       document.addEventListener('sort:change', function (e) { state.sort = e.detail.sort; render(); });
       document.addEventListener('view:change', function (e) { state.view = e.detail.view; render(); });
     }

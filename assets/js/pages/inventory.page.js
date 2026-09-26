@@ -245,9 +245,8 @@
       render();
     });
 
-    if (sortHost && NS.SortBar && typeof NS.SortBar.mount === 'function') {
-      /* Pass current view so the toggle button reflects it */
-      NS.SortBar.mount(sortHost, state.view);
+   if (sortHost && NS.SortBar && typeof NS.SortBar.mount === 'function') {
+  NS.SortBar.mount(sortHost, { initialView: state.view });
 
       document.addEventListener('sort:change', function (e) {
         state.sort = e.detail.sort;

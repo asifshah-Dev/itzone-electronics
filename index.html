@@ -34,10 +34,8 @@
 
   <main id="main" tabindex="-1">
 
-    <!-- Hero -->
     <section id="hero-slot" class="hero-section"></section>
 
-    <!-- All products -->
     <section id="products" class="section" aria-labelledby="products-heading">
       <div class="container">
 
@@ -46,27 +44,20 @@
           <p class="section-subtitle" id="home-count">Loading inventory…</p>
         </header>
 
-        <!-- Type tabs -->
-        <div class="inventory-toolbar">
-          <div class="product-filters" id="home-filters" role="group" aria-label="Filter by type"></div>
-        </div>
-
-        <!-- Sort + view toggle -->
+        <!-- Sort bar with embedded tabs (All / Laptops / PCs) -->
         <div id="home-sort"></div>
 
-        <!-- Product grid -->
-        <div id="home-grid" class="row g-4" role="list"></div>
+        <div id="home-grid" class="row g-3" role="list"></div>
 
       </div>
     </section>
 
-    <!-- CTA strip -->
     <section id="inventory" class="section-tight" aria-labelledby="inventory-heading">
       <div class="container">
         <div class="cta-strip">
           <div>
             <h2 id="inventory-heading" class="section-title mb-1">Need something specific?</h2>
-            <p class="section-subtitle mb-0">Browse the full catalog with filters and search.</p>
+            <p class="section-subtitle mb-0">Browse the full catalog with search and advanced filters.</p>
           </div>
           <div class="d-flex gap-3 flex-wrap">
             <a href="pages/inventory.html" class="btn btn-brand">Open full catalog</a>
@@ -76,7 +67,6 @@
       </div>
     </section>
 
-    <!-- Reviews -->
     <section id="reviews" class="section" aria-labelledby="reviews-heading">
       <div class="container">
         <div id="reviews-slot"></div>
@@ -87,28 +77,22 @@
 
   <footer class="site-footer"></footer>
 
-  <!-- Vendors -->
   <script defer src="assets/js/vendors/bootstrap.bundle.min.js"></script>
   <script defer src="assets/js/vendors/lucide.min.js"></script>
 
-  <!-- Core -->
   <script defer src="assets/js/core/data.js"></script>
   <script defer src="assets/js/core/whatsapp.js"></script>
   <script defer src="assets/js/core/cursor.js"></script>
 
-  <!-- Components -->
   <script defer src="assets/js/components/Navbar.js"></script>
   <script defer src="assets/js/components/Footer.js"></script>
   <script defer src="assets/js/components/Hero.js"></script>
   <script defer src="assets/js/components/ProductCard.js"></script>
-  <script defer src="assets/js/components/ProductGrid.js"></script>
   <script defer src="assets/js/components/SortBar.js"></script>
   <script defer src="assets/js/components/Reviews.js"></script>
 
-  <!-- Home page module -->
   <script defer src="assets/js/pages/home.js"></script>
 
-  <!-- App bootstrap -->
   <script defer src="assets/js/main.js"></script>
 
 </body>

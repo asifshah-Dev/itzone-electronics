@@ -1,17 +1,17 @@
 // assets/js/components/SortBar.js
 /* ─────────────────────────────────────────────────────────
-   Sort dropdown + grid/list view toggle.
-   - Reads initial view from localStorage (fallback: 'grid')
+   Sort bar + (optional) type tabs.
+   - Renders tabs, count, sort dropdown, view toggle in ONE row
    - Emits 'sort:change' and 'view:change'
-   - Persists view choice in localStorage
+   - Persists view + sort to localStorage
    ───────────────────────────────────────────────────────── */
 
 (function () {
   'use strict';
   const NS = (window.ITZone = window.ITZone || {});
 
-  const STORAGE_KEY = 'itz.view';
-  const SORT_STORAGE_KEY = 'itz.sort';
+  const STORAGE_VIEW = 'itz.view';
+  const STORAGE_SORT = 'itz.sort';
 
   const SORT_OPTIONS = [
     { id: 'featured',   label: 'Featured' },
@@ -19,30 +19,45 @@
     { id: 'price-desc', label: 'Price: High to Low' },
     { id: 'model-asc',  label: 'Model: A to Z' },
     { id: 'ram-desc',   label: 'RAM: High to Low' },
-    { id: 'ssd-desc',   label: 'Storage: High to Low' },
+    { id: 'ssd-desc',   label: 'Storage: High to Low' }
   ];
 
-  /* Read from localStorage (safely) */
   function readStored(key, fallback) {
-    try {
-      const v = localStorage.getItem(key);
-      return v || fallback;
-    } catch (e) { return fallback; }
+    try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; }
   }
   function writeStored(key, value) {
     try { localStorage.setItem(key, value); } catch (e) {}
   }
 
-  function template(view) {
+  /* options: { initialView, tabs: [{id,label}], activeTab } */
+  function template(view, sort, tabs, activeTab) {
     const options = SORT_OPTIONS.map(function (o) {
-      return '<option value="' + o.id + '">' + o.label + '</option>';
+      return '<option value="' + o.id + '"' + (o.id === sort ? ' selected' : '') + '>' + o.label + '</option>';
     }).join('');
 
     const gridActive = view !== 'list';
     const listActive = view === 'list';
 
+    /* Optional tabs on the left */
+    const tabsHtml = (tabs && tabs.length)
+      ? '<div class="sort-bar-tabs" role="group" aria-label="Filter by type">' +
+          tabs.map(function (t) {
+            const active = t.id === activeTab;
+            return '<button type="button" ' +
+                     'class="filter-btn' + (active ? ' is-active' : '') + '" ' +
+                     'data-filter="' + t.id + '" ' +
+                     'aria-pressed="' + (active ? 'true' : 'false') + '">' +
+                     t.label +
+                   '</button>';
+          }).join('') +
+        '</div>'
+      : '';
+
     return (
       '<div class="sort-bar">' +
+
+        tabsHtml +
+
         '<div class="sort-bar-count">' +
           '<span id="sort-bar-count-value">0</span>' +
           '<span class="sort-bar-count-label">items</span>' +
@@ -74,31 +89,30 @@
             '</button>' +
           '</div>' +
         '</div>' +
+
       '</div>'
     );
   }
 
-  function mount(host, initialView) {
+  /* options: { initialView, tabs, activeTab, onTabChange } */
+  function mount(host, options) {
     if (!host) return;
     if (host.dataset.mounted === 'true') return;
     host.dataset.mounted = 'true';
 
-    /* Resolve view: URL → localStorage → 'grid' */
-    const view = initialView ||
-                 readStored(STORAGE_KEY, 'grid');
-    const storedSort = readStored(SORT_STORAGE_KEY, 'featured');
+    options = options || {};
+    const initialView = options.initialView || readStored(STORAGE_VIEW, 'grid');
+    const initialSort = readStored(STORAGE_SORT, 'featured');
+    const tabs = options.tabs || [];
+    const activeTab = options.activeTab || 'all';
 
-    host.innerHTML = template(view);
-
-    const select = host.querySelector('#sort-select');
-    if (select && storedSort) select.value = storedSort;
-
-    const viewBtns = host.querySelectorAll('.view-btn');
+    host.innerHTML = template(initialView, initialSort, tabs, activeTab);
 
     /* Sort change */
+    const select = host.querySelector('#sort-select');
     if (select) {
       select.addEventListener('change', function () {
-        writeStored(SORT_STORAGE_KEY, select.value);
+        writeStored(STORAGE_SORT, select.value);
         document.dispatchEvent(new CustomEvent('sort:change', {
           detail: { sort: select.value }
         }));
@@ -106,6 +120,7 @@
     }
 
     /* View change */
+    const viewBtns = host.querySelectorAll('.view-btn');
     viewBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         viewBtns.forEach(function (b) {
@@ -115,12 +130,28 @@
         btn.classList.add('is-active');
         btn.setAttribute('aria-pressed', 'true');
         const newView = btn.dataset.view;
-        writeStored(STORAGE_KEY, newView);
+        writeStored(STORAGE_VIEW, newView);
         document.dispatchEvent(new CustomEvent('view:change', {
           detail: { view: newView }
         }));
       });
     });
+
+    /* Tabs */
+    const tabsHost = host.querySelector('.sort-bar-tabs');
+    if (tabsHost && typeof options.onTabChange === 'function') {
+      tabsHost.addEventListener('click', function (e) {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        tabsHost.querySelectorAll('.filter-btn').forEach(function (b) {
+          b.classList.remove('is-active');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-pressed', 'true');
+        options.onTabChange(btn.dataset.filter);
+      });
+    }
   }
 
   function setCount(n) {
@@ -131,7 +162,7 @@
   NS.SortBar = {
     mount: mount,
     setCount: setCount,
-    getStoredView: function () { return readStored(STORAGE_KEY, 'grid'); },
-    getStoredSort: function () { return readStored(SORT_STORAGE_KEY, 'featured'); }
+    getStoredView: function () { return readStored(STORAGE_VIEW, 'grid'); },
+    getStoredSort: function () { return readStored(STORAGE_SORT, 'featured'); }
   };
 })();

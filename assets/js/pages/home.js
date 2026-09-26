@@ -2,10 +2,9 @@
 /* ─────────────────────────────────────────────────────────
    Home page controller.
    - Mounts hero
-   - Fetches laptops + PCs
-   - Shows ALL products in a grid
-   - Type tabs: All / Laptops / PCs & Monitors
-   - Sort + view toggle (same as inventory page)
+   - Fetches all laptops + PCs
+   - Type tabs + sort + view toggle live in ONE bar
+   - Full-width grid, 4 cards per row
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -14,7 +13,6 @@
 
   let allItems = [];
 
-  /* ── Tag items with subtype ─────────────────────────────── */
   function mergeAll(laptops, pcs) {
     const out = [];
     (laptops || []).forEach(function (i) {
@@ -32,37 +30,12 @@
     return out;
   }
 
-  /* ── Type tabs (same as inventory page) ─────────────────── */
   const TABS = [
     { id: 'all',    label: 'All' },
     { id: 'laptop', label: 'Laptops' },
     { id: 'pc',     label: 'PCs & Monitors' }
   ];
 
-  function mountTabs(host, state, onChange) {
-    if (!host) return;
-    host.innerHTML = TABS.map(function (t) {
-      const active = state.type === t.id;
-      return '<button type="button" class="filter-btn' + (active ? ' is-active' : '') + '"' +
-             ' data-filter="' + t.id + '"' +
-             ' aria-pressed="' + (active ? 'true' : 'false') + '">' +
-             t.label + '</button>';
-    }).join('');
-
-    host.addEventListener('click', function (e) {
-      const btn = e.target.closest('.filter-btn');
-      if (!btn) return;
-      host.querySelectorAll('.filter-btn').forEach(function (b) {
-        b.classList.remove('is-active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('is-active');
-      btn.setAttribute('aria-pressed', 'true');
-      onChange(btn.dataset.filter);
-    });
-  }
-
-  /* ── Sort ──────────────────────────────────────────────── */
   function applySort(items, sort) {
     const copy = items.slice();
     switch (sort) {
@@ -76,7 +49,6 @@
     }
   }
 
-  /* ── Count display ─────────────────────────────────────── */
   function updateCount(visible, total) {
     const el = document.getElementById('home-count');
     if (el) {
@@ -87,17 +59,13 @@
     NS.SortBar?.setCount?.(visible);
   }
 
-  /* ── Render loop ───────────────────────────────────────── */
-  function render(grid, state, gridHost) {
-    /* Filter by type */
+  function render(state, gridHost) {
     let items = allItems.slice();
     if (state.type === 'laptop') items = items.filter(function (i) { return i._type === 'laptop'; });
     if (state.type === 'pc')     items = items.filter(function (i) { return i._type === 'pc'; });
 
-    /* Sort */
     items = applySort(items, state.sort);
 
-    /* Render cards inside Bootstrap columns */
     if (!items.length) {
       gridHost.innerHTML =
         '<div class="product-empty" role="status">' +
@@ -115,32 +83,24 @@
       NS.renderIcons?.(gridHost);
     }
 
-    /* Apply list/grid view class to the row container */
     gridHost.classList.toggle('is-list', state.view === 'list');
 
     updateCount(items.length, allItems.length);
   }
 
-  /* ── Init ──────────────────────────────────────────────── */
   async function init() {
-    /* 1. Hero */
     NS.Hero?.mount();
 
-    /* 2. Products */
     const gridHost = document.getElementById('home-grid');
-    const tabsHost = document.getElementById('home-filters');
     const sortHost = document.getElementById('home-sort');
 
     if (!gridHost) return;
 
-    /* Check that ProductCard loaded */
     if (!NS.ProductCard || typeof NS.ProductCard.render !== 'function') {
       console.error('[IT Zone] Home: ProductCard module missing.');
-      gridHost.innerHTML = '<div class="product-empty">Product card module not loaded.</div>';
       return;
     }
 
-    /* Loading state */
     gridHost.innerHTML =
       '<div class="product-loading" role="status" aria-live="polite">' +
         '<i data-lucide="loader-2"></i>' +
@@ -148,7 +108,6 @@
       '</div>';
     NS.renderIcons?.(gridHost);
 
-    /* Fetch data */
     try {
       const results = await Promise.all([
         NS.Data.laptops().catch(function () { return []; }),
@@ -166,29 +125,27 @@
       return;
     }
 
-    /* State */
     const state = {
       type: 'all',
       sort: (NS.SortBar && NS.SortBar.getStoredSort) ? NS.SortBar.getStoredSort() : 'featured',
       view: (NS.SortBar && NS.SortBar.getStoredView) ? NS.SortBar.getStoredView() : 'grid'
     };
 
-    /* Fake grid object — the home page doesn't use ProductGrid.js */
-    const grid = { render: function () { /* no-op */ } };
-
     function refresh() {
-      render(grid, state, gridHost);
+      render(state, gridHost);
     }
 
-    /* Mount type tabs */
-    mountTabs(tabsHost, state, function (type) {
-      state.type = type;
-      refresh();
-    });
-
-    /* Mount sort bar */
+    /* Mount SortBar with tabs inside */
     if (sortHost && NS.SortBar && typeof NS.SortBar.mount === 'function') {
-      NS.SortBar.mount(sortHost, state.view);
+      NS.SortBar.mount(sortHost, {
+        initialView: state.view,
+        tabs: TABS,
+        activeTab: state.type,
+        onTabChange: function (type) {
+          state.type = type;
+          refresh();
+        }
+      });
 
       document.addEventListener('sort:change', function (e) {
         state.sort = e.detail.sort;
@@ -201,7 +158,7 @@
       });
     }
 
-    /* WhatsApp order tracking via delegation */
+    /* WhatsApp order tracking */
     if (gridHost.dataset.bound !== 'true') {
       gridHost.dataset.bound = 'true';
       gridHost.addEventListener('click', function (e) {
@@ -213,7 +170,6 @@
       });
     }
 
-    /* First render */
     refresh();
 
     console.info('[IT Zone] Home: rendered ' + allItems.length + ' products.');

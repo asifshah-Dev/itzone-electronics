@@ -115,7 +115,7 @@
   }
 
   function template() {
-    const logoSrc = r('assets/img/logo.svg');
+    const logoSrc = r('assets/img/logo.png');
 
     const socialLinks = SOCIALS.map(function (s) {
       const icon = s.icon === 'whatsapp' ? whatsappSvg(16) : '<i data-lucide="' + s.icon + '"></i>';
