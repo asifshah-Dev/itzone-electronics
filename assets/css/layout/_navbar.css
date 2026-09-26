@@ -1215,3 +1215,34 @@ body.dropdown-open .nav-sticky { z-index: 2147483601; }
     height: 1.1rem !important;
   }
 }
+
+@media (max-width: 991.98px) {
+  #mobile-search-open,
+  button.nav-search-btn,
+  .nav-search-btn {
+    width: 2.6rem !important;
+    height: 2.6rem !important;
+    min-width: 2.6rem !important;
+    min-height: 2.6rem !important;
+    max-width: 2.6rem !important;
+    max-height: 2.6rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  #mobile-search-open svg,
+  #mobile-search-open i,
+  .nav-search-btn svg,
+  .nav-search-btn i {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+    min-width: 1.2rem !important;
+    min-height: 1.2rem !important;
+    max-width: 1.2rem !important;
+    max-height: 1.2rem !important;
+    display: block !important;
+  }
+}
