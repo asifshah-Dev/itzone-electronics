@@ -1154,3 +1154,64 @@ body.dropdown-open .nav-sticky { z-index: 2147483601; }
     height: 1.1rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE — Force search icon to match phone icon size
+   (Overrides all earlier rules)
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 991.98px) {
+  .nav-left .nav-search-btn,
+  .nav-actions .nav-phone-icon {
+    width: 2.6rem !important;
+    height: 2.6rem !important;
+    min-width: 2.6rem !important;
+    min-height: 2.6rem !important;
+    border-radius: var(--radius-pill) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+  }
+
+  .nav-left .nav-search-btn .lucide,
+  .nav-left .nav-search-btn svg,
+  .nav-actions .nav-phone-icon .lucide,
+  .nav-actions .nav-phone-icon svg {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+    stroke-width: 2.5 !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Ensure both have the same border + background */
+  .nav-left .nav-search-btn {
+    border: 1.5px solid var(--brand-primary) !important;
+    background: #ffffff !important;
+    color: var(--brand-primary) !important;
+  }
+
+  .nav-actions .nav-phone-icon {
+    border: 1.5px solid var(--brand-primary) !important;
+    background: #ffffff !important;
+    color: var(--brand-primary) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .nav-left .nav-search-btn,
+  .nav-actions .nav-phone-icon {
+    width: 2.4rem !important;
+    height: 2.4rem !important;
+    min-width: 2.4rem !important;
+    min-height: 2.4rem !important;
+  }
+
+  .nav-left .nav-search-btn .lucide,
+  .nav-left .nav-search-btn svg,
+  .nav-actions .nav-phone-icon .lucide,
+  .nav-actions .nav-phone-icon svg {
+    width: 1.1rem !important;
+    height: 1.1rem !important;
+  }
+}
