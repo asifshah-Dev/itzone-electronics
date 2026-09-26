@@ -1,26 +1,26 @@
 /* assets/css/layout/_hero.css
    ─────────────────────────────────────────────────────────
-   Home hero — banner image, no zoom, no green overlay.
-   Text is warm cream with a gold→coral gradient accent.
-   A soft dark scrim sits behind the text for readability.
+   Home hero section — full-width banner with image background.
+   Dark green gradient overlay for text readability.
    ───────────────────────────────────────────────────────── */
 
 /* ═══════════════════════════════════════════════════════
-   HERO WRAPPER
+   HERO WRAPPER — the outer <section>
    ═══════════════════════════════════════════════════════ */
 .hero-section {
   position: relative;
   padding: 0;
-  background: #f7faf8;
+  background: #0a3d1f;   /* fallback while image loads */
   overflow: hidden;
 }
 
 /* ═══════════════════════════════════════════════════════
-   BANNER — full-width image, no zoom
+   BANNER — the full-width image area
    ═══════════════════════════════════════════════════════ */
 .hero-banner {
   position: relative;
   width: 100%;
+  /* Tall enough to feel like a banner, short enough to keep CTAs above the fold */
   min-height: clamp(520px, 78vh, 760px);
   display: flex;
   align-items: center;
@@ -28,7 +28,7 @@
   isolation: isolate;
 }
 
-/* Background image — displayed at its natural fit, no zoom */
+/* Background image layer */
 .hero-banner-bg {
   position: absolute;
   inset: 0;
@@ -36,30 +36,37 @@
   background-position: center;
   background-repeat: no-repeat;
   z-index: 1;
-  /* no animation, no transform — keeps image at natural proportions */
+  /* Gentle zoom-in on load for a cinematic feel */
+  animation: heroZoom 18s ease-out forwards;
+  will-change: transform;
+}
+@keyframes heroZoom {
+  from { transform: scale(1.08); }
+  to   { transform: scale(1); }
 }
 
-/* ── LOCALIZED SCRIM — darkens behind the text only ──── */
-/* Not a full-width green wash. Just enough contrast
-   on the left side so the text pops without dulling the image. */
-.hero-banner-scrim {
+/* Dark green gradient overlay — makes white text pop */
+.hero-banner-overlay {
   position: absolute;
   inset: 0;
   z-index: 2;
   background:
     linear-gradient(
-      95deg,
-      rgba(10, 15, 13, 0.75) 0%,
-      rgba(10, 15, 13, 0.62) 30%,
-      rgba(10, 15, 13, 0.35) 55%,
-      rgba(10, 15, 13, 0) 75%
+      100deg,
+      rgba(10, 61, 31, 0.92) 0%,
+      rgba(10, 61, 31, 0.82) 35%,
+      rgba(10, 61, 31, 0.55) 60%,
+      rgba(10, 61, 31, 0.25) 100%
+    ),
+    radial-gradient(
+      70% 60% at 15% 50%,
+      rgba(0, 0, 0, 0.35) 0%,
+      rgba(0, 0, 0, 0) 70%
     );
   pointer-events: none;
 }
 
-/* ═══════════════════════════════════════════════════════
-   CONTENT — left-aligned on the scrim
-   ═══════════════════════════════════════════════════════ */
+/* Content column — constrained to a comfortable reading width */
 .hero-banner-content {
   position: relative;
   z-index: 3;
@@ -71,10 +78,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: 0;
 }
 
 /* ═══════════════════════════════════════════════════════
-   EYEBROW — cream pill with gold icon
+   EYEBROW
    ═══════════════════════════════════════════════════════ */
 .hero-eyebrow {
   display: inline-flex;
@@ -82,14 +90,14 @@
   gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
-  background: rgba(255, 236, 200, 0.14);       /* warm tint */
-  border: 1px solid rgba(255, 236, 200, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: #fff3dc;                               /* cream */
+  color: #ffffff;
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   margin-bottom: var(--space-5);
 }
 .hero-eyebrow .lucide,
@@ -97,49 +105,45 @@
   width: 1rem;
   height: 1rem;
   stroke-width: 2.5;
-  color: #f5b81c;                               /* gold */
+  color: #f5b81c;   /* gold accent */
 }
 
 /* ═══════════════════════════════════════════════════════
-   TITLE — warm cream, with vivid gradient accent
+   TITLE
    ═══════════════════════════════════════════════════════ */
 .hero-title {
   font-size: clamp(2rem, 5vw + 0.5rem, 3.5rem);
-  font-weight: 900;
+  font-weight: var(--fw-black);
   line-height: 1.08;
-  letter-spacing: -0.02em;
-  color: #fff8ec;                               /* warm cream */
+  letter-spacing: var(--ls-tight);
+  color: #ffffff;
   margin: 0 0 var(--space-5);
   text-wrap: balance;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 
-/* Eye-catching gradient accent — gold → coral */
-.hero-title-accent {
+/* Brand gradient on the emphasized words — brighter for the dark bg */
+.hero-title .text-gradient-brand {
   background: linear-gradient(135deg,
-    #ffd166 0%,       /* warm gold */
-    #ffb347 30%,      /* amber */
-    #ff8a5b 60%,      /* coral */
-    #ff5e62 100%      /* rose coral */
-  );
+    #7ae0a0 0%,
+    #f5b81c 55%,
+    #ff8a80 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: none;                              /* shadow breaks the gradient */
-  filter: drop-shadow(0 2px 16px rgba(255, 138, 91, 0.35));
 }
 
 /* ═══════════════════════════════════════════════════════
-   SUBTITLE — soft cream, readable
+   SUBTITLE
    ═══════════════════════════════════════════════════════ */
 .hero-subtitle {
   font-size: clamp(1rem, 1.5vw + 0.5rem, 1.2rem);
   line-height: 1.6;
-  color: rgba(255, 244, 230, 0.9);              /* warm cream */
+  color: rgba(255, 255, 255, 0.88);
   margin: 0 0 var(--space-6);
   max-width: 52ch;
   text-wrap: pretty;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -157,7 +161,7 @@
   font-weight: var(--fw-semibold);
 }
 
-/* Outline button — glassy, tuned for the banner */
+/* Hero-specific outline button — designed for dark backgrounds */
 .btn-outline-hero {
   display: inline-flex;
   align-items: center;
@@ -166,9 +170,9 @@
   font-size: var(--fs-base);
   font-weight: var(--fw-semibold);
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1.5px solid rgba(255, 244, 230, 0.55);
-  color: #fff8ec;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  color: #ffffff;
   text-decoration: none;
   white-space: nowrap;
   backdrop-filter: blur(10px);
@@ -180,8 +184,8 @@
     transform        var(--dur-fast) var(--ease-out);
 }
 .btn-outline-hero:hover {
-  background: #fff8ec;
-  border-color: #fff8ec;
+  background: #ffffff;
+  border-color: #ffffff;
   color: var(--brand-primary);
   transform: translateY(-1px);
 }
@@ -189,11 +193,11 @@
 .btn-outline-hero svg { width: 1.15rem; height: 1.15rem; }
 .btn-outline-hero:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 248, 236, 0.5);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
 }
 
 /* ═══════════════════════════════════════════════════════
-   TRUST BADGES — cream text, gold icons
+   TRUST BADGES
    ═══════════════════════════════════════════════════════ */
 .hero-trust {
   list-style: none;
@@ -203,7 +207,7 @@
   flex-wrap: wrap;
   gap: var(--space-4) var(--space-6);
   font-size: var(--fs-sm);
-  color: rgba(255, 244, 230, 0.9);
+  color: rgba(255, 255, 255, 0.85);
 }
 .hero-trust li {
   display: inline-flex;
@@ -216,7 +220,7 @@
   width: 1.1rem;
   height: 1.1rem;
   stroke-width: 2.5;
-  color: #ffd166;                                /* warm gold */
+  color: #f5b81c;   /* gold accent */
   flex-shrink: 0;
 }
 
@@ -235,15 +239,14 @@
 
 @media (max-width: 576px) {
   .hero-banner {
-    min-height: 520px;
+    min-height: 500px;
   }
-  /* On mobile, a full-height scrim so text stays readable over any image */
-  .hero-banner-scrim {
+  .hero-banner-overlay {
     background: linear-gradient(
       180deg,
-      rgba(10, 15, 13, 0.55) 0%,
-      rgba(10, 15, 13, 0.72) 50%,
-      rgba(10, 15, 13, 0.85) 100%
+      rgba(10, 61, 31, 0.75) 0%,
+      rgba(10, 61, 31, 0.85) 50%,
+      rgba(10, 61, 31, 0.9) 100%
     );
   }
   .hero-ctas {
@@ -263,10 +266,11 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   REDUCED MOTION — nothing to disable now, but keep for safety
+   REDUCED MOTION
    ═══════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
-  .btn-outline-hero:hover {
+  .hero-banner-bg {
+    animation: none;
     transform: none;
   }
 }
