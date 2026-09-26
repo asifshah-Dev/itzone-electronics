@@ -69,14 +69,13 @@
     return map;
   }
 
-  /* ── JSON-driven category pills ────────────────────────── */
+    /* ── JSON-driven category pills ────────────────────────── */
   function buildCategories(data) {
     const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
     const pcs      = data.pcs || {};
     const desktops = pcs.desktops || [];
-    const tiny     = pcs.tiny     || [];
     const monitors = pcs.monitors || [];
-    const allPCs   = [].concat(desktops, tiny, monitors);
+    const allPCs   = [].concat(desktops, pcs.tiny || [], monitors);
     const combined = laptops.concat(allPCs);
 
     const hay = function (i) {
@@ -84,15 +83,11 @@
     };
 
     const candidates = [
-      { id: 'laptops',   label: 'Laptops',
-        test: function (i) { return laptops.indexOf(i) !== -1; } },
-      { id: 'desktops',  label: 'Desktops',
+      { id: 'desktops', label: 'Desktops',
         test: function (i) { return desktops.indexOf(i) !== -1; } },
-      { id: 'tiny-pcs',  label: 'Tiny PCs',
-        test: function (i) { return tiny.indexOf(i) !== -1; } },
-      { id: 'monitors',  label: 'Monitors',
+      { id: 'monitors', label: 'Monitors',
         test: function (i) { return monitors.indexOf(i) !== -1; } },
-      { id: 'gaming',    label: 'Workstations',
+      { id: 'gaming',   label: 'Workstations',
         test: function (i) {
           if (i.gpu && String(i.gpu).trim() !== '') return true;
           const h = hay(i);
@@ -101,26 +96,7 @@
                  h.indexOf('z2') !== -1 || h.indexOf('xps') !== -1 ||
                  h.indexOf('xeon') !== -1 || h.indexOf('quadro') !== -1 ||
                  h.indexOf('workstation') !== -1;
-        } },
-      { id: 'touch',     label: 'Touch / 2-in-1',
-        test: function (i) {
-          const h = hay(i);
-          return h.indexOf('touch') !== -1 || h.indexOf('2in1') !== -1 || h.indexOf('2-in-1') !== -1;
-        } },
-      { id: 'i7',        label: 'Core i7',
-        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i7') !== -1; } },
-      { id: 'i5',        label: 'Core i5',
-        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i5') !== -1; } },
-      { id: 'i3',        label: 'Core i3',
-        test: function (i) { return (i.cpu || '').toLowerCase().indexOf('i3') !== -1; } },
-      { id: 'ryzen',     label: 'Ryzen',
-        test: function (i) { return /ryzen|r5|r7/i.test(i.cpu || ''); } },
-      { id: '12th-gen',  label: '12th Gen',
-        test: function (i) { return (i.gen || '').toLowerCase().indexOf('12th') !== -1; } },
-      { id: '11th-gen',  label: '11th Gen',
-        test: function (i) { return (i.gen || '').toLowerCase().indexOf('11th') !== -1; } },
-      { id: '10th-gen',  label: '10th Gen',
-        test: function (i) { return (i.gen || '').toLowerCase().indexOf('10th') !== -1; } }
+        } }
     ];
 
     return candidates
@@ -129,7 +105,7 @@
           _count: combined.filter(c.test).length
         });
       })
-      .filter(function (c) { return c._count >= 2; })
+      .filter(function (c) { return c._count >= 1; })
       .map(function (c) { delete c._count; return c; });
   }
 
