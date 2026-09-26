@@ -48,6 +48,10 @@
     const page = document.body.dataset.page || 'home';
     const vendors = vendorStatus();
 
+    /* ── Intro splash runs FIRST so it covers the page
+       while the rest of the app mounts behind it. ──── */
+    try { ITZone.IntroSplash?.mount(); } catch (e) { console.error('IntroSplash:', e); }
+
     try { ITZone.Navbar?.mount(); } catch (e) { console.error('Navbar:', e); }
     try { ITZone.Footer?.mount(); } catch (e) { console.error('Footer:', e); }
     try { ITZone.SocialSidebar?.mount(); } catch (e) { console.error('SocialSidebar:', e); }
