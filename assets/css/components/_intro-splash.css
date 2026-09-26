@@ -1,10 +1,11 @@
 /* assets/css/components/_intro-splash.css
    ─────────────────────────────────────────────────────────
    Big "IT Zone Electronics" intro reveal — matched to logo
-   with floating tech icons scattered around the edges.
-   IT       → dark green
-   Zone     → red/orange gradient (from the logo "ZONE")
+   with 12 floating tech icons around the edges.
+   IT          → dark green
+   Zone        → red/orange gradient (from the logo "ZONE")
    Electronics → dark green (logo subtitle)
+   All 12 icons visible on every screen size.
    ───────────────────────────────────────────────────────── */
 
 .intro-splash {
@@ -51,7 +52,6 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 50%;
   background: #ffffff;
   color: #0d4a26;
   border: 1.5px solid rgba(13, 74, 38, 0.15);
@@ -71,14 +71,14 @@
   stroke-width: 2;
 }
 
-/* Sizes */
+/* ── Sizes (desktop) ──────────────────────────────────── */
 .intro-icon--lg { width: 76px;  height: 76px;  border-radius: 20px; }
 .intro-icon--lg .lucide, .intro-icon--lg svg { width: 50%; height: 50%; stroke-width: 1.8; }
 .intro-icon--md { width: 60px;  height: 60px;  border-radius: 16px; }
 .intro-icon--sm { width: 46px;  height: 46px;  border-radius: 12px; }
 .intro-icon--xs { width: 36px;  height: 36px;  border-radius: 10px; }
 
-/* Positions — spread around the outer frame */
+/* ── Positions (desktop) ──────────────────────────────── */
 .intro-icon--top-left       { top: 8%;    left: 5%; }
 .intro-icon--top-mid-left   { top: 14%;   left: 20%; }
 .intro-icon--top-mid-right  { top: 10%;   right: 22%; }
@@ -94,7 +94,7 @@
 .intro-icon--accent-3       { bottom: 32%; left: 4%; }
 .intro-icon--accent-4       { bottom: 34%; right: 4%; }
 
-/* Gentle drift */
+/* ── Gentle drift ─────────────────────────────────────── */
 @keyframes introIconDrift {
   0%   { transform: translate3d(0, 0, 0); }
   25%  { transform: translate3d(6px, -10px, 0); }
@@ -186,38 +186,80 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   RESPONSIVE
+   RESPONSIVE — TABLET (≤ 768px)
    ═══════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Shrink icons on tablet */
-  .intro-icon--lg { width: 58px; height: 58px; border-radius: 16px; }
-  .intro-icon--md { width: 48px; height: 48px; border-radius: 13px; }
-  .intro-icon--sm { width: 38px; height: 38px; border-radius: 10px; }
-  .intro-icon--xs { width: 30px; height: 30px; border-radius: 8px; }
+  .intro-icon--lg { width: 54px; height: 54px; border-radius: 15px; }
+  .intro-icon--md { width: 44px; height: 44px; border-radius: 12px; }
+  .intro-icon--sm { width: 36px; height: 36px; border-radius: 10px; }
+  .intro-icon--xs { width: 28px; height: 28px; border-radius: 8px; }
+
+  .intro-icon--top-left       { top: 5%;    left: 3%; }
+  .intro-icon--top-mid-left   { top: 8%;    left: 15%; }
+  .intro-icon--top-mid-right  { top: 6%;    right: 15%; }
+  .intro-icon--top-right      { top: 5%;    right: 3%; }
+
+  .intro-icon--bot-left       { bottom: 5%; left: 3%; }
+  .intro-icon--bot-mid-left   { bottom: 8%; left: 15%; }
+  .intro-icon--bot-mid-right  { bottom: 7%; right: 15%; }
+  .intro-icon--bot-right      { bottom: 5%; right: 3%; }
 }
 
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE — PHONE (≤ 576px)
+   ALL 12 icons visible — tiny, pinned to the edges.
+   ═══════════════════════════════════════════════════════ */
 @media (max-width: 576px) {
-  /* Hide the mid-row icons on phones — they'd overlap the text */
-  .intro-icon--top-mid-left,
-  .intro-icon--top-mid-right,
-  .intro-icon--bot-mid-left,
-  .intro-icon--bot-mid-right { display: none; }
+  /* Base sizes — small so they don't clash with the text */
+  .intro-icon--lg { width: 34px; height: 34px; border-radius: 10px; }
+  .intro-icon--md { width: 28px; height: 28px; border-radius: 8px; }
+  .intro-icon--sm { width: 24px; height: 24px; border-radius: 7px; }
+  .intro-icon--xs { width: 20px; height: 20px; border-radius: 6px; }
 
-  /* Hide the tiny accents too */
-  .intro-icon--accent-1,
-  .intro-icon--accent-2,
-  .intro-icon--accent-3,
-  .intro-icon--accent-4 { display: none; }
+  /* Slightly thicker stroke so the icon reads at small size */
+  .intro-icon .lucide,
+  .intro-icon svg { width: 62%; height: 62%; stroke-width: 2.2; }
 
-  /* Keep corner icons small */
-  .intro-icon--lg { width: 46px; height: 46px; border-radius: 13px; }
-  .intro-icon--sm { width: 36px; height: 36px; border-radius: 10px; }
+  .intro-icon--lg .lucide,
+  .intro-icon--lg svg { width: 58%; height: 58%; stroke-width: 2.2; }
 
-  /* Pull them closer to the edges */
-  .intro-icon--top-left  { top: 4%; left: 3%; }
-  .intro-icon--top-right { top: 4%; right: 3%; }
-  .intro-icon--bot-left  { bottom: 4%; left: 3%; }
-  .intro-icon--bot-right { bottom: 4%; right: 3%; }
+  /* ── Corners (4 icons) ────────────────────────────── */
+  .intro-icon--top-left  { top: 3%; left: 3%; }
+  .intro-icon--top-right { top: 3%; right: 3%; }
+  .intro-icon--bot-left  { bottom: 3%; left: 3%; }
+  .intro-icon--bot-right { bottom: 3%; right: 3%; }
+
+  /* ── Mid-row (4 icons) — tucked along the top/bottom edges ── */
+  .intro-icon--top-mid-left   { top: 3%; left: 22%; }
+  .intro-icon--top-mid-right  { top: 3%; right: 22%; }
+  .intro-icon--bot-mid-left   { bottom: 3%; left: 22%; }
+  .intro-icon--bot-mid-right  { bottom: 3%; right: 22%; }
+
+  /* ── Accents (4 icons) — pinned to the far left/right edges ── */
+  .intro-icon--accent-1 { top: 36%;   left: 1%; }
+  .intro-icon--accent-2 { top: 32%;   right: 1%; }
+  .intro-icon--accent-3 { bottom: 36%; left: 1%; }
+  .intro-icon--accent-4 { bottom: 32%; right: 1%; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE — SMALL PHONE (≤ 380px)
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 380px) {
+  .intro-icon--lg { width: 30px; height: 30px; border-radius: 9px; }
+  .intro-icon--md { width: 24px; height: 24px; border-radius: 7px; }
+  .intro-icon--sm { width: 20px; height: 20px; border-radius: 6px; }
+  .intro-icon--xs { width: 16px; height: 16px; border-radius: 5px; }
+
+  .intro-icon--top-left  { top: 2%; left: 2%; }
+  .intro-icon--top-right { top: 2%; right: 2%; }
+  .intro-icon--bot-left  { bottom: 2%; left: 2%; }
+  .intro-icon--bot-right { bottom: 2%; right: 2%; }
+
+  .intro-icon--top-mid-left   { top: 2%; left: 24%; }
+  .intro-icon--top-mid-right  { top: 2%; right: 24%; }
+  .intro-icon--bot-mid-left   { bottom: 2%; left: 24%; }
+  .intro-icon--bot-mid-right  { bottom: 2%; right: 24%; }
 }
 
 /* ═══════════════════════════════════════════════════════
