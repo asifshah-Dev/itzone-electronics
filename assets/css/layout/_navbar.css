@@ -157,12 +157,10 @@ body.dropdown-open .nav-sticky { z-index: 2147483601; }
   display: none;
   align-items: center;
   justify-content: center;
-  /* Bigger touch target */
-  width: 3rem;
-  height: 3rem;
+  width: 2.6rem;
+  height: 2.6rem;
   border-radius: var(--radius-pill);
-  /* Stronger border + green tint so it's clearly visible */
-  border: 2px solid var(--brand-primary);
+  border: 1.5px solid var(--brand-primary);
   background: var(--brand-primary-soft);
   color: var(--brand-primary);
   cursor: pointer;
@@ -177,8 +175,8 @@ body.dropdown-open .nav-sticky { z-index: 2147483601; }
 }
 .nav-search-btn .lucide,
 .nav-search-btn svg {
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.2rem;
+  height: 1.2rem;
   stroke-width: 2.5;
 }
 .nav-search {
@@ -731,18 +729,18 @@ body.dropdown-open .nav-sticky { z-index: 2147483601; }
   .nav-search-btn { display: inline-flex !important; }
   .nav-phone-icon { display: inline-flex !important; }
 
-  /* Bigger icons on mobile */
+  /* Keep icons and buttons the same size as desktop */
   .nav-search-btn,
   .nav-phone-icon {
-    width: 3rem !important;
-    height: 3rem !important;
+    width: 2.6rem !important;
+    height: 2.6rem !important;
   }
   .nav-search-btn .lucide,
   .nav-search-btn svg,
   .nav-phone-icon .lucide,
   .nav-phone-icon svg {
-    width: 1.4rem !important;
-    height: 1.4rem !important;
+    width: 1.2rem !important;
+    height: 1.2rem !important;
   }
 
   .brand { padding: 0; }
