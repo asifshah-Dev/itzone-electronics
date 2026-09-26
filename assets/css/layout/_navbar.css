@@ -157,23 +157,30 @@ body.dropdown-open .nav-sticky { z-index: 2147483601; }
   display: none;
   align-items: center;
   justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  /* Bigger touch target */
+  width: 3rem;
+  height: 3rem;
   border-radius: var(--radius-pill);
-  border: 1.5px solid #e2e8f0;
-  background: #ffffff;
-  color: #0f172a;
+  /* Stronger border + green tint so it's clearly visible */
+  border: 2px solid var(--brand-primary);
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary);
   cursor: pointer;
   flex-shrink: 0;
-  transition: all .14s ease;
+  transition: all .16s ease;
 }
-.nav-search-btn:hover {
+.nav-search-btn:hover,
+.nav-search-btn:active {
   border-color: var(--brand-primary);
-  color: var(--brand-primary);
-  background: var(--brand-primary-soft);
+  color: #ffffff;
+  background: var(--brand-primary);
 }
 .nav-search-btn .lucide,
-.nav-search-btn svg { width: 1.25rem; height: 1.25rem; stroke-width: 2.5; }
+.nav-search-btn svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  stroke-width: 2.5;
+}
 .nav-search {
   flex: 1 1 auto;
   min-width: 0;
@@ -715,13 +722,28 @@ body.dropdown-open .nav-sticky { z-index: 2147483601; }
   .nav-row-1 { display: none; }
 
   .nav-row-2 {
-    grid-template-columns: 1fr auto 1fr;
-    gap: var(--space-3);
+    grid-template-columns: auto 1fr auto;
+    gap: var(--space-2);
+    align-items: center;
   }
 
   .nav-search    { display: none !important; }
   .nav-search-btn { display: inline-flex !important; }
   .nav-phone-icon { display: inline-flex !important; }
+
+  /* Bigger icons on mobile */
+  .nav-search-btn,
+  .nav-phone-icon {
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+  .nav-search-btn .lucide,
+  .nav-search-btn svg,
+  .nav-phone-icon .lucide,
+  .nav-phone-icon svg {
+    width: 1.4rem !important;
+    height: 1.4rem !important;
+  }
 
   .brand { padding: 0; }
   .brand-logo {
@@ -938,33 +960,37 @@ body.dropdown-open .nav-sticky { z-index: 2147483601; }
 }
 
 /* ═══════════════════════════════════════════════════════
-   MOBILE DROPDOWN SHEET — bottom sheet modal
+   MOBILE DROPDOWN SHEET — bottom sheet with smooth in/out
    ═══════════════════════════════════════════════════════ */
 .mobile-dropdown-sheet {
   position: fixed;
   inset: 0;
   z-index: 2147483600;
-  display: none;
+  /* Use visibility + pointer-events instead of display so
+     the transition can actually run */
+  visibility: hidden;
   pointer-events: none;
 }
 .mobile-dropdown-sheet.is-open {
-  display: block;
+  visibility: visible;
   pointer-events: auto;
 }
 
+/* Backdrop fades in smoothly */
 .mobile-dropdown-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(10, 15, 13, 0.55);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   opacity: 0;
-  transition: opacity .22s ease;
+  transition: opacity .35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .mobile-dropdown-sheet.is-open .mobile-dropdown-backdrop {
   opacity: 1;
 }
 
+/* Sheet slides up with a soft spring overshoot */
 .mobile-dropdown-panel {
   position: absolute;
   left: 0;
@@ -976,13 +1002,25 @@ body.dropdown-open .nav-sticky { z-index: 2147483601; }
   background: #ffffff;
   border-top-left-radius: 22px;
   border-top-right-radius: 22px;
-  box-shadow: 0 -12px 32px -8px rgba(10, 15, 13, 0.35);
+  box-shadow: 0 -16px 40px -8px rgba(10, 15, 13, 0.4);
   transform: translateY(100%);
-  transition: transform .32s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Spring feel: fast start, tiny overshoot, smooth settle */
+  transition: transform .45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
   overflow: hidden;
+  /* Prevent rubber-band scroll on the panel itself */
+  overscroll-behavior: contain;
 }
 .mobile-dropdown-sheet.is-open .mobile-dropdown-panel {
   transform: translateY(0);
+}
+
+/* On reduced motion, disable the slide */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-dropdown-panel,
+  .mobile-dropdown-backdrop {
+    transition: none !important;
+  }
 }
 
 .mobile-dropdown-head {
