@@ -296,10 +296,11 @@
   transition: transform .14s ease, box-shadow .14s ease, background-color .14s ease;
 }
 .nav-call-btn:hover {
+  background: linear-gradient(135deg, rgba(31, 160, 80, 0.95) 0%, rgba(13, 74, 38, 0.95) 100%);
   transform: translateY(-1px);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.4) inset,
-    0 10px 28px -8px rgba(10, 61, 31, 0.55);
+    0 10px 28px -8px rgba(31, 160, 80, 0.5);
 }
 .nav-call-btn .lucide,
 .nav-call-btn svg {
