@@ -1,7 +1,10 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
-   Navbar — white rows 1 & 2, glass green row 3.
-   Row 3: brand dropdowns + JSON-driven category pills.
+   Navbar — single-row design.
+   Left:  Logo
+   Center: Nav links (Laptops ▾, PCs ▾, Monitors, Accessories, Contact)
+   Right:  Search / Call / Menu
+   Mobile: Logo | Search icon | Menu icon + slide-in drawer
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -12,130 +15,88 @@
   const PHONE_DISPLAY = '03265974741';
   const PHONE_TEL     = 'tel:+923265974741';
 
-  const TAGLINE = 'Certified business laptops \u00b7 Genuine quality, honest prices';
-
-  const NAV_ITEMS = [
-    { id: 'inventory', label: 'Laptops',        href: 'pages/inventory.html', icon: 'laptop' },
-    { id: 'pcs',       label: 'PCs & Monitors', href: 'pages/pcs.html',       icon: 'monitor' },
+  /* ═══════════════════════════════════════════════════════
+     NAV STRUCTURE
+     ═══════════════════════════════════════════════════════ */
+  const NAV_STRUCTURE = [
+    {
+      label: 'Laptops',
+      href: 'pages/inventory.html',
+      children: [
+        {
+          label: 'HP',
+          href: 'pages/inventory.html?brand=hp',
+          children: [
+            { label: 'Pavilion',  href: 'pages/inventory.html?brand=hp&model=pavilion' },
+            { label: 'EliteBook', href: 'pages/inventory.html?brand=hp&model=elitebook' },
+            { label: 'ProBook',   href: 'pages/inventory.html?brand=hp&model=probook' },
+            { label: 'ZBook',     href: 'pages/inventory.html?brand=hp&model=zbook' }
+          ]
+        },
+        {
+          label: 'Dell',
+          href: 'pages/inventory.html?brand=dell',
+          children: [
+            { label: 'Latitude', href: 'pages/inventory.html?brand=dell&model=latitude' },
+            { label: 'Inspiron', href: 'pages/inventory.html?brand=dell&model=inspiron' },
+            { label: 'Vostro',   href: 'pages/inventory.html?brand=dell&model=vostro' }
+          ]
+        },
+        {
+          label: 'Lenovo',
+          href: 'pages/inventory.html?brand=lenovo',
+          children: [
+            { label: 'ThinkPad', href: 'pages/inventory.html?brand=lenovo&model=thinkpad' },
+            { label: 'IdeaPad',  href: 'pages/inventory.html?brand=lenovo&model=ideapad' }
+          ]
+        },
+        {
+          label: 'Apple',
+          href: 'pages/inventory.html?brand=apple',
+          children: [
+            { label: 'MacBook Air', href: 'pages/inventory.html?brand=apple&model=macbook-air' },
+            { label: 'MacBook Pro', href: 'pages/inventory.html?brand=apple&model=macbook-pro' }
+          ]
+        },
+        {
+          label: 'Microsoft',
+          href: 'pages/inventory.html?brand=microsoft',
+          children: [
+            { label: 'Surface',        href: 'pages/inventory.html?brand=microsoft&model=surface' },
+            { label: 'Surface Laptop', href: 'pages/inventory.html?brand=microsoft&model=surface-laptop' },
+            { label: 'Surface Book',   href: 'pages/inventory.html?brand=microsoft&model=surface-book' }
+          ]
+        }
+      ]
+    },
+    {
+      label: 'PCs',
+      href: 'pages/pcs.html',
+      children: [
+        { label: 'Desktops', href: 'pages/pcs.html#desktops' },
+        { label: 'Tiny PCs', href: 'pages/pcs.html#tiny' }
+      ]
+    },
+    { label: 'Monitors',    href: 'pages/pcs.html#monitors' },
+    { label: 'Accessories', href: 'pages/inventory.html?tag=accessories' },
+    { label: 'Contact',     href: 'pages/contact.html' }
   ];
 
-  const SOCIALS = [
-    { name: 'Facebook',  href: 'https://facebook.com/',       icon: 'facebook' },
-    { name: 'Instagram', href: 'https://instagram.com/',      icon: 'instagram' },
-    { name: 'WhatsApp',  href: 'https://wa.me/923265974741',  icon: 'whatsapp' },
-    { name: 'TikTok',    href: 'https://tiktok.com/',         icon: 'tiktok' }
-  ];
-
-  /* ── TikTok SVG ────────────────────────────────────────── */
-  function tiktokSvg(size) {
-    const s = size || 16;
-    return (
-      '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">' +
-        '<path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/>' +
-      '</svg>'
-    );
-  }
-
-  /* ── Brand → models map ────────────────────────────────── */
-  function buildBrandModels(data) {
-    const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
-    const pcs      = data.pcs || {};
-    const allPCs   = [].concat(pcs.desktops || [], pcs.tiny || [], pcs.monitors || []);
-    const combined = laptops.concat(allPCs);
-
-    const brands = ['DELL', 'HP', 'LENOVO', 'LG', 'ACER'];
-    const map = {};
-
-    brands.forEach(function (brand) {
-      const items = combined.filter(function (i) {
-        return (i.brand || '').toUpperCase() === brand;
-      });
-
-      const groups = {};
-      items.forEach(function (i) {
-        const key = (i.model || '').toUpperCase().trim();
-        if (!key) return;
-        if (!groups[key]) groups[key] = { label: i.model, count: 0 };
-        groups[key].count++;
-      });
-
-      map[brand] = Object.keys(groups).map(function (k) {
-        return { label: groups[k].label, count: groups[k].count, brand: brand };
-      }).sort(function (a, b) {
-        return a.label.localeCompare(b.label);
-      });
-    });
-
-    return map;
-  }
-
-    /* ── JSON-driven category pills ────────────────────────── */
-  function buildCategories(data) {
-    const laptops  = Array.isArray(data.laptops) ? data.laptops : [];
-    const pcs      = data.pcs || {};
-    const desktops = pcs.desktops || [];
-    const monitors = pcs.monitors || [];
-    const allPCs   = [].concat(desktops, pcs.tiny || [], monitors);
-    const combined = laptops.concat(allPCs);
-
-    const hay = function (i) {
-      return ((i.model || '') + ' ' + (i.extras || '') + ' ' + (i.gpu || '')).toLowerCase();
-    };
-
-    const candidates = [
-      { id: 'desktops', label: 'Desktops',
-        test: function (i) { return desktops.indexOf(i) !== -1; } },
-      { id: 'monitors', label: 'Monitors',
-        test: function (i) { return monitors.indexOf(i) !== -1; } },
-      { id: 'gaming',   label: 'Workstations',
-        test: function (i) {
-          if (i.gpu && String(i.gpu).trim() !== '') return true;
-          const h = hay(i);
-          return h.indexOf('p51') !== -1 || h.indexOf('p14') !== -1 ||
-                 h.indexOf('z book') !== -1 || h.indexOf('zbook') !== -1 ||
-                 h.indexOf('z2') !== -1 || h.indexOf('xps') !== -1 ||
-                 h.indexOf('xeon') !== -1 || h.indexOf('quadro') !== -1 ||
-                 h.indexOf('workstation') !== -1;
-        } }
-    ];
-
-    return candidates
-      .map(function (c) {
-        return Object.assign({}, c, {
-          _count: combined.filter(c.test).length
-        });
-      })
-      .filter(function (c) { return c._count >= 1; })
-      .map(function (c) { delete c._count; return c; });
-  }
-
-  let BRAND_MODELS = {};
-  let CATEGORIES   = [];
-
+  /* ═══════════════════════════════════════════════════════
+     HELPERS
+     ═══════════════════════════════════════════════════════ */
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
 
   function r(href) {
+    if (!href) return '';
     if (href.startsWith('#')) return isInPagesDir() ? `../index.html${href}` : href;
     if (/^https?:|^tel:|^mailto:/.test(href)) return href;
     if (isInPagesDir()) return href.startsWith('pages/') ? href.replace('pages/', '') : `../${href}`;
     return href;
   }
 
-  function gotoTag(slug) {
-    try { sessionStorage.setItem('itz.pendingTag', slug); } catch (e) {}
-    try { sessionStorage.setItem('itz.pendingAt', String(Date.now())); } catch (e) {}
-    const url = (isInPagesDir() ? '' : 'pages/') + 'inventory.html?tag=' + encodeURIComponent(slug);
-    window.location.href = url;
-  }
-
-  function gotoSearch(q) {
-    try { sessionStorage.removeItem('itz.pendingTag'); } catch (e) {}
-    const url = (isInPagesDir() ? '' : 'pages/') + 'inventory.html?q=' + encodeURIComponent(q);
-    window.location.href = url;
-  }
-
   function whatsappSvg(size) {
-    const s = size || 16;
+    const s = size || 20;
     return (
       '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">' +
         '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />' +
@@ -145,7 +106,7 @@
 
   function inlineLogoSVG(cls) {
     return `
-      <svg class="${cls || 'brand-logo'}" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+      <svg class="${cls || 'nav-logo'}" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
         <defs>
           <linearGradient id="itzGreenNav" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
             <stop offset="0%" stop-color="#0d4a26"/><stop offset="100%" stop-color="#1fa050"/>
@@ -163,573 +124,347 @@
       </svg>`;
   }
 
-  /* ── Row 3 builder ─────────────────────────────────────── */
-  function buildRow3() {
-    const parts = [];
+  /* ═══════════════════════════════════════════════════════
+     DESKTOP NAV LINKS with nested dropdowns
+     ═══════════════════════════════════════════════════════ */
+  function buildDesktopNav() {
+    return NAV_STRUCTURE.map(function (item) {
 
-    /* Brand dropdowns */
-    ['DELL', 'HP', 'LENOVO'].forEach(function (brand) {
-      const models = BRAND_MODELS[brand] || [];
-      if (!models.length) return;
+      if (!item.children || !item.children.length) {
+        return '<li><a class="nav-item" href="' + r(item.href) + '">' + item.label + '</a></li>';
+      }
 
-      const brandLabel = brand === 'DELL' ? 'Dell'
-                       : brand === 'HP'   ? 'HP'
-                       : 'Lenovo';
+      const childItems = item.children.map(function (child) {
 
-      const modelItems = models.map(function (m) {
-        const modelSlug = m.label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        const tag = brand.toLowerCase() + '-' + modelSlug;
+        if (!child.children || !child.children.length) {
+          return '<li><a class="nav-subitem" href="' + r(child.href) + '">' + child.label + '</a></li>';
+        }
+
+        const subItems = child.children.map(function (gc) {
+          return '<li><a class="nav-subitem nav-subitem--deep" href="' + r(gc.href) + '">' + gc.label + '</a></li>';
+        }).join('');
+
         return (
-          '<li>' +
-            '<button type="button" class="cat-dropdown-item" data-cat="' + tag + '">' +
-              '<span class="cat-dropdown-model">' + m.label + '</span>' +
-              '<span class="cat-dropdown-count">' + m.count + '</span>' +
-            '</button>' +
+          '<li class="nav-parent">' +
+            '<a class="nav-subitem nav-subitem--parent" href="' + r(child.href) + '">' +
+              '<span>' + child.label + '</span>' +
+              '<i data-lucide="chevron-right" class="nav-caret-right"></i>' +
+            '</a>' +
+            '<ul class="nav-flyout">' + subItems + '</ul>' +
           '</li>'
         );
       }).join('');
 
-      parts.push(
-        '<div class="cat-dropdown" data-brand="' + brand + '">' +
-          '<button type="button" class="cat-link cat-link--dropdown" aria-haspopup="true" aria-expanded="false">' +
-            brandLabel +
-            '<i data-lucide="chevron-down" class="cat-dropdown-caret"></i>' +
+      return (
+        '<li class="nav-dropdown">' +
+          '<button type="button" class="nav-item nav-item--has-children" aria-haspopup="true" aria-expanded="false">' +
+            item.label +
+            '<i data-lucide="chevron-down" class="nav-caret-down"></i>' +
           '</button>' +
-          '<div class="cat-dropdown-menu" role="menu">' +
-            '<ul class="cat-dropdown-list">' + modelItems + '</ul>' +
-          '</div>' +
-        '</div>'
+          '<ul class="nav-menu">' + childItems + '</ul>' +
+        '</li>'
       );
-    });
-
-    /* JSON-driven category pills */
-    CATEGORIES.forEach(function (c) {
-      parts.push(
-        '<button type="button" class="cat-link" data-cat="' + c.id + '">' + c.label + '</button>'
-      );
-    });
-
-    return parts.join('');
+    }).join('');
   }
 
+  /* ═══════════════════════════════════════════════════════
+     MOBILE DRAWER (flat list)
+     ═══════════════════════════════════════════════════════ */
+  function buildMobileList() {
+    const out = [];
+    NAV_STRUCTURE.forEach(function (item) {
+      if (!item.children || !item.children.length) {
+        out.push({ label: item.label, href: item.href, level: 0 });
+        return;
+      }
+      out.push({ label: item.label, href: item.href, level: 0 });
+      item.children.forEach(function (child) {
+        if (child.children && child.children.length) {
+          child.children.forEach(function (gc) {
+            out.push({ label: gc.label, href: gc.href, level: 2, parent: child.label });
+          });
+        } else {
+          out.push({ label: child.label, href: child.href, level: 1 });
+        }
+      });
+    });
+    return out;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     TEMPLATE
+     ═══════════════════════════════════════════════════════ */
   function template() {
     const logoSrc = r('assets/img/logo.png');
+    const desktopNav = buildDesktopNav();
+    const mobileList = buildMobileList();
 
-    const socialLinks = SOCIALS.map(function (s) {
-      let icon;
-      if (s.icon === 'whatsapp')      icon = whatsappSvg(16);
-      else if (s.icon === 'tiktok')   icon = tiktokSvg(16);
-      else                            icon = '<i data-lucide="' + s.icon + '"></i>';
-
-      return '<a href="' + s.href + '" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="' + s.name + '">' +
-        icon +
-      '</a>';
-    }).join('');
-
-    const row3Content = buildRow3();
-
-    /* Drawer + mobile categories: brands + JSON categories */
-    const drawerCatList = [
-      { id: 'dell',   label: 'Dell' },
-      { id: 'hp',     label: 'HP' },
-      { id: 'lenovo', label: 'Lenovo' }
-    ].concat(CATEGORIES);
-
-    const drawerCatButtons = drawerCatList.map(function (c) {
-      return '<li><button type="button" class="drawer-cat" data-cat="' + c.id + '">' + c.label + '</button></li>';
-    }).join('');
-
-    const mobileCatButtons = drawerCatList.map(function (c) {
-      return '<li><button type="button" class="mobile-cat" data-cat="' + c.id + '"><i data-lucide="tag"></i><span>' + c.label + '</span></button></li>';
+    const drawerItems = mobileList.map(function (c) {
+      const cls = 'drawer-item' + (c.level ? ' drawer-item--sub' : '');
+      const label = c.level === 2 ? c.parent + ' \u2014 ' + c.label : c.label;
+      return '<li><a class="' + cls + '" href="' + r(c.href) + '">' + label + '</a></li>';
     }).join('');
 
     return `
       <nav class="site-nav" aria-label="Primary">
+        <div class="nav-container">
 
-        <div class="nav-row nav-row-1">
-          <div class="nav-container">
-            <div class="nav-socials">${socialLinks}</div>
-            <p class="nav-tagline">${TAGLINE}</p>
+          <!-- LEFT: Logo -->
+          <a class="nav-brand" href="${r('index.html')}" aria-label="IT Zone Electronics \u2014 Home">
+            <img class="nav-logo" src="${logoSrc}" alt="IT Zone Electronics"
+                 decoding="async" fetchpriority="high">
+          </a>
+
+          <!-- CENTER: Nav links -->
+          <ul class="nav-list" id="desktop-nav">
+            ${desktopNav}
+          </ul>
+
+          <!-- RIGHT: Search / Call / Menu -->
+          <div class="nav-end">
+            <button type="button" class="nav-icon-btn" id="nav-search-toggle"
+                    aria-label="Search" aria-expanded="false" aria-controls="nav-search-panel">
+              <i data-lucide="search"></i>
+            </button>
+
+            <a href="${PHONE_TEL}" class="nav-icon-btn nav-icon-btn--phone" aria-label="Call ${PHONE_DISPLAY}">
+              <i data-lucide="phone"></i>
+            </a>
+
+            <a href="${PHONE_TEL}" class="nav-call-btn">
+              <i data-lucide="phone"></i>
+              <span>${PHONE_DISPLAY}</span>
+            </a>
+
+            <button type="button" class="nav-menu-btn" id="nav-menu-toggle"
+                    aria-label="Open menu" aria-expanded="false" aria-controls="mobile-drawer">
+              <i data-lucide="menu"></i>
+            </button>
           </div>
+
         </div>
 
-        <div class="nav-sticky" id="nav-sticky">
-          <div class="nav-container">
-
-            <div class="nav-row nav-row-2">
-              <div class="nav-left">
-                <button type="button" class="nav-search-btn" id="mobile-search-open"
-                        aria-label="Open search" aria-expanded="false" aria-controls="mobile-search">
-                  <i data-lucide="search"></i>
-                </button>
-
-                <form class="nav-search" role="search" onsubmit="return false;">
-                  <label for="nav-search-input" class="visually-hidden">Search laptops</label>
-                  <i data-lucide="search" class="nav-search-icon"></i>
-                  <input type="search" id="nav-search-input" class="nav-search-input"
-                         placeholder="Search laptops\u2026" autocomplete="off">
-                </form>
-
-                <a href="${PHONE_TEL}" class="nav-phone-icon" aria-label="Call ${PHONE_DISPLAY}">
-                  <i data-lucide="phone"></i>
-                </a>
-              </div>
-
-              <a class="brand" href="${r('index.html')}" aria-label="IT Zone Electronics \u2014 Home">
-                <img class="brand-logo" src="${logoSrc}" alt="IT Zone Electronics"
-                     decoding="async" fetchpriority="high">
-              </a>
-
-              <div class="nav-actions">
-                <a href="${PHONE_TEL}" class="nav-call">
-                  <i data-lucide="phone"></i>
-                  <span>Call now <strong>${PHONE_DISPLAY}</strong></span>
-                </a>
-                <button type="button" class="nav-toggler" id="nav-toggler"
-                        aria-label="Open menu" aria-expanded="false" aria-controls="primary-menu">
-                  <i data-lucide="menu"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="nav-row nav-row-3">
-              <div class="cat-links-scroll">
-                <div class="cat-links">${row3Content}</div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="nav-sticky-placeholder" id="nav-sticky-placeholder" hidden></div>
-      </nav>
-
-      <aside class="mobile-search" id="mobile-search" aria-hidden="true" aria-label="Search">
-        <header class="mobile-search-head">
-          <form class="mobile-search-form" role="search" onsubmit="return false;">
-            <i data-lucide="search" class="mobile-search-icon"></i>
-            <input type="search" id="mobile-search-input" class="mobile-search-input"
-                   placeholder="Search laptops\u2026" autocomplete="off">
-            <button type="button" class="mobile-search-clear" id="mobile-search-clear" aria-label="Clear search">
+        <!-- Search panel (drops below navbar) -->
+        <div class="nav-search-panel" id="nav-search-panel" aria-hidden="true">
+          <form class="nav-search-form" role="search" onsubmit="return false;">
+            <i data-lucide="search" class="nav-search-icon"></i>
+            <input type="search" id="nav-search-input" class="nav-search-input"
+                   placeholder="Search laptops, PCs, monitors\u2026" autocomplete="off">
+            <button type="button" class="nav-search-close" id="nav-search-close" aria-label="Close search">
               <i data-lucide="x"></i>
             </button>
           </form>
-          <button type="button" class="mobile-search-close" id="mobile-search-close" aria-label="Close search">
+        </div>
+      </nav>
+
+      <!-- Mobile drawer -->
+      <aside class="mobile-drawer" id="mobile-drawer" aria-hidden="true" aria-label="Menu">
+        <header class="mobile-drawer-head">
+          <a class="mobile-drawer-brand" href="${r('index.html')}" aria-label="Home">
+            <img class="mobile-drawer-logo" src="${logoSrc}" alt="IT Zone Electronics" decoding="async">
+          </a>
+          <button type="button" class="mobile-drawer-close" id="mobile-drawer-close" aria-label="Close menu">
             <i data-lucide="x"></i>
           </button>
         </header>
-        <div class="mobile-search-body">
-          <h3 class="mobile-search-title">Quick filters</h3>
-          <ul class="mobile-cats">${mobileCatButtons}</ul>
-        </div>
+
+        <nav class="mobile-drawer-nav">
+          <ul class="mobile-drawer-list">
+            ${drawerItems}
+          </ul>
+        </nav>
+
+        <footer class="mobile-drawer-foot">
+          <a href="${PHONE_TEL}" class="mobile-drawer-call">
+            <i data-lucide="phone"></i>
+            <span>Call ${PHONE_DISPLAY}</span>
+          </a>
+        </footer>
       </aside>
 
-      <ul class="nav-links" id="primary-menu">
-        <li class="drawer-header">
-          <a class="drawer-brand" href="${r('index.html')}" aria-label="Home">
-            <img class="drawer-logo" src="${logoSrc}" alt="IT Zone Electronics" decoding="async">
-          </a>
-          <button type="button" class="drawer-close" id="drawer-close" aria-label="Close menu">
-            <i data-lucide="x"></i>
-          </button>
-        </li>
-        ${NAV_ITEMS.map(function (item) {
-          return '<li><a class="nav-link" href="' + r(item.href) + '">' +
-            '<i data-lucide="' + item.icon + '"></i><span>' + item.label + '</span>' +
-          '</a></li>';
-        }).join('')}
-        <li class="drawer-cats-header">Quick filters</li>
-        ${drawerCatButtons}
-        <li class="drawer-call-wrap">
-          <a href="${PHONE_TEL}" class="btn btn-brand drawer-call">
-            <i data-lucide="phone"></i><span>Call ${PHONE_DISPLAY}</span>
-          </a>
-        </li>
-      </ul>
-      <div class="nav-backdrop" id="nav-backdrop" hidden></div>
+      <div class="mobile-drawer-backdrop" id="mobile-drawer-backdrop" hidden></div>
     `;
   }
 
+  /* ═══════════════════════════════════════════════════════
+     LOGO FALLBACK
+     ═══════════════════════════════════════════════════════ */
   function attachLogoFallback(root) {
-    root.querySelectorAll('img.brand-logo, img.drawer-logo').forEach(function (img) {
+    root.querySelectorAll('img.nav-logo, img.mobile-drawer-logo').forEach(function (img) {
       img.addEventListener('error', function () {
         const wrapper = document.createElement('div');
-        const cls = img.classList.contains('drawer-logo') ? 'drawer-logo' : 'brand-logo';
+        const cls = img.classList.contains('mobile-drawer-logo') ? 'mobile-drawer-logo' : 'nav-logo';
         wrapper.innerHTML = inlineLogoSVG(cls).trim();
         img.replaceWith(wrapper.firstElementChild);
       }, { once: true });
     });
   }
 
+  /* ═══════════════════════════════════════════════════════
+     WIRE
+     ═══════════════════════════════════════════════════════ */
   function wire(root) {
-    const toggler  = root.querySelector('#nav-toggler');
-    const menu     = root.querySelector('#primary-menu');
-    const backdrop = root.querySelector('#nav-backdrop');
-    const closeBtn = root.querySelector('#drawer-close');
+    const searchToggle = root.querySelector('#nav-search-toggle');
+    const searchPanel  = root.querySelector('#nav-search-panel');
+    const searchClose  = root.querySelector('#nav-search-close');
+    const searchInput  = root.querySelector('#nav-search-input');
 
-    const searchOpen  = root.querySelector('#mobile-search-open');
-    const searchPanel = root.querySelector('#mobile-search');
-    const searchClose = root.querySelector('#mobile-search-close');
-    const searchInput = root.querySelector('#mobile-search-input');
-    const searchClear = root.querySelector('#mobile-search-clear');
+    const menuToggle   = root.querySelector('#nav-menu-toggle');
+    const drawer       = root.querySelector('#mobile-drawer');
+    const drawerClose  = root.querySelector('#mobile-drawer-close');
+    const drawerBack   = root.querySelector('#mobile-drawer-backdrop');
 
     const lockScroll = function (on) { document.documentElement.style.overflow = on ? 'hidden' : ''; };
 
+    /* ── Desktop dropdowns ─────────────────────────────── */
     function closeAllDropdowns() {
-      root.querySelectorAll('.cat-dropdown.is-open').forEach(function (dd) {
+      root.querySelectorAll('.nav-dropdown.is-open').forEach(function (dd) {
         dd.classList.remove('is-open');
-        const b = dd.querySelector('.cat-link--dropdown');
+        const b = dd.querySelector('.nav-item--has-children');
         if (b) b.setAttribute('aria-expanded', 'false');
       });
-      document.body.classList.remove('dropdown-open');
     }
 
-    /* Category clicks */
-    root.addEventListener('click', function (e) {
-      const btn = e.target.closest('[data-cat]');
-      if (btn) {
-        e.preventDefault();
-        closeAllDropdowns();
-        gotoTag(btn.dataset.cat);
-      }
-    });
-
-    /* Dropdown toggles */
-    const isMobile = function () {
-      return window.matchMedia('(max-width: 991.98px)').matches;
-    };
-
-    /* Build the mobile dropdown sheet once */
-    let mobileSheet = document.getElementById('mobile-dropdown-sheet');
-    if (!mobileSheet) {
-      mobileSheet = document.createElement('div');
-      mobileSheet.id = 'mobile-dropdown-sheet';
-      mobileSheet.className = 'mobile-dropdown-sheet';
-      mobileSheet.setAttribute('aria-hidden', 'true');
-      mobileSheet.innerHTML =
-        '<div class="mobile-dropdown-backdrop" id="mobile-dropdown-backdrop"></div>' +
-        '<div class="mobile-dropdown-panel" role="dialog" aria-modal="true" aria-labelledby="mobile-dropdown-title">' +
-          '<header class="mobile-dropdown-head">' +
-            '<h3 class="mobile-dropdown-title" id="mobile-dropdown-title">Select a model</h3>' +
-            '<button type="button" class="mobile-dropdown-close" id="mobile-dropdown-close" aria-label="Close">' +
-              '<i data-lucide="x"></i>' +
-            '</button>' +
-          '</header>' +
-          '<ul class="mobile-dropdown-list" id="mobile-dropdown-list"></ul>' +
-        '</div>';
-      document.body.appendChild(mobileSheet);
-      NS.renderIcons?.(mobileSheet);
-    }
-
-    function openMobileSheet(brand, brandLabel, models) {
-      const titleEl = mobileSheet.querySelector('#mobile-dropdown-title');
-      const listEl  = mobileSheet.querySelector('#mobile-dropdown-list');
-
-      titleEl.textContent = brandLabel + ' \u2014 choose a model';
-
-      listEl.innerHTML = models.map(function (m) {
-        const modelSlug = m.label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        const tag = brand.toLowerCase() + '-' + modelSlug;
-        return (
-          '<li>' +
-            '<button type="button" class="mobile-dropdown-item" data-cat="' + tag + '">' +
-              '<span class="mobile-dropdown-model">' + m.label + '</span>' +
-              '<span class="mobile-dropdown-count">' + m.count + '</span>' +
-            '</button>' +
-          '</li>'
-        );
-      }).join('');
-
-      mobileSheet.classList.add('is-open');
-      mobileSheet.setAttribute('aria-hidden', 'false');
-      document.documentElement.style.overflow = 'hidden';
-    }
-
-    function closeMobileSheet() {
-      mobileSheet.classList.remove('is-open');
-      mobileSheet.setAttribute('aria-hidden', 'true');
-      document.documentElement.style.overflow = '';
-    }
-
-    /* Close button */
-    mobileSheet.querySelector('#mobile-dropdown-close').addEventListener('click', closeMobileSheet);
-    mobileSheet.querySelector('#mobile-dropdown-backdrop').addEventListener('click', closeMobileSheet);
-
-    /* Model click inside the mobile sheet */
-    mobileSheet.querySelector('#mobile-dropdown-list').addEventListener('click', function (e) {
-      const btn = e.target.closest('[data-cat]');
-      if (!btn) return;
-      closeMobileSheet();
-      gotoTag(btn.dataset.cat);
-    });
-
-    /* Escape closes mobile sheet */
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && mobileSheet.classList.contains('is-open')) {
-        closeMobileSheet();
-      }
-    });
-
-    root.querySelectorAll('.cat-dropdown').forEach(function (dd) {
-      const trigger = dd.querySelector('.cat-link--dropdown');
+    root.querySelectorAll('.nav-dropdown').forEach(function (dd) {
+      const trigger = dd.querySelector('.nav-item--has-children');
       if (!trigger) return;
       trigger.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-
-        const brand = dd.dataset.brand;
-        const brandLabel = brand === 'DELL' ? 'Dell'
-                         : brand === 'HP'   ? 'HP'
-                         : 'Lenovo';
-        const models = BRAND_MODELS[brand] || [];
-
-        /* Mobile → bottom sheet */
-        if (isMobile()) {
-          if (!models.length) return;
-          openMobileSheet(brand, brandLabel, models);
-          return;
-        }
-
-        /* Desktop → dropdown menu */
         const wasOpen = dd.classList.contains('is-open');
         closeAllDropdowns();
-
         if (!wasOpen) {
           dd.classList.add('is-open');
           trigger.setAttribute('aria-expanded', 'true');
-          document.body.classList.add('dropdown-open');
         }
       });
     });
 
-    /* Outside click closes dropdowns */
     document.addEventListener('click', function (e) {
-      if (e.target.closest('.cat-dropdown')) return;
+      if (e.target.closest('.nav-dropdown')) return;
       closeAllDropdowns();
     });
-
-    /* Escape closes dropdowns */
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeAllDropdowns();
     });
 
-    /* Right drawer */
-    if (toggler && menu && backdrop) {
-      menu.classList.remove('is-open');
-      backdrop.classList.remove('is-open');
-      backdrop.hidden = true;
-
-      const setIcon = function (el, name) {
-        el.innerHTML = '<i data-lucide="' + name + '"></i>';
-        NS.renderIcons?.(el);
-      };
-
-      const openMenu = function () {
-        closeSearch();
-        closeAllDropdowns();
-        menu.classList.add('is-open');
-        backdrop.hidden = false;
-        void backdrop.offsetWidth;
-        backdrop.classList.add('is-open');
-        toggler.setAttribute('aria-expanded', 'true');
-        setIcon(toggler, 'x');
-        lockScroll(true);
-      };
-      const closeMenu = function () {
-        menu.classList.remove('is-open');
-        backdrop.classList.remove('is-open');
-        toggler.setAttribute('aria-expanded', 'false');
-        setIcon(toggler, 'menu');
-        lockScroll(false);
-        window.setTimeout(function () { backdrop.hidden = true; }, 250);
-      };
-
-      if (toggler.dataset.bound !== 'true') {
-        toggler.dataset.bound = 'true';
-        toggler.addEventListener('click', function (e) {
-          e.preventDefault();
-          menu.classList.contains('is-open') ? closeMenu() : openMenu();
-        });
-      }
-      if (closeBtn) closeBtn.addEventListener('click', function (e) { e.preventDefault(); closeMenu(); toggler.focus(); });
-      backdrop.addEventListener('click', closeMenu);
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && menu.classList.contains('is-open')) { closeMenu(); toggler.focus(); }
-      });
-
-      const mq = window.matchMedia('(min-width: 992px)');
-      const mqHandler = function (e) {
-        if (e.matches) {
-          if (menu.classList.contains('is-open')) closeMenu();
-          if (searchPanel.classList.contains('is-open')) closeSearch();
-        }
-      };
-      if (mq.addEventListener) mq.addEventListener('change', mqHandler);
-      else if (mq.addListener) mq.addListener(mqHandler);
-    }
-
-    /* Mobile search drawer */
+    /* ── Search panel ──────────────────────────────────── */
     function openSearch() {
       closeAllDropdowns();
       searchPanel.classList.add('is-open');
       searchPanel.setAttribute('aria-hidden', 'false');
-      if (searchOpen) searchOpen.setAttribute('aria-expanded', 'true');
-      lockScroll(true);
-      window.setTimeout(function () { if (searchInput) searchInput.focus(); }, 220);
+      if (searchToggle) searchToggle.setAttribute('aria-expanded', 'true');
+      window.setTimeout(function () { if (searchInput) searchInput.focus(); }, 180);
     }
     function closeSearch() {
       searchPanel.classList.remove('is-open');
       searchPanel.setAttribute('aria-hidden', 'true');
-      if (searchOpen) searchOpen.setAttribute('aria-expanded', 'false');
-      if (!menu || !menu.classList.contains('is-open')) lockScroll(false);
+      if (searchToggle) searchToggle.setAttribute('aria-expanded', 'false');
     }
 
-    if (searchOpen) {
-      searchOpen.addEventListener('click', function (e) {
+    if (searchToggle) {
+      searchToggle.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         searchPanel.classList.contains('is-open') ? closeSearch() : openSearch();
       });
     }
-    if (searchClose) searchClose.addEventListener('click', function (e) { e.preventDefault(); closeSearch(); });
+    if (searchClose) searchClose.addEventListener('click', closeSearch);
 
     document.addEventListener('click', function (e) {
       if (!searchPanel.classList.contains('is-open')) return;
       if (searchPanel.contains(e.target)) return;
-      if (searchOpen && searchOpen.contains(e.target)) return;
+      if (searchToggle && searchToggle.contains(e.target)) return;
       closeSearch();
     });
+
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && searchPanel.classList.contains('is-open')) {
         closeSearch();
-        if (searchOpen) searchOpen.focus();
+        if (searchToggle) searchToggle.focus();
       }
     });
 
+    /* Search submit */
     if (searchInput) {
       searchInput.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter') return;
         e.preventDefault();
         const q = searchInput.value.trim();
         if (!q) return;
-        if (document.body.dataset.page === 'inventory') {
-          const page = document.getElementById('page-search');
-          if (page) page.value = q;
-          document.dispatchEvent(new CustomEvent('search:change', { detail: { query: q } }));
-          closeSearch();
-        } else {
-          gotoSearch(q);
-        }
-      });
-    }
-    if (searchClear) {
-      searchClear.addEventListener('click', function () {
-        if (searchInput) { searchInput.value = ''; searchInput.focus(); }
+        window.location.href = r('pages/inventory.html') + '?q=' + encodeURIComponent(q);
       });
     }
 
-    const desktopSearch = root.querySelector('#nav-search-input');
-    if (desktopSearch) {
-      desktopSearch.addEventListener('keydown', function (e) {
-        if (e.key !== 'Enter') return;
+    /* ── Mobile drawer ─────────────────────────────────── */
+    if (menuToggle && drawer && drawerBack) {
+      const setIcon = function (el, name) {
+        el.innerHTML = '<i data-lucide="' + name + '"></i>';
+        NS.renderIcons?.(el);
+      };
+
+      const openDrawer = function () {
+        closeSearch();
+        closeAllDropdowns();
+        drawer.classList.add('is-open');
+        drawer.setAttribute('aria-hidden', 'false');
+        drawerBack.hidden = false;
+        void drawerBack.offsetWidth;
+        drawerBack.classList.add('is-open');
+        menuToggle.setAttribute('aria-expanded', 'true');
+        setIcon(menuToggle, 'x');
+        lockScroll(true);
+      };
+      const closeDrawer = function () {
+        drawer.classList.remove('is-open');
+        drawer.setAttribute('aria-hidden', 'true');
+        drawerBack.classList.remove('is-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        setIcon(menuToggle, 'menu');
+        lockScroll(false);
+        window.setTimeout(function () { drawerBack.hidden = true; }, 250);
+      };
+
+      menuToggle.addEventListener('click', function (e) {
         e.preventDefault();
-        const q = desktopSearch.value.trim();
-        if (!q) return;
-        if (document.body.dataset.page === 'inventory') {
-          const page = document.getElementById('page-search');
-          if (page) page.value = q;
-          document.dispatchEvent(new CustomEvent('search:change', { detail: { query: q } }));
-        } else {
-          gotoSearch(q);
+        drawer.classList.contains('is-open') ? closeDrawer() : openDrawer();
+      });
+      if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+      drawerBack.addEventListener('click', closeDrawer);
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+          closeDrawer();
+          menuToggle.focus();
         }
       });
-    }
 
-    setupSticky();
+      /* Auto-close on resize to desktop */
+      const mq = window.matchMedia('(min-width: 992px)');
+      const mqHandler = function (e) {
+        if (e.matches) {
+          if (drawer.classList.contains('is-open')) closeDrawer();
+          if (searchPanel.classList.contains('is-open')) closeSearch();
+        }
+      };
+      if (mq.addEventListener) mq.addEventListener('change', mqHandler);
+      else if (mq.addListener) mq.addListener(mqHandler);
+    }
   }
 
-  function setupSticky() {
-    const sticky = document.getElementById('nav-sticky');
-    const placeholder = document.getElementById('nav-sticky-placeholder');
-    const row1 = document.querySelector('.nav-row-1');
-    const header = document.querySelector('.site-header');
-    if (!sticky || !placeholder || !row1 || !header) return;
-
-    function measure() {
-      placeholder.style.height = sticky.offsetHeight + 'px';
-    }
-
-    function onScroll() {
-      const row1Bottom = row1.getBoundingClientRect().bottom;
-      const shouldStick = row1Bottom <= 0;
-
-      if (shouldStick) {
-        if (sticky.dataset.fixed !== 'true') {
-          measure();
-          placeholder.hidden = false;
-          sticky.style.position = 'fixed';
-          sticky.style.top = '0';
-          sticky.style.left = '0';
-          sticky.style.right = '0';
-          sticky.style.zIndex = 'var(--z-sticky)';
-          sticky.dataset.fixed = 'true';
-          header.classList.add('is-stuck');
-        }
-      } else {
-        if (sticky.dataset.fixed === 'true') {
-          sticky.style.position = '';
-          sticky.style.top = '';
-          sticky.style.left = '';
-          sticky.style.right = '';
-          sticky.style.zIndex = '';
-          placeholder.hidden = true;
-          placeholder.style.height = '';
-          sticky.dataset.fixed = 'false';
-          header.classList.remove('is-stuck');
-        }
-      }
-
-      header.classList.toggle('is-scrolled', window.scrollY > 8);
-    }
-
-    measure();
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', function () {
-      if (sticky.dataset.fixed === 'true') measure();
-    });
-  }
-
-  async function mount() {
+  /* ═══════════════════════════════════════════════════════
+     MOUNT
+     ═══════════════════════════════════════════════════════ */
+  function mount() {
     const host = document.querySelector('.site-header');
     if (!host) return;
     if (host.dataset.mounted === 'true') return;
     host.dataset.mounted = 'true';
 
-    try {
-      const [laptops, pcs] = await Promise.all([
-        NS.Data?.laptops ? NS.Data.laptops().catch(function () { return []; }) : [],
-        NS.Data?.pcs     ? NS.Data.pcs().catch(function () { return {}; }) : {},
-      ]);
-      BRAND_MODELS = buildBrandModels({ laptops: laptops, pcs: pcs });
-      CATEGORIES   = buildCategories({ laptops: laptops, pcs: pcs });
-    } catch (e) {
-      console.warn('[IT Zone] Navbar: category computation failed.', e);
-      BRAND_MODELS = {};
-      CATEGORIES   = [];
-    }
-
     host.innerHTML = template();
     attachLogoFallback(host);
     wire(host);
     NS.renderIcons?.(host);
-
-    const totalModels = Object.keys(BRAND_MODELS).reduce(function (sum, b) {
-      return sum + BRAND_MODELS[b].length;
-    }, 0);
-    console.info('[IT Zone] Navbar: ' + totalModels + ' models across ' +
-                 Object.keys(BRAND_MODELS).length + ' brands · ' +
-                 CATEGORIES.length + ' category pills.');
   }
 
   NS.Navbar = { mount: mount };
