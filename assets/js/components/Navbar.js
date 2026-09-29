@@ -4,7 +4,8 @@
    Left:  Logo
    Center: Nav links (Laptops ▾, PCs ▾, Monitors, Accessories, Contact)
    Right:  Search / Call / Menu
-   Mobile: Logo | Search icon | Menu icon + slide-in drawer
+   Mobile: Logo | Search icon | Menu icon + slide-in drawer with
+           accordion-style collapsible groups.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -168,27 +169,64 @@
   }
 
   /* ═══════════════════════════════════════════════════════
-     MOBILE DRAWER (flat list)
+     MOBILE ACCORDION — nested collapsible groups
      ═══════════════════════════════════════════════════════ */
-  function buildMobileList() {
-    const out = [];
-    NAV_STRUCTURE.forEach(function (item) {
-      if (!item.children || !item.children.length) {
-        out.push({ label: item.label, href: item.href, level: 0 });
-        return;
+  function buildMobileAccordion() {
+    return NAV_STRUCTURE.map(function (item, idx) {
+      const hasChildren = item.children && item.children.length;
+      const id = 'mob-group-' + idx;
+
+      if (!hasChildren) {
+        return (
+          '<li class="mob-item">' +
+            '<a class="mob-link" href="' + r(item.href) + '">' + item.label + '</a>' +
+          '</li>'
+        );
       }
-      out.push({ label: item.label, href: item.href, level: 0 });
-      item.children.forEach(function (child) {
-        if (child.children && child.children.length) {
-          child.children.forEach(function (gc) {
-            out.push({ label: gc.label, href: gc.href, level: 2, parent: child.label });
-          });
-        } else {
-          out.push({ label: child.label, href: child.href, level: 1 });
+
+      const brandsMarkup = item.children.map(function (child, cidx) {
+        const hasGrand = child.children && child.children.length;
+        const cid = 'mob-sub-' + idx + '-' + cidx;
+
+        if (!hasGrand) {
+          return (
+            '<li class="mob-subitem">' +
+              '<a class="mob-sublink" href="' + r(child.href) + '">' + child.label + '</a>' +
+            '</li>'
+          );
         }
-      });
-    });
-    return out;
+
+        const modelsMarkup = child.children.map(function (gc) {
+          return (
+            '<li class="mob-modelitem">' +
+              '<a class="mob-modellink" href="' + r(gc.href) + '">' + gc.label + '</a>' +
+            '</li>'
+          );
+        }).join('');
+
+        return (
+          '<li class="mob-subgroup">' +
+            '<button type="button" class="mob-sublink mob-sublink--toggle" ' +
+                    'data-target="' + cid + '" aria-expanded="false">' +
+              '<span>' + child.label + '</span>' +
+              '<i data-lucide="chevron-down" class="mob-caret"></i>' +
+            '</button>' +
+            '<ul class="mob-models" id="' + cid + '">' + modelsMarkup + '</ul>' +
+          '</li>'
+        );
+      }).join('');
+
+      return (
+        '<li class="mob-group">' +
+          '<button type="button" class="mob-link mob-link--toggle" ' +
+                  'data-target="' + id + '" aria-expanded="false">' +
+            '<span>' + item.label + '</span>' +
+            '<i data-lucide="chevron-down" class="mob-caret"></i>' +
+          '</button>' +
+          '<ul class="mob-sublist" id="' + id + '">' + brandsMarkup + '</ul>' +
+        '</li>'
+      );
+    }).join('');
   }
 
   /* ═══════════════════════════════════════════════════════
@@ -197,13 +235,7 @@
   function template() {
     const logoSrc = r('assets/img/logo.png');
     const desktopNav = buildDesktopNav();
-    const mobileList = buildMobileList();
-
-    const drawerItems = mobileList.map(function (c) {
-      const cls = 'drawer-item' + (c.level ? ' drawer-item--sub' : '');
-      const label = c.level === 2 ? c.parent + ' \u2014 ' + c.label : c.label;
-      return '<li><a class="' + cls + '" href="' + r(c.href) + '">' + label + '</a></li>';
-    }).join('');
+    const drawerItems = buildMobileAccordion();
 
     return `
       <nav class="site-nav" aria-label="Primary">
@@ -402,6 +434,34 @@
         el.innerHTML = '<i data-lucide="' + name + '"></i>';
         NS.renderIcons?.(el);
       };
+
+      /* Accordion toggle behavior */
+      drawer.querySelectorAll('.mob-link--toggle, .mob-sublink--toggle').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          const targetId = btn.dataset.target;
+          const panel = drawer.querySelector('#' + targetId);
+          if (!panel) return;
+
+          const isOpen = btn.getAttribute('aria-expanded') === 'true';
+
+          /* Close siblings at the same level */
+          const parentList = btn.closest('ul');
+          if (parentList) {
+            const selector = ':scope > li > .mob-link--toggle[aria-expanded="true"], ' +
+                             ':scope > li > .mob-sublink--toggle[aria-expanded="true"]';
+            parentList.querySelectorAll(selector).forEach(function (sib) {
+              if (sib === btn) return;
+              sib.setAttribute('aria-expanded', 'false');
+              const sibPanel = drawer.querySelector('#' + sib.dataset.target);
+              if (sibPanel) sibPanel.classList.remove('is-open');
+            });
+          }
+
+          btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+          panel.classList.toggle('is-open', !isOpen);
+        });
+      });
 
       const openDrawer = function () {
         closeSearch();
