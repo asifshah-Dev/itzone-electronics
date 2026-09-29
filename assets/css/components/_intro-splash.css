@@ -1,270 +1,249 @@
 /* assets/css/components/_intro-splash.css
    ─────────────────────────────────────────────────────────
-   Big "IT Zone Electronics" intro reveal — matched to logo
-   with 12 floating tech icons around the edges.
-   IT          → dark green
-   Zone        → red/orange gradient (from the logo "ZONE")
-   Electronics → dark green (logo subtitle)
-   All 12 icons visible on every screen size.
+   Intro splash — LAG-FREE version.
+   What was cut:
+   - filter: blur() on aurora  →  replaced with pre-baked gradients
+   - filter: blur on text bloom →  removed
+   - backface-visibility / contain on tiny elements →  removed
+   - Only 3 GPU-friendly animations: opacity, translate3d, scale
    ───────────────────────────────────────────────────────── */
 
+/* ═══════════════════════════════════════════════════════
+   OVERLAY
+   ═══════════════════════════════════════════════════════ */
 .intro-splash {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
   position: fixed;
   inset: 0;
   z-index: 9999;
 
-  background: #ffffff;
-
-  opacity: 1;
-
-  will-change: opacity, transform;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  contain: strict;
-}
-
-/* JS adds this class right before removal for a smooth exit */
-.intro-splash.is-leaving {
-  opacity: 0;
-  transform: translate3d(0, -2%, 0);
-  transition:
-    opacity 500ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* ═══════════════════════════════════════════════════════
-   FLOATING ICONS (behind the text)
-   ═══════════════════════════════════════════════════════ */
-.intro-splash__icons {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.intro-icon {
-  position: absolute;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 
   background: #ffffff;
-  color: #0d4a26;
-  border: 1.5px solid rgba(13, 74, 38, 0.15);
-  box-shadow:
-    0 12px 32px -12px rgba(10, 15, 13, 0.18),
-    0 4px 10px -4px rgba(10, 15, 13, 0.08);
 
-  animation: introIconDrift var(--drift-dur, 8s) ease-in-out infinite;
-  animation-delay: var(--drift-delay, 0s);
+  overflow: hidden;
+  opacity: 1;
 
-  will-change: transform;
+  /* Single compositor layer for the whole splash */
+  transform: translateZ(0);
+  will-change: opacity;
 }
 
-.intro-icon .lucide,
-.intro-icon svg {
-  width: 55%; height: 55%;
-  stroke-width: 2;
-}
-
-/* ── Sizes (desktop) ──────────────────────────────────── */
-.intro-icon--lg { width: 76px;  height: 76px;  border-radius: 20px; }
-.intro-icon--lg .lucide, .intro-icon--lg svg { width: 50%; height: 50%; stroke-width: 1.8; }
-.intro-icon--md { width: 60px;  height: 60px;  border-radius: 16px; }
-.intro-icon--sm { width: 46px;  height: 46px;  border-radius: 12px; }
-.intro-icon--xs { width: 36px;  height: 36px;  border-radius: 10px; }
-
-/* ── Positions (desktop) ──────────────────────────────── */
-.intro-icon--top-left       { top: 8%;    left: 5%; }
-.intro-icon--top-mid-left   { top: 14%;   left: 20%; }
-.intro-icon--top-mid-right  { top: 10%;   right: 22%; }
-.intro-icon--top-right      { top: 8%;    right: 5%; }
-
-.intro-icon--bot-left       { bottom: 8%; left: 5%; }
-.intro-icon--bot-mid-left   { bottom: 14%; left: 20%; }
-.intro-icon--bot-mid-right  { bottom: 12%; right: 20%; }
-.intro-icon--bot-right      { bottom: 8%; right: 5%; }
-
-.intro-icon--accent-1       { top: 36%;   left: 2%; }
-.intro-icon--accent-2       { top: 32%;   right: 2%; }
-.intro-icon--accent-3       { bottom: 32%; left: 4%; }
-.intro-icon--accent-4       { bottom: 34%; right: 4%; }
-
-/* ── Gentle drift ─────────────────────────────────────── */
-@keyframes introIconDrift {
-  0%   { transform: translate3d(0, 0, 0); }
-  25%  { transform: translate3d(6px, -10px, 0); }
-  50%  { transform: translate3d(-4px, 8px, 0); }
-  75%  { transform: translate3d(8px, 4px, 0); }
-  100% { transform: translate3d(0, 0, 0); }
+.intro-splash.is-leaving {
+  opacity: 0;
+  transition: opacity 600ms ease-out;
 }
 
 /* ═══════════════════════════════════════════════════════
-   MAIN TEXT (above icons)
+   BACKGROUND GLOW — NO blur filter.
+   Pre-baked soft radial gradients look identical
+   but cost nothing at runtime.
    ═══════════════════════════════════════════════════════ */
-.intro-splash__inner {
-  position: relative;
-  z-index: 2;
+.aurora {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
 
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 0.35em;
-
-  animation: introGroup 2600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  /* No blur, no filter — just a static soft background */
+  background:
+    radial-gradient(ellipse 55% 55% at 15% 20%,
+      rgba(122, 184, 0, 0.18) 0%,
+      rgba(122, 184, 0, 0) 65%),
+    radial-gradient(ellipse 50% 50% at 85% 80%,
+      rgba(230, 0, 0, 0.10) 0%,
+      rgba(230, 0, 0, 0) 65%),
+    radial-gradient(ellipse 45% 45% at 70% 40%,
+      rgba(31, 160, 80, 0.12) 0%,
+      rgba(31, 160, 80, 0) 65%);
 }
 
-.intro-splash__word {
-  display: inline-block;
+/* Individual streak elements aren't used anymore, but
+   keep this rule so the markup doesn't break. */
+.aurora__streak { display: none; }
 
-  font-family: var(--font-sans);
-  font-weight: 900;
-  letter-spacing: -0.045em;
-  line-height: 1;
+/* ═══════════════════════════════════════════════════════
+   ORBIT RINGS + ICONS
+   ═══════════════════════════════════════════════════════ */
+.orbit {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
 
-  font-size: clamp(2.5rem, 11vw, 11rem);
+.orbit__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.orbit__ring--inner {
+  width: min(52vw, 640px);
+  height: min(52vw, 640px);
+  border: 1px solid rgba(10, 15, 13, 0.1);
+}
+.orbit__ring--outer {
+  width: min(78vw, 980px);
+  height: min(78vw, 960px);
+  border: 1px solid rgba(10, 15, 13, 0.06);
+}
+
+.orbit__icons { position: absolute; inset: 0; }
+
+.orbit-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  transform:
+    translate3d(-50%, -50%, 0)
+    rotate(var(--angle))
+    translateY(calc(-1 * var(--radius)))
+    rotate(calc(-1 * var(--angle)));
 
   opacity: 0;
-  transform: translate3d(0, 0.35em, 0) scale(0.92);
-  will-change: opacity, transform;
+  animation: iconFadeIn 400ms ease-out both;
+  animation-delay: calc(300ms + (var(--angle) / 360deg * 150ms));
 
-  backface-visibility: hidden;
+  will-change: opacity;
 }
 
-/* ── Word colors — matched to the logo ────────────────── */
+.orbit-icon--inner { --radius: min(26vw, 320px); }
+.orbit-icon--outer { --radius: min(39vw, 480px); }
 
-/* "IT" — dark green from the logo */
-.intro-splash__word--it {
+.orbit-icon__inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1.5px solid rgba(10, 15, 13, 0.1);
+  color: #0a0f0d;
+
+  /* Single flat shadow — cheap */
+  box-shadow: 0 6px 16px -8px rgba(10, 15, 13, 0.18);
+}
+
+.orbit-icon__inner .lucide,
+.orbit-icon__inner svg {
+  width: 55%; height: 55%;
+  stroke: #0a0f0d !important;
+  color: #0a0f0d !important;
+  stroke-width: 2;
+}
+.orbit-icon__inner svg [stroke] { stroke: #0a0f0d !important; }
+
+.orbit-icon--lg .orbit-icon__inner { width: 72px; height: 72px; border-radius: 18px; }
+.orbit-icon--md .orbit-icon__inner { width: 56px; height: 56px; border-radius: 15px; }
+.orbit-icon--sm .orbit-icon__inner { width: 44px; height: 44px; border-radius: 13px; }
+
+@keyframes iconFadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CENTER TEXT — no jiggle, no blur
+   ═══════════════════════════════════════════════════════ */
+.intro-text {
+  position: relative;
+  z-index: 5;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  padding: 1rem;
+}
+
+/* Fixed-height slot per word → no layout shift */
+.intro-text__slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(4rem, 13.5vw, 10.5rem);
+  line-height: 1;
+}
+.intro-text__slot--elec {
+  height: clamp(1.2rem, 3vw, 2.4rem);
+  margin-top: 0.6em;
+}
+
+.intro-text__word {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.05em;
+
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+}
+
+/* "IT" */
+.intro-text__word--it {
   color: #0d4a26;
+  font-size: clamp(4rem, 14vw, 11rem);
+  animation: wordSlideUp 400ms ease-out 60ms both;
 }
 
-/* "Zone" — red → orange → red gradient (from the logo "ZONE") */
-.intro-splash__word--zone {
-  background: linear-gradient(135deg,
-    #8b0000 0%,
-    #c1121f 35%,
-    #e63900 55%,
-    #ff6a00 70%,
-    #c1121f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* "ZONE" */
+.intro-text__word--zone {
+  color: #E60000;
+  font-size: clamp(4rem, 14vw, 11rem);
+  text-shadow: 0 0 22px rgba(230, 0, 0, 0.2);
+  animation: wordSlideUp 400ms ease-out 180ms both;
 }
 
-/* "Electronics" — smaller, dark green like the logo subtitle */
-.intro-splash__word--elec {
-  color: #0d4a26;
-  font-size: clamp(1.1rem, 3.6vw, 3.2rem);
+/* "ELECTRONICS" */
+.intro-text__word--elec {
+  color: #7AB800;
+  font-size: clamp(0.85rem, 2.2vw, 1.8rem);
   font-weight: 800;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.42em;
   text-transform: uppercase;
+  padding-left: 0.42em;
+  text-shadow: 0 0 12px rgba(122, 184, 0, 0.35);
+  animation: wordSlideUp 400ms ease-out 300ms both;
 }
 
-/* ── Staggered delays ─────────────────────────────────── */
-.intro-splash__word--it   { animation: introWordIn 900ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both; }
-.intro-splash__word--zone { animation: introWordIn 900ms cubic-bezier(0.16, 1, 0.3, 1) 400ms both; }
-.intro-splash__word--elec { animation: introWordIn 900ms cubic-bezier(0.16, 1, 0.3, 1) 700ms both; }
-
-/* ── Keyframes ─────────────────────────────────────────── */
-
-@keyframes introWordIn {
-  0%   { opacity: 0; transform: translate3d(0, 0.4em, 0) scale(0.94); }
-  60%  { opacity: 1; }
-  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-}
-
-@keyframes introGroup {
-  0%   { transform: scale(1); }
-  70%  { transform: scale(1.02); }
-  100% { transform: scale(1.06); }
+@keyframes wordSlideUp {
+  0%   { opacity: 0; transform: translate3d(0, 10px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 /* ═══════════════════════════════════════════════════════
-   RESPONSIVE — TABLET (≤ 768px)
+   MOBILE
    ═══════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  .intro-icon--lg { width: 54px; height: 54px; border-radius: 15px; }
-  .intro-icon--md { width: 44px; height: 44px; border-radius: 12px; }
-  .intro-icon--sm { width: 36px; height: 36px; border-radius: 10px; }
-  .intro-icon--xs { width: 28px; height: 28px; border-radius: 8px; }
+@media (max-width: 767.98px) {
+  .orbit-icon--inner { --radius: min(38vw, 220px); }
+  .orbit-icon--outer { --radius: min(58vw, 340px); }
 
-  .intro-icon--top-left       { top: 5%;    left: 3%; }
-  .intro-icon--top-mid-left   { top: 8%;    left: 15%; }
-  .intro-icon--top-mid-right  { top: 6%;    right: 15%; }
-  .intro-icon--top-right      { top: 5%;    right: 3%; }
+  .orbit-icon--lg .orbit-icon__inner { width: 54px; height: 54px; border-radius: 14px; }
+  .orbit-icon--md .orbit-icon__inner { width: 44px; height: 44px; border-radius: 12px; }
+  .orbit-icon--sm .orbit-icon__inner { width: 36px; height: 36px; border-radius: 10px; }
 
-  .intro-icon--bot-left       { bottom: 5%; left: 3%; }
-  .intro-icon--bot-mid-left   { bottom: 8%; left: 15%; }
-  .intro-icon--bot-mid-right  { bottom: 7%; right: 15%; }
-  .intro-icon--bot-right      { bottom: 5%; right: 3%; }
+  .intro-text__slot { height: clamp(2.5rem, 14vw, 5.5rem); }
+
+  .intro-text__word--it,
+  .intro-text__word--zone { font-size: clamp(2.5rem, 15vw, 5rem); }
+
+  .intro-text__word--elec {
+    font-size: clamp(0.7rem, 2.6vw, 1rem);
+    letter-spacing: 0.34em;
+    padding-left: 0.34em;
+  }
 }
 
-/* ═══════════════════════════════════════════════════════
-   RESPONSIVE — PHONE (≤ 576px)
-   ALL 12 icons visible — tiny, pinned to the edges.
-   ═══════════════════════════════════════════════════════ */
-@media (max-width: 576px) {
-  /* Base sizes — small so they don't clash with the text */
-  .intro-icon--lg { width: 34px; height: 34px; border-radius: 10px; }
-  .intro-icon--md { width: 28px; height: 28px; border-radius: 8px; }
-  .intro-icon--sm { width: 24px; height: 24px; border-radius: 7px; }
-  .intro-icon--xs { width: 20px; height: 20px; border-radius: 6px; }
-
-  /* Slightly thicker stroke so the icon reads at small size */
-  .intro-icon .lucide,
-  .intro-icon svg { width: 62%; height: 62%; stroke-width: 2.2; }
-
-  .intro-icon--lg .lucide,
-  .intro-icon--lg svg { width: 58%; height: 58%; stroke-width: 2.2; }
-
-  /* ── Corners (4 icons) ────────────────────────────── */
-  .intro-icon--top-left  { top: 3%; left: 3%; }
-  .intro-icon--top-right { top: 3%; right: 3%; }
-  .intro-icon--bot-left  { bottom: 3%; left: 3%; }
-  .intro-icon--bot-right { bottom: 3%; right: 3%; }
-
-  /* ── Mid-row (4 icons) — tucked along the top/bottom edges ── */
-  .intro-icon--top-mid-left   { top: 3%; left: 22%; }
-  .intro-icon--top-mid-right  { top: 3%; right: 22%; }
-  .intro-icon--bot-mid-left   { bottom: 3%; left: 22%; }
-  .intro-icon--bot-mid-right  { bottom: 3%; right: 22%; }
-
-  /* ── Accents (4 icons) — pinned to the far left/right edges ── */
-  .intro-icon--accent-1 { top: 36%;   left: 1%; }
-  .intro-icon--accent-2 { top: 32%;   right: 1%; }
-  .intro-icon--accent-3 { bottom: 36%; left: 1%; }
-  .intro-icon--accent-4 { bottom: 32%; right: 1%; }
-}
-
-/* ═══════════════════════════════════════════════════════
-   RESPONSIVE — SMALL PHONE (≤ 380px)
-   ═══════════════════════════════════════════════════════ */
-@media (max-width: 380px) {
-  .intro-icon--lg { width: 30px; height: 30px; border-radius: 9px; }
-  .intro-icon--md { width: 24px; height: 24px; border-radius: 7px; }
-  .intro-icon--sm { width: 20px; height: 20px; border-radius: 6px; }
-  .intro-icon--xs { width: 16px; height: 16px; border-radius: 5px; }
-
-  .intro-icon--top-left  { top: 2%; left: 2%; }
-  .intro-icon--top-right { top: 2%; right: 2%; }
-  .intro-icon--bot-left  { bottom: 2%; left: 2%; }
-  .intro-icon--bot-right { bottom: 2%; right: 2%; }
-
-  .intro-icon--top-mid-left   { top: 2%; left: 24%; }
-  .intro-icon--top-mid-right  { top: 2%; right: 24%; }
-  .intro-icon--bot-mid-left   { bottom: 2%; left: 24%; }
-  .intro-icon--bot-mid-right  { bottom: 2%; right: 24%; }
-}
-
-/* ═══════════════════════════════════════════════════════
-   REDUCED MOTION
-   ═══════════════════════════════════════════════════════ */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .intro-splash { display: none !important; }
 }

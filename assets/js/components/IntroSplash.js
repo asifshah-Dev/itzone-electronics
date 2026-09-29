@@ -1,48 +1,42 @@
 // assets/js/components/IntroSplash.js
 /* ─────────────────────────────────────────────────────────
-   Intro splash — big "IT Zone Electronics" reveal on load
-   with floating tech icons drifting around the edges.
-   Stays up until the page is actually ready (or MAX_MS).
+   Intro splash — Aurora Curtain (fast + no jiggle).
    ───────────────────────────────────────────────────────── */
 
 (function () {
   'use strict';
   const NS = (window.ITZone = window.ITZone || {});
 
-  /* ── SETTINGS ───────────────────────────────────────── */
-  const DESKTOP_MIN  = 0;       // 0 = all screen sizes
-  const SESSION_LOCK = false;   // false = fires every page load
+  const DESKTOP_MIN  = 0;
+  const SESSION_LOCK = false;
 
-  const MIN_MS = 2600;          // minimum time on screen
-  const MAX_MS = 6000;          // absolute max (safety net)
+  /* Tighter timings — entire splash done in ~2.4s */
+  const MIN_MS = 2200;
+  const MAX_MS = 4000;
 
-  /* ── Floating icons — scattered around the edges ────── */
-  const FLOATING_ICONS = [
-    /* Top row */
-    { icon: 'laptop',      size: 'lg', pos: 'top-left',      dur: 7.5, delay: 0.0 },
-    { icon: 'server',      size: 'md', pos: 'top-mid-left',  dur: 8.4, delay: 0.4 },
-    { icon: 'cpu',         size: 'sm', pos: 'top-mid-right', dur: 6.8, delay: 0.8 },
-    { icon: 'headphones',  size: 'lg', pos: 'top-right',     dur: 9.1, delay: 0.2 },
-
-    /* Bottom row */
-    { icon: 'hard-drive',  size: 'sm', pos: 'bot-left',      dur: 8.0, delay: 0.6 },
-    { icon: 'monitor',     size: 'md', pos: 'bot-mid-left',  dur: 7.2, delay: 0.9 },
-    { icon: 'smartphone',  size: 'sm', pos: 'bot-mid-right', dur: 8.7, delay: 0.3 },
-    { icon: 'keyboard',    size: 'lg', pos: 'bot-right',     dur: 7.8, delay: 0.7 },
-
-    /* Tiny accents */
-    { icon: 'wifi',            size: 'xs', pos: 'accent-1', dur: 6.4, delay: 0.5 },
-    { icon: 'battery-charging',size: 'xs', pos: 'accent-2', dur: 8.2, delay: 0.1 },
-    { icon: 'usb',             size: 'xs', pos: 'accent-3', dur: 7.6, delay: 0.8 },
-    { icon: 'tablet',          size: 'xs', pos: 'accent-4', dur: 6.9, delay: 0.4 }
+  const ORBIT_ICONS = [
+    { icon: 'laptop',           size: 'lg', ring: 'inner', angle: 0   },
+    { icon: 'cpu',              size: 'md', ring: 'inner', angle: 60  },
+    { icon: 'monitor',          size: 'lg', ring: 'inner', angle: 120 },
+    { icon: 'hard-drive',       size: 'md', ring: 'inner', angle: 180 },
+    { icon: 'headphones',       size: 'lg', ring: 'inner', angle: 240 },
+    { icon: 'smartphone',       size: 'md', ring: 'inner', angle: 300 },
+    { icon: 'keyboard',         size: 'md', ring: 'outer', angle: 30  },
+    { icon: 'server',           size: 'md', ring: 'outer', angle: 90  },
+    { icon: 'tablet',           size: 'sm', ring: 'outer', angle: 150 },
+    { icon: 'wifi',             size: 'sm', ring: 'outer', angle: 210 },
+    { icon: 'battery-charging', size: 'sm', ring: 'outer', angle: 270 },
+    { icon: 'usb',              size: 'sm', ring: 'outer', angle: 330 }
   ];
 
-  function iconsMarkup() {
-    return FLOATING_ICONS.map(function (ic) {
+  function orbitMarkup() {
+    return ORBIT_ICONS.map(function (ic) {
       return (
-        '<div class="intro-icon intro-icon--' + ic.size + ' intro-icon--' + ic.pos + '"' +
-        '     style="--drift-dur: ' + ic.dur + 's; --drift-delay: ' + ic.delay + 's;">' +
-          '<i data-lucide="' + ic.icon + '"></i>' +
+        '<div class="orbit-icon orbit-icon--' + ic.size + ' orbit-icon--' + ic.ring + '"' +
+        '     style="--angle:' + ic.angle + 'deg;">' +
+          '<div class="orbit-icon__inner">' +
+            '<i data-lucide="' + ic.icon + '"></i>' +
+          '</div>' +
         '</div>'
       );
     }).join('');
@@ -58,13 +52,28 @@
   function template() {
     return `
       <div class="intro-splash" role="presentation" aria-hidden="true">
-        <div class="intro-splash__icons" aria-hidden="true">
-          ${iconsMarkup()}
+        <div class="aurora">
+          <div class="aurora__streak aurora__streak--1"></div>
+          <div class="aurora__streak aurora__streak--2"></div>
+          <div class="aurora__streak aurora__streak--3"></div>
         </div>
-        <div class="intro-splash__inner">
-          <span class="intro-splash__word intro-splash__word--it">IT</span>
-          <span class="intro-splash__word intro-splash__word--zone">Zone</span>
-          <span class="intro-splash__word intro-splash__word--elec">Electronics</span>
+
+        <div class="orbit">
+          <div class="orbit__ring orbit__ring--inner"></div>
+          <div class="orbit__ring orbit__ring--outer"></div>
+          <div class="orbit__icons">${orbitMarkup()}</div>
+        </div>
+
+        <div class="intro-text">
+          <span class="intro-text__slot">
+            <span class="intro-text__word intro-text__word--it">IT</span>
+          </span>
+          <span class="intro-text__slot">
+            <span class="intro-text__word intro-text__word--zone">ZONE</span>
+          </span>
+          <span class="intro-text__slot intro-text__slot--elec">
+            <span class="intro-text__word intro-text__word--elec">ELECTRONICS</span>
+          </span>
         </div>
       </div>
     `;
@@ -81,7 +90,6 @@
     const splash = wrap.firstElementChild;
     document.body.appendChild(splash);
 
-    /* Render the Lucide icons inside the splash */
     NS.renderIcons?.(splash);
 
     if (SESSION_LOCK) {
@@ -108,7 +116,7 @@
           splash.remove();
           document.documentElement.style.overflow = prevOverflow;
         }
-      }, 800);
+      }, 900);
     }
 
     function tryFinish() {
@@ -117,16 +125,11 @@
       window.setTimeout(removeSplash, remaining);
     }
 
-    if (document.readyState === 'complete') {
-      tryFinish();
-    } else {
-      window.addEventListener('load', tryFinish, { once: true });
-    }
+    if (document.readyState === 'complete') tryFinish();
+    else window.addEventListener('load', tryFinish, { once: true });
 
-    window.setTimeout(function () {
-      removeSplash();
-    }, MAX_MS);
+    window.setTimeout(removeSplash, MAX_MS);
   }
 
-  NS.IntroSplash = { mount };
+  NS.IntroSplash = { mount: mount };
 })();
