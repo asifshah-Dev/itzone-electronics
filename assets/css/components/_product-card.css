@@ -808,12 +808,12 @@
   gap: var(--space-3);
 }
 
-/* ── Slider viewport — clips the track ────────────────── */
+/* ── Slider viewport ─────────────────────────────────── */
 .product-detail-image {
   position: relative;
   aspect-ratio: 4 / 3;
   width: 100%;
-  background: #ffffff;
+  background: #f1f5f9;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-color);
   overflow: hidden;
@@ -830,7 +830,7 @@
   will-change: transform;
 }
 
-/* ── One slide per image, 100% of viewport ───────────── */
+/* ── One slide per image ─────────────────────────────── */
 .pd-slide {
   flex: 0 0 100%;
   width: 100%;
@@ -838,15 +838,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6%;
   background: #ffffff;
   box-sizing: border-box;
 }
 
+/* Fill the slide — no white bars on left/right */
 .pd-slide img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;      /* 🔑 fills the container */
+  object-position: center;
   display: block;
 }
 
