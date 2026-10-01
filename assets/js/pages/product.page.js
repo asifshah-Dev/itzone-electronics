@@ -418,7 +418,63 @@
         if (e.key === 'ArrowRight') goTo(currentIndex + 1);
       });
     }
+        /* ✅ Magnifier zoom — follows the cursor */
+    const detailImage = host.querySelector('.product-detail-image');
+    if (detailImage) {
+      /* Ensure positioning context */
+      detailImage.style.position = 'relative';
+      detailImage.style.overflow = 'hidden';
 
+      const slides = detailImage.querySelectorAll('.pd-slide');
+      const ZOOM = 2.2;   /* ← zoom strength (try 1.8 / 2.5 / 3) */
+
+      function onMove(e) {
+        const rect = detailImage.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+        slides.forEach(function (slide) {
+          const img = slide.querySelector('img');
+          if (!img) return;
+          img.style.transition = 'transform 0.15s ease-out';
+          img.style.transformOrigin = x + '% ' + y + '%';
+          img.style.transform = 'scale(' + ZOOM + ')';
+        });
+      }
+
+      function onEnter() {
+        slides.forEach(function (slide) {
+          const img = slide.querySelector('img');
+          if (!img) return;
+          img.style.willChange = 'transform';
+        });
+      }
+
+      function onLeave() {
+        slides.forEach(function (slide) {
+          const img = slide.querySelector('img');
+          if (!img) return;
+          img.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
+          img.style.transform = 'scale(1)';
+          img.style.transformOrigin = 'center center';
+          /* Clean up will-change after the transition */
+          window.setTimeout(function () {
+            img.style.willChange = '';
+          }, 500);
+        });
+      }
+
+      detailImage.addEventListener('mouseenter', onEnter);
+      detailImage.addEventListener('mousemove', onMove);
+      detailImage.addEventListener('mouseleave', onLeave);
+
+      /* On touch devices — skip the magnifier */
+      if (window.matchMedia('(hover: none)').matches) {
+        detailImage.removeEventListener('mouseenter', onEnter);
+        detailImage.removeEventListener('mousemove', onMove);
+        detailImage.removeEventListener('mouseleave', onLeave);
+      }
+    }
     console.info('[IT Zone] Product loaded:', item.brand, item.model,
                  '| Images:', imagesOf(item).length,
                  '| Related:', related.length);
