@@ -32,7 +32,117 @@
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
     0 8px 32px -14px rgba(10, 15, 13, 0.2);
 }
+/* ═══════════════════════════════════════════════════════
+   ANNOUNCEMENT BAR — sits above the entire navbar
+   ═══════════════════════════════════════════════════════ */
+.announce-bar {
+  width: 100%;
+  background: linear-gradient(90deg,
+    #0b5e2e 0%,
+    #146b38 25%,
+    #8f0c17 75%,
+    #c1121f 100%);
+  color: #ffffff;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 100;
+  animation: announceSlideDown .5s cubic-bezier(0.22, 1, 0.36, 1);
+}
 
+@keyframes announceSlideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+.announce-bar-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  min-height: 34px;
+  overflow: hidden;
+}
+
+.announce-bar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.announce-bar-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f5b81c;                /* gold accent */
+  flex-shrink: 0;
+  position: relative;
+}
+.announce-bar-dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: #f5b81c;
+  opacity: 0.5;
+  animation: announceDotPulse 2s ease-out infinite;
+}
+@keyframes announceDotPulse {
+  0%   { transform: scale(1);   opacity: 0.5; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+.announce-bar-sep {
+  opacity: 0.5;
+  font-weight: 400;
+  margin: 0 0.15rem;
+}
+
+/* ── Mobile: shrink text ─────────────────────────────── */
+@media (max-width: 768px) {
+  .announce-bar-item {
+    font-size: 0.7rem;
+    gap: 0.4rem;
+  }
+  .announce-bar-dot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .announce-bar-track {
+    padding: 0.4rem 0.75rem;
+    min-height: 30px;
+  }
+  .announce-bar-item {
+    font-size: 0.65rem;
+    letter-spacing: 0;
+  }
+  .announce-bar-sep {
+    display: none;                    /* hide separators on tiny screens */
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .announce-bar {
+    animation: none !important;
+  }
+  .announce-bar-dot::after {
+    animation: none !important;
+  }
+}
 .nav-container {
   max-width: 1400px;
   margin: 0 auto;

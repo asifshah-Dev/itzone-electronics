@@ -238,6 +238,19 @@
     const drawerItems = buildMobileAccordion();
 
     return `
+      <!-- ── Announcement bar ──────────────────────────── -->
+      <div class="announce-bar" role="region" aria-label="Announcement">
+        <div class="announce-bar-track">
+          <span class="announce-bar-item">
+            <span class="announce-bar-dot" aria-hidden="true"></span>
+            Fresh UK Import Stock Just Arrived!
+            <span class="announce-bar-sep" aria-hidden="true">|</span>
+            100% Original &amp; Checked
+            <span class="announce-bar-sep" aria-hidden="true">|</span>
+            Order on WhatsApp
+          </span>
+        </div>
+      </div>
       <nav class="site-nav" aria-label="Primary">
         <div class="nav-container">
 
