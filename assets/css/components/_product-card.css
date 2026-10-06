@@ -513,7 +513,7 @@
 .product-image.product-image--desktop img,
 .product-image.product-image--tiny img,
 .product-image.product-image--monitor img {
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   padding: 4%;
 }
