@@ -63,7 +63,7 @@
 .filter-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
 /* ═══════════════════════════════════════════════════════
-   SORT BAR — responsive grid layout
+   SORT BAR
    ═══════════════════════════════════════════════════════ */
 .sort-bar {
   display: flex;
@@ -272,7 +272,7 @@
 .view-btn svg { width: 1rem; height: 1rem; stroke-width: 2.5; }
 
 /* ═══════════════════════════════════════════════════════
-   PRODUCT GRID (inventory + pcs pages use CSS grid)
+   PRODUCT GRID
    ═══════════════════════════════════════════════════════ */
 #product-grid,
 #pcs-grid {
@@ -293,7 +293,7 @@
 #product-grid > *, #pcs-grid > * { min-width: 0; max-width: 100%; }
 
 /* ═══════════════════════════════════════════════════════
-   HOME PAGE GRID — uses Bootstrap .row (no side gaps)
+   HOME PAGE GRID
    ═══════════════════════════════════════════════════════ */
 #home-grid {
   --bs-gutter-x: 0.75rem;
@@ -588,7 +588,7 @@
   font-weight: var(--fw-bold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #000000 !important;                       /* was brand green */
+  color: #000000 !important;
   background: var(--brand-primary-soft);
   border-radius: var(--radius-pill);
   margin-bottom: var(--space-2);
@@ -665,7 +665,7 @@
 .product-price-value {
   font-size: var(--fs-lg);
   font-weight: var(--fw-black);
-  color: #000000 !important;                       /* was brand green */
+  color: #000000 !important;
   font-feature-settings: "tnum";
   white-space: nowrap;
 }
@@ -941,6 +941,7 @@
 .product-pill .lucide,
 .product-pill svg { width: 1rem; height: 1rem; color: var(--brand-primary); stroke-width: 2.5; }
 
+/* ── Feature badges (Face Unlock, Fingerprint, etc.) ── */
 .product-features {
   margin-top: var(--space-2);
   padding-top: var(--space-4);
@@ -969,9 +970,9 @@
   padding: var(--space-2) var(--space-3);
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
-  color: var(--brand-primary);
-  background: var(--brand-primary-soft);
-  border: 1px solid rgba(13, 74, 38, 0.15);
+  color: #000000 !important;                    /* black text */
+  background: transparent !important;           /* no green fill */
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-pill);
 }
 .product-feature .lucide,
@@ -979,7 +980,8 @@
   width: 1rem;
   height: 1rem;
   stroke-width: 2.5;
-  color: var(--brand-primary);
+  color: #000000 !important;                    /* black icon */
+  stroke: #000000 !important;
   flex-shrink: 0;
 }
 
@@ -1169,7 +1171,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   LOADING / EMPTY inside a Bootstrap .row (home page)
+   LOADING / EMPTY inside a Bootstrap .row
    ═══════════════════════════════════════════════════════ */
 #featured-grid .product-loading,
 #featured-grid .product-empty {
@@ -1291,7 +1293,6 @@
   }
 }
 
-/* Loading / empty inside the home grid */
 #home-grid .product-loading,
 #home-grid .product-empty {
   grid-column: unset;
@@ -1349,8 +1350,6 @@
 
 /* ═══════════════════════════════════════════════════════
    HOME GRID — mobile view
-   - DEFAULT: 1 card per row (list)
-   - .is-grid: 2 cards per row
    ═══════════════════════════════════════════════════════ */
 @media (max-width: 576px) {
   #home-grid > [class*="col-"] {
