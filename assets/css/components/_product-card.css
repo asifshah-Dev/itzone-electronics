@@ -1,10 +1,9 @@
 /* assets/css/components/_product-card.css
    ─────────────────────────────────────────────────────────
    Product card + detail page.
-   - Laptops / Desktops → object-fit: cover (fills card)
-   - Tiny PCs / Monitors → object-fit: contain (full product)
-   - Hover on card: slow crossfade + subtle zoom + soft darkening
-   - Detail page: horizontal slider between images
+   - All images normalised to 4:3 → object-fit: cover everywhere
+   - No cropping (source is already 4:3), no letterboxing
+   - Uniform grid, full-bleed product images
    ───────────────────────────────────────────────────────── */
 
 /* ═══════════════════════════════════════════════════════
@@ -244,7 +243,7 @@
 .sort-select:focus {
   outline: none;
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(13, 74, 38, 0.15);
+  box-shadow: 0 0 0 3px rgba(141, 198, 63, 0.25);
 }
 .view-toggle {
   display: inline-flex;
@@ -457,7 +456,7 @@
 .product-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
-  border-color: rgba(13, 74, 38, 0.35);
+  border-color: rgba(141, 198, 63, 0.5);
 }
 .product-link {
   display: flex;
@@ -476,6 +475,9 @@
 
 /* ═══════════════════════════════════════════════════════
    PRODUCT CARD IMAGE
+   ─────────────────────────────────────────────────────────
+   All source images normalised to 4:3 → cover fills the box
+   perfectly with no cropping and no letterboxing.
    ═══════════════════════════════════════════════════════ */
 .product-image {
   position: relative;
@@ -489,6 +491,7 @@
 .product-image.product-image--tiny {
   aspect-ratio: 1 / 1;
 }
+
 .product-image img {
   position: absolute;
   inset: 0;
@@ -504,18 +507,15 @@
     opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* 🔑 ALL product types — cover, no padding */
 .product-image.product-image--laptop img,
-.product-image.product-image--desktop img {
-  object-fit: cover;
-  padding: 0;
-}
-.product-image.product-image--tiny img {
-  object-fit: contain;
-  padding: 6%;
-}
+.product-image.product-image--desktop img,
+.product-image.product-image--tiny img,
 .product-image.product-image--monitor img {
-  object-fit: contain;
-  padding: 6%;
+  object-fit: cover;
+  object-position: center;
+  padding: 0;
 }
 
 .product-image .pi-primary {
@@ -541,6 +541,7 @@
 .product-card:hover .product-image::after {
   background: rgba(10, 15, 13, 0.18);
 }
+
 .product-image.has-hover:hover .pi-primary {
   opacity: 0;
   transform: scale(1.06);
@@ -777,7 +778,7 @@
   position: relative;
   aspect-ratio: 4 / 3;
   width: 100%;
-  background: #f1f5f9;
+  background: #ffffff;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-color);
   overflow: hidden;
@@ -850,10 +851,9 @@
 .pd-thumb img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   background: #ffffff;
   display: block;
-  padding: 4px;
 }
 .pd-thumb:hover {
   border-color: var(--brand-primary);
@@ -861,7 +861,7 @@
 }
 .pd-thumb.is-active {
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 2px rgba(13, 74, 38, 0.15);
+  box-shadow: 0 0 0 2px rgba(141, 198, 63, 0.3);
   transform: scale(1.05);
 }
 .pd-thumb:focus-visible {
@@ -970,8 +970,8 @@
   padding: var(--space-2) var(--space-3);
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
-  color: #000000 !important;                    /* black text */
-  background: transparent !important;           /* no green fill */
+  color: #000000 !important;
+  background: transparent !important;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-pill);
 }
@@ -980,7 +980,7 @@
   width: 1rem;
   height: 1rem;
   stroke-width: 2.5;
-  color: #000000 !important;                    /* black icon */
+  color: #000000 !important;
   stroke: #000000 !important;
   flex-shrink: 0;
 }
