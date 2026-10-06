@@ -72,7 +72,7 @@
               '<h3 class="footer-heading">Support</h3>' +
               '<ul class="footer-list">' +
                 '<li><a href="' + r('pages/contact.html') + '">Contact us</a></li>' +
-                '<li><a href="' + r('pages/contact.html') + '#warranty">Warranty</a></li>' +
+                '<li><a href="' + r('pages/warranty.html') + '">Warranty Policy</a></li>' +
                 '<li><a href="' + r('pages/contact.html') + '#delivery">Delivery</a></li>' +
                 '<li><a href="' + r('pages/contact.html') + '#returns">Returns</a></li>' +
               '</ul>' +
@@ -107,7 +107,7 @@
           '<div class="footer-bottom">' +
             '<div class="footer-trust">' +
               '<span class="footer-trust-item">' +
-                '<i data-lucide="shield-check"></i>1-year warranty' +
+                '<i data-lucide="shield-check"></i>30-day performance warranty' +
               '</span>' +
               '<span class="footer-trust-item">' +
                 '<i data-lucide="truck"></i>Nationwide delivery' +

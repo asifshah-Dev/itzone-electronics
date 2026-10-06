@@ -181,3 +181,50 @@
   .footer-brand, .footer-social, .footer-list a { transition: none !important; }
   .footer-brand:hover { transform: none; }
 }
+/* ═══════════════════════════════════════════════════════
+   FOOTER ICONS — white on dark background
+   Overrides the global black-icon rule from base.css
+   ═══════════════════════════════════════════════════════ */
+
+/* All Lucide icons inside the footer → white */
+.site-footer .lucide,
+.site-footer svg.lucide,
+.site-footer svg.lucide *,
+.site-footer svg[data-lucide],
+.site-footer i[data-lucide] svg,
+.site-footer i[data-lucide] svg *,
+.site-footer [class*="lucide-"] {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Social icons inside their circular buttons */
+.footer-social .lucide,
+.footer-social svg,
+.footer-social svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Contact list icons (phone, WhatsApp, map-pin, clock) */
+.footer-contact .lucide,
+.footer-contact svg,
+.footer-contact svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Trust badge icons (shield-check, truck, badge-check) */
+.footer-trust-item .lucide,
+.footer-trust-item svg,
+.footer-trust-item svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* WhatsApp glyph in footer (solid fill) */
+.site-footer svg[fill="currentColor"] {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  stroke: none !important;
+}

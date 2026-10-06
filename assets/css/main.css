@@ -25,7 +25,7 @@
 @import url("components/_404.css");
 @import url("components/_social-sidebar.css");
 @import "components/_intro-splash.css";
-
+@import "components/_warranty.css";
 
 /* 5. Bootstrap overrides — MUST be last */
 @import url("utilities/_overrides.css");
