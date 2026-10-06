@@ -15,6 +15,7 @@
 
   const PHONE_DISPLAY = '03265974741';
   const PHONE_TEL     = 'tel:+923265974741';
+  const WA_NUMBER     = '923265974741';
 
   /* ═══════════════════════════════════════════════════════
      NAV STRUCTURE
@@ -124,6 +125,37 @@
         <path d="M 66 74 L 90 74 L 90 82 L 66 82 Z" fill="url(#itzGreenNav)"/>
       </svg>`;
   }
+
+  /* ═══════════════════════════════════════════════════════
+     ANNOUNCEMENT BAR (above navbar)
+     ═══════════════════════════════════════════════════════ */
+  /* ═══════════════════════════════════════════════════════
+   ANNOUNCEMENT BAR (above navbar)
+   ═══════════════════════════════════════════════════════ */
+function buildAnnounceBar() {
+  const waText = encodeURIComponent("Hi IT Zone, I'd like to order from the new UK import stock.");
+  const bar = document.createElement('div');
+  bar.className = 'announce-bar';
+  bar.setAttribute('role', 'region');
+  bar.setAttribute('aria-label', 'Store announcement');
+  bar.innerHTML = `
+    <div class="announce-bar__inner">
+      <span class="announce-bar__item">Fresh UK Import Stock Just Arrived!</span>
+      <span class="announce-bar__sep">|</span>
+      <span class="announce-bar__item">100% Original &amp; Checked</span>
+      <span class="announce-bar__sep">|</span>
+      <a class="announce-bar__cta"
+         href="https://wa.me/${WA_NUMBER}?text=${waText}"
+         target="_blank" rel="noopener">Order on WhatsApp</a>
+    </div>
+  `;
+  return bar;
+}
+
+function mountAnnounceBar() {
+  if (document.querySelector('.announce-bar')) return;
+  document.body.insertBefore(buildAnnounceBar(), document.body.firstChild);
+}
 
   /* ═══════════════════════════════════════════════════════
      DESKTOP NAV LINKS with nested dropdowns
@@ -238,19 +270,7 @@
     const drawerItems = buildMobileAccordion();
 
     return `
-      <!-- ── Announcement bar ──────────────────────────── -->
-      <div class="announce-bar" role="region" aria-label="Announcement">
-        <div class="announce-bar-track">
-          <span class="announce-bar-item">
-            <span class="announce-bar-dot" aria-hidden="true"></span>
-            Fresh UK Import Stock Just Arrived!
-            <span class="announce-bar-sep" aria-hidden="true">|</span>
-            100% Original &amp; Checked
-            <span class="announce-bar-sep" aria-hidden="true">|</span>
-            Order on WhatsApp
-          </span>
-        </div>
-      </div>
+    
       <nav class="site-nav" aria-label="Primary">
         <div class="nav-container">
 
@@ -529,6 +549,9 @@
      MOUNT
      ═══════════════════════════════════════════════════════ */
   function mount() {
+    /* Announcement bar — sits above the navbar, scrolls away naturally */
+    mountAnnounceBar();
+
     const host = document.querySelector('.site-header');
     if (!host) return;
     if (host.dataset.mounted === 'true') return;

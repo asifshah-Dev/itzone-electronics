@@ -1,48 +1,50 @@
 /* assets/css/tokens.css
    ─────────────────────────────────────────────────────────
    Design tokens — matched to the IT Zone logo.
-   Green arc + red power + gold highlight.
+   Bright grass green + pure red + gold highlight.
    ───────────────────────────────────────────────────────── */
 
 :root {
   /* ── Brand palette (from logo) ─────────────────────── */
-  --itz-green-900: #0a3d1f;    /* deepest — logo shadow green */
-  --itz-green-700: #0d4a26;    /* primary — logo dark green */
-  --itz-green-600: #146b38;    /* mid — logo mid green */
-  --itz-green-500: #1fa050;    /* bright — logo highlight green */
-  --itz-green-100: #e6f4ec;    /* soft tint */
+  --itz-green-900: #4a7a1e;    /* darkest logo green (edge shadow) */
+  --itz-green-700: #6faa2e;    /* dark logo green */
+  --itz-green-600: #7fb832;    /* mid logo green */
+  --itz-green-500: #8dc63f;    /* PRIMARY — logo arc green */
+  --itz-green-400: #a3d956;    /* bright logo green */
+  --itz-green-100: #eef7e0;    /* soft tint */
 
-  --itz-red-900:   #5c0805;
-  --itz-red-700:   #8a0f0a;    /* dark — logo red shadow */
-  --itz-red-500:   #d4281c;    /* primary — logo ZONE red */
-  --itz-red-400:   #e8382a;    /* hover bright */
+  --itz-red-900:   #6b0a10;
+  --itz-red-700:   #a01019;    /* dark red */
+  --itz-red-600:   #c1121f;    /* deep logo red */
+  --itz-red-500:   #ed1c24;    /* PRIMARY — logo ZONE red */
+  --itz-red-400:   #ff2b34;    /* hover bright */
   --itz-red-100:   #fdeceb;
 
-  --itz-gold-600:  #c99512;    /* deep gold */
+  --itz-gold-600:  #c99512;
   --itz-gold-500:  #f5b81c;    /* logo edge glow */
   --itz-gold-100:  #fdf6e0;
 
   /* ── Neutrals ──────────────────────────────────────── */
-  --itz-ink-900:   #0a0f0d;    /* near-black, cool */
+  --itz-ink-900:   #0a0f0d;
   --itz-ink-800:   #1c2622;
   --itz-ink-700:   #334155;
   --itz-ink-500:   #64748b;
   --itz-ink-400:   #94a3b8;
   --itz-ink-200:   #e2e8f0;
   --itz-ink-100:   #f1f5f9;
-  --itz-surface:   #f7faf8;    /* very soft green-tinted off-white */
+  --itz-surface:   #f7faf8;
   --itz-white:     #ffffff;
 
   /* ── Semantic aliases ──────────────────────────────── */
-  --brand-primary:       var(--itz-green-700);
-  --brand-primary-hover: var(--itz-green-900);
+  --brand-primary:       var(--itz-green-500);   /* logo green */
+  --brand-primary-hover: var(--itz-green-700);   /* darker on hover */
   --brand-primary-soft:  var(--itz-green-100);
 
-  --brand-accent:        var(--itz-red-500);
+  --brand-accent:        var(--itz-red-500);     /* logo red */
   --brand-accent-hover:  var(--itz-red-700);
   --brand-accent-soft:   var(--itz-red-100);
 
-  --brand-highlight:     var(--itz-gold-500);  /* used sparingly */
+  --brand-highlight:     var(--itz-gold-500);
 
   --text-primary:   var(--itz-ink-900);
   --text-secondary: var(--itz-ink-700);
@@ -112,8 +114,8 @@
                0 2px 6px rgba(10, 15, 13, 0.05);
   --shadow-lg: 0 24px 48px -16px rgba(10, 15, 13, 0.2),
                0 8px 16px -8px rgba(10, 15, 13, 0.08);
-  --shadow-brand: 0 8px 20px -6px rgba(13, 74, 38, 0.35);
-  --shadow-accent: 0 8px 20px -6px rgba(212, 40, 28, 0.35);
+  --shadow-brand:  0 8px 20px -6px rgba(141, 198, 63, 0.45);
+  --shadow-accent: 0 8px 20px -6px rgba(237, 28, 36, 0.4);
 
   /* ── Layout ────────────────────────────────────────── */
   --container-max: 1240px;
@@ -121,6 +123,7 @@
   --header-height: 104px;
 
   /* ── Motion ────────────────────────────────────────── */
+  --ease:        cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-fast:    120ms;
@@ -135,16 +138,26 @@
   --z-toast:    1080;
 
   /* ── Focus ring ────────────────────────────────────── */
-  --focus-ring:        0 0 0 3px rgba(13, 74, 38, 0.35);
-  --focus-ring-accent: 0 0 0 3px rgba(212, 40, 28, 0.35);
+  --focus-ring:        0 0 0 3px rgba(141, 198, 63, 0.45);
+  --focus-ring-accent: 0 0 0 3px rgba(237, 28, 36, 0.4);
+
+  /* ── Legacy aliases (kept so nothing breaks) ───────── */
+  --brand-700:      var(--itz-green-700);
+  --brand-600:      var(--itz-green-600);
+  --brand-bright:   var(--itz-green-500);
+  --brand-soft:     var(--itz-green-100);
+  --accent:         var(--itz-red-500);
+  --accent-hover:   var(--itz-red-700);
+  --accent-bright:  var(--itz-red-400);
+  --gold:           var(--itz-gold-500);
 }
 
 /* ── Bootstrap theme mapping ─────────────────────────── */
 :root {
   --bs-primary:        var(--brand-primary);
-  --bs-primary-rgb:    13, 74, 38;
+  --bs-primary-rgb:    141, 198, 63;      /* #8dc63f */
   --bs-danger:         var(--brand-accent);
-  --bs-danger-rgb:     212, 40, 28;
+  --bs-danger-rgb:     237, 28, 36;       /* #ed1c24 */
 
   --bs-body-font-family: var(--font-sans);
   --bs-body-font-size:   var(--fs-base);
