@@ -1,12 +1,9 @@
 // assets/js/components/Navbar.js
 /* ─────────────────────────────────────────────────────────
    Navbar — single-row design.
-   Left:  Logo
-   Center: Nav links (Laptops ▾, PCs ▾, Monitors, Accessories, Contact)
-   Right:  Search / Call / Menu
-   Mobile: Logo | Search icon | Menu icon + slide-in drawer with
-           accordion-style collapsible groups.
-   ───────────────────────────────────────────────────────── */
+   Announcement bar injected above navbar.
+   Laptops dropdown grouped by brand → SERIES only.
+   ═════════════════════════════════════════════════════════ */
 
 (function () {
   'use strict';
@@ -20,69 +17,28 @@
   /* ═══════════════════════════════════════════════════════
      NAV STRUCTURE
      ═══════════════════════════════════════════════════════ */
-  const NAV_STRUCTURE = [
-    {
-      label: 'Laptops',
-      href: 'pages/inventory.html',
-      children: [
-        {
-          label: 'HP',
-          href: 'pages/inventory.html?brand=hp',
-          children: [
-            { label: 'Pavilion',  href: 'pages/inventory.html?brand=hp&model=pavilion' },
-            { label: 'EliteBook', href: 'pages/inventory.html?brand=hp&model=elitebook' },
-            { label: 'ProBook',   href: 'pages/inventory.html?brand=hp&model=probook' },
-            { label: 'ZBook',     href: 'pages/inventory.html?brand=hp&model=zbook' }
-          ]
-        },
-        {
-          label: 'Dell',
-          href: 'pages/inventory.html?brand=dell',
-          children: [
-            { label: 'Latitude', href: 'pages/inventory.html?brand=dell&model=latitude' },
-            { label: 'Inspiron', href: 'pages/inventory.html?brand=dell&model=inspiron' },
-            { label: 'Vostro',   href: 'pages/inventory.html?brand=dell&model=vostro' }
-          ]
-        },
-        {
-          label: 'Lenovo',
-          href: 'pages/inventory.html?brand=lenovo',
-          children: [
-            { label: 'ThinkPad', href: 'pages/inventory.html?brand=lenovo&model=thinkpad' },
-            { label: 'IdeaPad',  href: 'pages/inventory.html?brand=lenovo&model=ideapad' }
-          ]
-        },
-        {
-          label: 'Apple',
-          href: 'pages/inventory.html?brand=apple',
-          children: [
-            { label: 'MacBook Air', href: 'pages/inventory.html?brand=apple&model=macbook-air' },
-            { label: 'MacBook Pro', href: 'pages/inventory.html?brand=apple&model=macbook-pro' }
-          ]
-        },
-        {
-          label: 'Microsoft',
-          href: 'pages/inventory.html?brand=microsoft',
-          children: [
-            { label: 'Surface',        href: 'pages/inventory.html?brand=microsoft&model=surface' },
-            { label: 'Surface Laptop', href: 'pages/inventory.html?brand=microsoft&model=surface-laptop' },
-            { label: 'Surface Book',   href: 'pages/inventory.html?brand=microsoft&model=surface-book' }
-          ]
-        }
-      ]
-    },
-    {
-      label: 'PCs',
-      href: 'pages/pcs.html',
-      children: [
-        { label: 'Desktops', href: 'pages/pcs.html#desktops' },
-        { label: 'Tiny PCs', href: 'pages/pcs.html#tiny' }
-      ]
-    },
-    { label: 'Monitors',    href: 'pages/pcs.html#monitors' },
-    { label: 'Accessories', href: 'pages/inventory.html?tag=accessories' },
-    { label: 'Contact',     href: 'pages/contact.html' }
-  ];
+  function staticNav() {
+    return [
+      {
+        key: 'laptops',
+        label: 'Laptops',
+        href: 'pages/inventory.html',
+        children: []
+      },
+      {
+        key: 'pcs',
+        label: 'PCs',
+        href: 'pages/pcs.html',
+        children: [
+          { label: 'Desktops', href: 'pages/pcs.html#desktops' },
+          { label: 'Tiny PCs', href: 'pages/pcs.html#tiny' },
+          { label: 'Monitors', href: 'pages/pcs.html#monitors' }
+        ]
+      },
+      { label: 'Accessories', href: 'pages/inventory.html?tag=accessories' },
+      { label: 'Contact',     href: 'pages/contact.html' }
+    ];
+  }
 
   /* ═══════════════════════════════════════════════════════
      HELPERS
@@ -95,6 +51,49 @@
     if (/^https?:|^tel:|^mailto:/.test(href)) return href;
     if (isInPagesDir()) return href.startsWith('pages/') ? href.replace('pages/', '') : `../${href}`;
     return href;
+  }
+
+  function slug(s) {
+    return String(s || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     SERIES EXTRACTION
+     ═══════════════════════════════════════════════════════ */
+  function seriesOf(modelRaw) {
+    const m = String(modelRaw || '').trim();
+    if (!m) return '';
+    const upper = m.toUpperCase();
+
+    // ── DELL ────────────────────────────────────────────
+    if (/\bLATITUDE\b/.test(upper))  return 'Latitude';
+    if (/\bVOSTRO\b/.test(upper))    return 'Vostro';
+    if (/\bINSPIRON\b/.test(upper))  return 'Inspiron';
+    if (/\bXPS\b/.test(upper))       return 'XPS';
+    if (/\bPRECISION\b/.test(upper)) return 'Precision';
+
+    // ── HP ──────────────────────────────────────────────
+    if (/\bZ\s*BOOK\s*FIREFLY\b|\bZBOOK\s*FIREFLY\b/.test(upper)) return 'ZBook Firefly';
+    if (/\bZ\s*BOOK\b|\bZBOOK\b/.test(upper))                     return 'ZBook';
+    if (/\bELITEBOOK\b/.test(upper)) return 'EliteBook';
+    if (/\bPROBOOK\b/.test(upper))   return 'ProBook';
+    if (/\bPAVILION\b/.test(upper))  return 'Pavilion';
+    if (/^250\b/.test(upper))        return 'HP 250 Series';
+    if (/^445\b/.test(upper))        return 'HP 445 Series';
+
+    // ── LENOVO ──────────────────────────────────────────
+    if (/^(T|X|L|E|P|W|S)\d{2,4}\b/.test(upper)) return 'ThinkPad';
+    if (/\bTHINKPAD\b/.test(upper))              return 'ThinkPad';
+    if (/\bIDEAPAD\b/.test(upper))               return 'IdeaPad';
+    if (/\bLEGION\b/.test(upper))                return 'Legion';
+    if (/\bYOGA\b/.test(upper))                  return 'Yoga';
+
+    const fallback = m.replace(/[\s\-]*\d.*$/, '').trim();
+    return fallback || m;
   }
 
   function whatsappSvg(size) {
@@ -111,10 +110,10 @@
       <svg class="${cls || 'nav-logo'}" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
         <defs>
           <linearGradient id="itzGreenNav" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#0d4a26"/><stop offset="100%" stop-color="#1fa050"/>
+            <stop offset="0%" stop-color="#6faa2e"/><stop offset="100%" stop-color="#8dc63f"/>
           </linearGradient>
           <linearGradient id="itzRedNav" x1="60" y1="15" x2="60" y2="65" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#e8382a"/><stop offset="100%" stop-color="#8a0f0a"/>
+            <stop offset="0%" stop-color="#ed1c24"/><stop offset="100%" stop-color="#a01019"/>
           </linearGradient>
         </defs>
         <path d="M 22 40 A 48 48 0 1 0 98 40" stroke="url(#itzGreenNav)" stroke-width="9" stroke-linecap="round" fill="none"/>
@@ -127,41 +126,94 @@
   }
 
   /* ═══════════════════════════════════════════════════════
-     ANNOUNCEMENT BAR (above navbar)
+     ANNOUNCEMENT BAR — injected above navbar
      ═══════════════════════════════════════════════════════ */
-  /* ═══════════════════════════════════════════════════════
-   ANNOUNCEMENT BAR (above navbar)
-   ═══════════════════════════════════════════════════════ */
-function buildAnnounceBar() {
-  const waText = encodeURIComponent("Hi IT Zone, I'd like to order from the new UK import stock.");
-  const bar = document.createElement('div');
-  bar.className = 'announce-bar';
-  bar.setAttribute('role', 'region');
-  bar.setAttribute('aria-label', 'Store announcement');
-  bar.innerHTML = `
-    <div class="announce-bar__inner">
-      <span class="announce-bar__item">Fresh UK Import Stock Just Arrived!</span>
-      <span class="announce-bar__sep">|</span>
-      <span class="announce-bar__item">100% Original &amp; Checked</span>
-      <span class="announce-bar__sep">|</span>
-      <a class="announce-bar__cta"
-         href="https://wa.me/${WA_NUMBER}?text=${waText}"
-         target="_blank" rel="noopener">Order on WhatsApp</a>
-    </div>
-  `;
-  return bar;
-}
+  function buildAnnounceBar() {
+    const waText = encodeURIComponent("Hi IT Zone, I'd like to order from the new UK import stock.");
+    const bar = document.createElement('div');
+    bar.className = 'announce-bar';
+    bar.setAttribute('role', 'region');
+    bar.setAttribute('aria-label', 'Store announcement');
+    bar.innerHTML = `
+      <div class="announce-bar__inner">
+        <span class="announce-bar__item">Fresh UK Import Stock Just Arrived!</span>
+        <span class="announce-bar__sep">|</span>
+        <span class="announce-bar__item">100% Original &amp; Checked</span>
+        <span class="announce-bar__sep">|</span>
+        <a class="announce-bar__cta"
+           href="https://wa.me/${WA_NUMBER}?text=${waText}"
+           target="_blank" rel="noopener">Order on WhatsApp</a>
+      </div>
+    `;
+    return bar;
+  }
 
-function mountAnnounceBar() {
-  if (document.querySelector('.announce-bar')) return;
-  document.body.insertBefore(buildAnnounceBar(), document.body.firstChild);
-}
+  function mountAnnounceBar() {
+    if (document.querySelector('.announce-bar')) return;
+    document.body.insertBefore(buildAnnounceBar(), document.body.firstChild);
+  }
 
   /* ═══════════════════════════════════════════════════════
-     DESKTOP NAV LINKS with nested dropdowns
+     DYNAMIC NAV — built from JSON
      ═══════════════════════════════════════════════════════ */
-  function buildDesktopNav() {
-    return NAV_STRUCTURE.map(function (item) {
+  function loadData() {
+    const laptopsUrl = r('data/laptops.json');
+    const pcsUrl     = r('data/pcs.json');
+
+    return Promise.all([
+      fetch(laptopsUrl).then(x => x.ok ? x.json() : []).catch(() => []),
+      fetch(pcsUrl).then(x => x.ok ? x.json() : {}).catch(() => ({}))
+    ]).then(([laptops, pcs]) => ({ laptops, pcs }));
+  }
+
+  function buildLaptopTree(laptops) {
+    const byBrand = new Map();
+
+    laptops.forEach(item => {
+      const brandKey = String(item.brand || '').toUpperCase();
+      if (!brandKey) return;
+
+      if (!byBrand.has(brandKey)) {
+        byBrand.set(brandKey, {
+          label: brandKey,
+          href: 'pages/inventory.html?brand=' + slug(brandKey),
+          seriesSet: new Set()
+        });
+      }
+      const brandObj = byBrand.get(brandKey);
+
+      const seriesName = seriesOf(item.model);
+      if (seriesName) brandObj.seriesSet.add(seriesName);
+    });
+
+    const brands = Array.from(byBrand.values()).sort((a, b) => a.label.localeCompare(b.label));
+    brands.forEach(b => {
+      b.children = Array.from(b.seriesSet)
+        .sort((a, b2) => a.localeCompare(b2))
+        .map(name => ({
+          label: name,
+          href: 'pages/inventory.html?brand=' + slug(b.label) + '&series=' + slug(name)
+        }));
+      delete b.seriesSet;
+    });
+
+    return brands;
+  }
+
+  function buildNavStructure(data) {
+    const nav = staticNav();
+    const laptopsNode = nav.find(n => n.key === 'laptops');
+    if (laptopsNode) {
+      laptopsNode.children = buildLaptopTree(data.laptops || []);
+    }
+    return nav;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     DESKTOP NAV
+     ═══════════════════════════════════════════════════════ */
+  function buildDesktopNav(nav) {
+    return nav.map(function (item) {
 
       if (!item.children || !item.children.length) {
         return '<li><a class="nav-item" href="' + r(item.href) + '">' + item.label + '</a></li>';
@@ -201,10 +253,10 @@ function mountAnnounceBar() {
   }
 
   /* ═══════════════════════════════════════════════════════
-     MOBILE ACCORDION — nested collapsible groups
+     MOBILE ACCORDION
      ═══════════════════════════════════════════════════════ */
-  function buildMobileAccordion() {
-    return NAV_STRUCTURE.map(function (item, idx) {
+  function buildMobileAccordion(nav) {
+    return nav.map(function (item, idx) {
       const hasChildren = item.children && item.children.length;
       const id = 'mob-group-' + idx;
 
@@ -264,28 +316,24 @@ function mountAnnounceBar() {
   /* ═══════════════════════════════════════════════════════
      TEMPLATE
      ═══════════════════════════════════════════════════════ */
-  function template() {
+  function template(nav) {
     const logoSrc = r('assets/img/logo.png');
-    const desktopNav = buildDesktopNav();
-    const drawerItems = buildMobileAccordion();
+    const desktopNav = buildDesktopNav(nav);
+    const drawerItems = buildMobileAccordion(nav);
 
     return `
-    
       <nav class="site-nav" aria-label="Primary">
         <div class="nav-container">
 
-          <!-- LEFT: Logo -->
           <a class="nav-brand" href="${r('index.html')}" aria-label="IT Zone Electronics \u2014 Home">
             <img class="nav-logo" src="${logoSrc}" alt="IT Zone Electronics"
                  decoding="async" fetchpriority="high">
           </a>
 
-          <!-- CENTER: Nav links -->
           <ul class="nav-list" id="desktop-nav">
             ${desktopNav}
           </ul>
 
-          <!-- RIGHT: Search / Call / Menu -->
           <div class="nav-end">
             <button type="button" class="nav-icon-btn" id="nav-search-toggle"
                     aria-label="Search" aria-expanded="false" aria-controls="nav-search-panel">
@@ -309,7 +357,6 @@ function mountAnnounceBar() {
 
         </div>
 
-        <!-- Search panel (drops below navbar) -->
         <div class="nav-search-panel" id="nav-search-panel" aria-hidden="true">
           <form class="nav-search-form" role="search" onsubmit="return false;">
             <i data-lucide="search" class="nav-search-icon"></i>
@@ -322,7 +369,6 @@ function mountAnnounceBar() {
         </div>
       </nav>
 
-      <!-- Mobile drawer -->
       <aside class="mobile-drawer" id="mobile-drawer" aria-hidden="true" aria-label="Menu">
         <header class="mobile-drawer-head">
           <a class="mobile-drawer-brand" href="${r('index.html')}" aria-label="Home">
@@ -351,9 +397,6 @@ function mountAnnounceBar() {
     `;
   }
 
-  /* ═══════════════════════════════════════════════════════
-     LOGO FALLBACK
-     ═══════════════════════════════════════════════════════ */
   function attachLogoFallback(root) {
     root.querySelectorAll('img.nav-logo, img.mobile-drawer-logo').forEach(function (img) {
       img.addEventListener('error', function () {
@@ -365,9 +408,6 @@ function mountAnnounceBar() {
     });
   }
 
-  /* ═══════════════════════════════════════════════════════
-     WIRE
-     ═══════════════════════════════════════════════════════ */
   function wire(root) {
     const searchToggle = root.querySelector('#nav-search-toggle');
     const searchPanel  = root.querySelector('#nav-search-panel');
@@ -381,7 +421,6 @@ function mountAnnounceBar() {
 
     const lockScroll = function (on) { document.documentElement.style.overflow = on ? 'hidden' : ''; };
 
-    /* ── Desktop dropdowns ─────────────────────────────── */
     function closeAllDropdowns() {
       root.querySelectorAll('.nav-dropdown.is-open').forEach(function (dd) {
         dd.classList.remove('is-open');
@@ -413,7 +452,6 @@ function mountAnnounceBar() {
       if (e.key === 'Escape') closeAllDropdowns();
     });
 
-    /* ── Search panel ──────────────────────────────────── */
     function openSearch() {
       closeAllDropdowns();
       searchPanel.classList.add('is-open');
@@ -450,7 +488,6 @@ function mountAnnounceBar() {
       }
     });
 
-    /* Search submit */
     if (searchInput) {
       searchInput.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter') return;
@@ -461,14 +498,12 @@ function mountAnnounceBar() {
       });
     }
 
-    /* ── Mobile drawer ─────────────────────────────────── */
     if (menuToggle && drawer && drawerBack) {
       const setIcon = function (el, name) {
         el.innerHTML = '<i data-lucide="' + name + '"></i>';
         NS.renderIcons?.(el);
       };
 
-      /* Accordion toggle behavior */
       drawer.querySelectorAll('.mob-link--toggle, .mob-sublink--toggle').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.preventDefault();
@@ -478,7 +513,6 @@ function mountAnnounceBar() {
 
           const isOpen = btn.getAttribute('aria-expanded') === 'true';
 
-          /* Close siblings at the same level */
           const parentList = btn.closest('ul');
           if (parentList) {
             const selector = ':scope > li > .mob-link--toggle[aria-expanded="true"], ' +
@@ -532,7 +566,6 @@ function mountAnnounceBar() {
         }
       });
 
-      /* Auto-close on resize to desktop */
       const mq = window.matchMedia('(min-width: 992px)');
       const mqHandler = function (e) {
         if (e.matches) {
@@ -549,7 +582,7 @@ function mountAnnounceBar() {
      MOUNT
      ═══════════════════════════════════════════════════════ */
   function mount() {
-    /* Announcement bar — sits above the navbar, scrolls away naturally */
+    // Inject the announcement bar above everything
     mountAnnounceBar();
 
     const host = document.querySelector('.site-header');
@@ -557,10 +590,21 @@ function mountAnnounceBar() {
     if (host.dataset.mounted === 'true') return;
     host.dataset.mounted = 'true';
 
-    host.innerHTML = template();
+    const skeletonNav = staticNav();
+    host.innerHTML = template(skeletonNav);
     attachLogoFallback(host);
     wire(host);
     NS.renderIcons?.(host);
+
+    loadData().then(function (data) {
+      const nav = buildNavStructure(data);
+      host.innerHTML = template(nav);
+      attachLogoFallback(host);
+      wire(host);
+      NS.renderIcons?.(host);
+    }).catch(function (err) {
+      console.warn('[IT Zone] Navbar: dynamic nav failed.', err);
+    });
   }
 
   NS.Navbar = { mount: mount };
