@@ -1,11 +1,8 @@
 /* assets/css/components/_intro-splash.css
    ─────────────────────────────────────────────────────────
-   Intro splash — LAG-FREE version.
-   What was cut:
-   - filter: blur() on aurora  →  replaced with pre-baked gradients
-   - filter: blur on text bloom →  removed
-   - backface-visibility / contain on tiny elements →  removed
-   - Only 3 GPU-friendly animations: opacity, translate3d, scale
+   Intro splash — LAG-FREE version, matched to IT Zone logo.
+   Palette: logo green #8dc63f · logo red #ed1c24
+   GPU-friendly: opacity, translate3d, scale only. No blur filters.
    ───────────────────────────────────────────────────────── */
 
 /* ═══════════════════════════════════════════════════════
@@ -36,9 +33,8 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   BACKGROUND GLOW — NO blur filter.
-   Pre-baked soft radial gradients look identical
-   but cost nothing at runtime.
+   BACKGROUND GLOW — pre-baked gradients (no blur filter)
+   Logo green · logo red · logo green
    ═══════════════════════════════════════════════════════ */
 .aurora {
   position: absolute;
@@ -46,21 +42,19 @@
   pointer-events: none;
   z-index: 1;
 
-  /* No blur, no filter — just a static soft background */
   background:
     radial-gradient(ellipse 55% 55% at 15% 20%,
-      rgba(122, 184, 0, 0.18) 0%,
-      rgba(122, 184, 0, 0) 65%),
+      rgba(141, 198, 63, 0.22) 0%,
+      rgba(141, 198, 63, 0) 65%),
     radial-gradient(ellipse 50% 50% at 85% 80%,
-      rgba(230, 0, 0, 0.10) 0%,
-      rgba(230, 0, 0, 0) 65%),
+      rgba(237, 28, 36, 0.12) 0%,
+      rgba(237, 28, 36, 0) 65%),
     radial-gradient(ellipse 45% 45% at 70% 40%,
-      rgba(31, 160, 80, 0.12) 0%,
-      rgba(31, 160, 80, 0) 65%);
+      rgba(141, 198, 63, 0.15) 0%,
+      rgba(141, 198, 63, 0) 65%);
 }
 
-/* Individual streak elements aren't used anymore, but
-   keep this rule so the markup doesn't break. */
+/* Kept for markup compatibility */
 .aurora__streak { display: none; }
 
 /* ═══════════════════════════════════════════════════════
@@ -87,12 +81,12 @@
 .orbit__ring--inner {
   width: min(52vw, 640px);
   height: min(52vw, 640px);
-  border: 1px solid rgba(10, 15, 13, 0.1);
+  border: 1px solid rgba(141, 198, 63, 0.18);
 }
 .orbit__ring--outer {
   width: min(78vw, 980px);
   height: min(78vw, 960px);
-  border: 1px solid rgba(10, 15, 13, 0.06);
+  border: 1px solid rgba(141, 198, 63, 0.1);
 }
 
 .orbit__icons { position: absolute; inset: 0; }
@@ -123,7 +117,7 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  border: 1.5px solid rgba(10, 15, 13, 0.1);
+  border: 1.5px solid rgba(141, 198, 63, 0.25);
   color: #0a0f0d;
 
   /* Single flat shadow — cheap */
@@ -149,7 +143,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   CENTER TEXT — no jiggle, no blur
+   CENTER TEXT — logo palette
    ═══════════════════════════════════════════════════════ */
 .intro-text {
   position: relative;
@@ -188,30 +182,30 @@
   transform: translate3d(0, 10px, 0);
 }
 
-/* "IT" */
+/* "IT" — logo green */
 .intro-text__word--it {
-  color: #0d4a26;
+  color: #8dc63f;
   font-size: clamp(4rem, 14vw, 11rem);
   animation: wordSlideUp 400ms ease-out 60ms both;
 }
 
-/* "ZONE" */
+/* "ZONE" — logo red */
 .intro-text__word--zone {
-  color: #E60000;
+  color: #ed1c24;
   font-size: clamp(4rem, 14vw, 11rem);
-  text-shadow: 0 0 22px rgba(230, 0, 0, 0.2);
+  text-shadow: 0 0 22px rgba(237, 28, 36, 0.25);
   animation: wordSlideUp 400ms ease-out 180ms both;
 }
 
-/* "ELECTRONICS" */
+/* "ELECTRONICS" — logo green */
 .intro-text__word--elec {
-  color: #7AB800;
+  color: #8dc63f;
   font-size: clamp(0.85rem, 2.2vw, 1.8rem);
   font-weight: 800;
   letter-spacing: 0.42em;
   text-transform: uppercase;
   padding-left: 0.42em;
-  text-shadow: 0 0 12px rgba(122, 184, 0, 0.35);
+  text-shadow: 0 0 12px rgba(141, 198, 63, 0.4);
   animation: wordSlideUp 400ms ease-out 300ms both;
 }
 
@@ -243,7 +237,9 @@
   }
 }
 
-/* Reduced motion */
+/* ═══════════════════════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   .intro-splash { display: none !important; }
 }
