@@ -60,16 +60,6 @@
 
 /* ═══════════════════════════════════════════════════════
    2. CONTAINER — the missing link
-
-   Bootstrap's `.container` only sets `width` inside media
-   queries. Below 576px it has NO width, so it inherits from
-   its parent block context. If any parent constrains width,
-   the container collapses.
-
-   We fix this by declaring `width: 100%` unconditionally,
-   then letting Bootstrap's responsive max-widths take over
-   for larger viewports. We only override at the top end
-   (xxl → 1240px).
    ═══════════════════════════════════════════════════════ */
 .container,
 .container-fluid,
@@ -149,4 +139,108 @@ a:hover { text-decoration: none; }
   --bs-navbar-brand-hover-color: var(--brand-primary);
   --bs-navbar-toggler-border-color: var(--border-color);
   --bs-navbar-toggler-focus-width: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   8. MOBILE NAV ICONS — search + menu must be LARGE
+   This block overrides the earlier small-icon rules.
+   Documented exception for !important (cascade battle).
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 991.98px) {
+  /* Buttons: 56px circle */
+  .site-nav .nav-icon-btn,
+  .site-nav .nav-menu-btn,
+  .nav-icon-btn,
+  .nav-menu-btn {
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    padding: 0 !important;
+  }
+
+  /* Icons inside those buttons: 28px */
+  .site-nav .nav-icon-btn .lucide,
+  .site-nav .nav-icon-btn svg,
+  .site-nav .nav-menu-btn .lucide,
+  .site-nav .nav-menu-btn svg,
+  .nav-icon-btn .lucide,
+  .nav-icon-btn svg,
+  .nav-menu-btn .lucide,
+  .nav-menu-btn svg {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    stroke-width: 2.4 !important;
+    display: block !important;
+  }
+
+  /* Give the right side a bit more breathing room */
+  .site-nav .nav-end {
+    gap: 0.65rem;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Buttons: 52px circle */
+  .site-nav .nav-icon-btn,
+  .site-nav .nav-menu-btn,
+  .nav-icon-btn,
+  .nav-menu-btn {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+  }
+
+  /* Icons inside: 26px */
+  .site-nav .nav-icon-btn .lucide,
+  .site-nav .nav-icon-btn svg,
+  .site-nav .nav-menu-btn .lucide,
+  .site-nav .nav-menu-btn svg,
+  .nav-icon-btn .lucide,
+  .nav-icon-btn svg,
+  .nav-menu-btn .lucide,
+  .nav-menu-btn svg {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    stroke-width: 2.4 !important;
+  }
+
+  .site-nav .nav-end {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Buttons: 46px circle */
+  .site-nav .nav-icon-btn,
+  .site-nav .nav-menu-btn,
+  .nav-icon-btn,
+  .nav-menu-btn {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    min-height: 46px !important;
+  }
+
+  /* Icons inside: 22px */
+  .site-nav .nav-icon-btn .lucide,
+  .site-nav .nav-icon-btn svg,
+  .site-nav .nav-menu-btn .lucide,
+  .site-nav .nav-menu-btn svg,
+  .nav-icon-btn .lucide,
+  .nav-icon-btn svg,
+  .nav-menu-btn .lucide,
+  .nav-menu-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    stroke-width: 2.4 !important;
+  }
 }
