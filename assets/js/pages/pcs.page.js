@@ -2,6 +2,8 @@
 /* ─────────────────────────────────────────────────────────
    PCs & Monitors page.
    Category tabs + sort + view (persisted).
+   Reads ?cat= query param AND #hash (e.g. #desktops, #tiny, #monitors)
+   so navbar links land on the right tab.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -15,6 +17,16 @@
     { id: 'monitor',  label: 'Monitors' },
   ];
 
+  /* Map URL hash → category id */
+  const HASH_TO_CAT = {
+    '#desktops': 'desktop',
+    '#desktop':  'desktop',
+    '#tiny':     'tiny',
+    '#tiny-pcs': 'tiny',
+    '#monitors': 'monitor',
+    '#monitor':  'monitor',
+  };
+
   let allItems = [];
 
   function flatten(data) {
@@ -27,8 +39,13 @@
 
   function readParams() {
     const p = new URLSearchParams(window.location.search);
+
+    /* Priority: #hash → ?cat= → 'all' */
+    const hashCat = HASH_TO_CAT[String(window.location.hash || '').toLowerCase()] || '';
+    const cat = hashCat || (p.get('cat') || 'all').trim();
+
     return {
-      cat:  (p.get('cat')  || 'all').trim(),
+      cat:  cat,
       sort: (p.get('sort') || '').trim(),
       view: (p.get('view') || '').trim(),
     };
@@ -36,7 +53,7 @@
 
   function writeParams(params) {
     const url = new URL(window.location.href);
-    if (params.cat  && params.cat  !== 'all')      url.searchParams.set('cat', params.cat);
+    if (params.cat && params.cat !== 'all')        url.searchParams.set('cat', params.cat);
     else                                            url.searchParams.delete('cat');
     if (params.sort && params.sort !== 'featured') url.searchParams.set('sort', params.sort);
     else                                            url.searchParams.delete('sort');
@@ -56,13 +73,24 @@
     }
   }
 
-  function updateCount(visible, total) {
+  function updateCount(visible, total, category) {
     const el = document.getElementById('pcs-count');
-    if (el) {
-      el.textContent = visible === total
-        ? total + ' items \u00b7 desktops, tiny PCs, monitors'
-        : visible + ' of ' + total + ' items shown';
+    if (!el) return;
+
+    const labelMap = {
+      'all':     'desktops, tiny PCs, monitors',
+      'desktop': 'desktops',
+      'tiny':    'tiny PCs',
+      'monitor': 'monitors',
+    };
+    const label = labelMap[category] || 'items';
+
+    if (visible === total && category === 'all') {
+      el.textContent = total + ' items \u00b7 ' + label;
+    } else {
+      el.textContent = visible + ' ' + label + ' shown';
     }
+
     if (NS.SortBar && typeof NS.SortBar.setCount === 'function') {
       NS.SortBar.setCount(visible);
     }
@@ -87,6 +115,16 @@
       btn.classList.add('is-active');
       btn.setAttribute('aria-pressed', 'true');
       onChange(btn.dataset.filter);
+    });
+  }
+
+  /* Update the tab UI without re-binding listeners */
+  function setActiveTab(host, category) {
+    if (!host) return;
+    host.querySelectorAll('.filter-btn').forEach(function (b) {
+      const active = b.dataset.filter === category;
+      b.classList.toggle('is-active', active);
+      b.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
   }
 
@@ -128,7 +166,7 @@
       ? NS.SortBar.getStoredSort() : 'featured';
 
     const state = {
-      category: urlState.cat,
+      category: urlState.cat || 'all',
       sort: urlState.sort || storedSort || 'featured',
       view: urlState.view || storedView || 'grid',
     };
@@ -143,7 +181,7 @@
       const sorted = applySort(filtered, state.sort);
 
       grid.render(sorted);
-      updateCount(sorted.length, allItems.length);
+      updateCount(sorted.length, allItems.length, state.category);
       gridHost.classList.toggle('is-list', state.view === 'list');
       writeParams(state);
     }
@@ -156,13 +194,23 @@
     }
 
     if (sortHost && NS.SortBar && typeof NS.SortBar.mount === 'function') {
-  NS.SortBar.mount(sortHost, { initialView: state.view });
+      NS.SortBar.mount(sortHost, { initialView: state.view });
       document.addEventListener('sort:change', function (e) { state.sort = e.detail.sort; render(); });
       document.addEventListener('view:change', function (e) { state.view = e.detail.view; render(); });
     }
 
+    /* Listen for hash changes (e.g. navbar link while already on this page) */
+    window.addEventListener('hashchange', function () {
+      const cat = HASH_TO_CAT[String(window.location.hash || '').toLowerCase()];
+      if (cat) {
+        state.category = cat;
+        setActiveTab(tabsHost, cat);
+        render();
+      }
+    });
+
     render();
-    console.info('[IT Zone] Loaded ' + allItems.length + ' PCs & monitors. View:', state.view);
+    console.info('[IT Zone] Loaded ' + allItems.length + ' PCs & monitors. Category:', state.category);
   }
 
   NS.pcsPage = { init: init };

@@ -270,11 +270,7 @@
             '<i data-lucide="phone"></i><span>Call ' + PHONE_DISPLAY + '</span>' +
           '</a>' +
         '</div>' +
-        '<ul class="product-detail-trust">' +
-          '<li><i data-lucide="shield-check"></i><span>1-year warranty</span></li>' +
-          '<li><i data-lucide="truck"></i><span>Nationwide delivery</span></li>' +
-          '<li><i data-lucide="badge-check"></i><span>Tested before shipping</span></li>' +
-        '</ul>' +
+       
       '</div>';
     fragment.appendChild(grid);
 
