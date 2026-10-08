@@ -82,7 +82,7 @@
 
           <p class="hero-subtitle">
             Dell &middot; HP &middot; Lenovo — meticulously tested, business-grade
-            machines at fair prices. Karachi-based, nationwide delivery.
+            machines at fair prices. Lahore-based, nationwide delivery.
           </p>
 
           <div class="hero-ctas">
