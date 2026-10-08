@@ -2,7 +2,8 @@
 /* ─────────────────────────────────────────────────────────
    Product detail page.
    Shows image gallery (3 images + thumbnails),
-   full spec table, and a features badges section.
+   full spec table, features badges section,
+   and a Warranty Policy modal trigger button.
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -91,7 +92,6 @@
       .slice(0, 4);
   }
 
-  /* ✅ Get all images (array or single) */
   function imagesOf(item) {
     if (Array.isArray(item.images) && item.images.length) {
       return item.images.map(r);
@@ -100,7 +100,6 @@
     return [];
   }
 
-  /* ✅ Gallery — horizontal slider with thumbnails */
   function imageGallery(item) {
     const imgs = imagesOf(item);
     const icon = item.resolution ? 'monitor'
@@ -111,7 +110,6 @@
       return '<div class="product-detail-image"><i data-lucide="' + icon + '"></i></div>';
     }
 
-    /* All images side by side in a horizontal track */
     const slides = imgs.map(function (src, i) {
       return '<div class="pd-slide" data-index="' + i + '">' +
         '<img src="' + esc(src) + '" alt="' +
@@ -157,7 +155,7 @@
     if (item.size)       rows.push(['Size', item.size]);
     if (item.extras)     rows.push(['Notes', item.extras]);
     rows.push(['Condition', 'Certified refurbished \u00b7 Tested']);
-    rows.push(['Warranty', '1 year']);
+    rows.push(['Warranty', '30-day technical performance warranty']);
     rows.push(['Delivery', 'Nationwide (2\u20134 business days)']);
 
     return rows.map(function (row) {
@@ -185,7 +183,6 @@
     }).join('');
   }
 
-  /* ✅ Feature badges with icons */
   function featureBadges(item) {
     if (!Array.isArray(item.features) || !item.features.length) return '';
 
@@ -269,8 +266,13 @@
              'class="btn btn-accent">' +
             '<i data-lucide="phone"></i><span>Call ' + PHONE_DISPLAY + '</span>' +
           '</a>' +
+          '<button type="button" class="btn btn-warranty" data-warranty-open ' +
+                  'data-cursor="View" ' +
+                  'aria-haspopup="dialog">' +
+            '<i data-lucide="shield-check"></i>' +
+            '<span>Warranty Policy</span>' +
+          '</button>' +
         '</div>' +
-       
       '</div>';
     fragment.appendChild(grid);
 
@@ -382,7 +384,6 @@
     const thumbs = host.querySelectorAll('.pd-thumb');
 
     if (track && thumbs.length) {
-      /* Start at index 0 */
       let currentIndex = 0;
 
       const goTo = function (index) {
@@ -391,11 +392,8 @@
         if (index === currentIndex) return;
 
         currentIndex = index;
-
-        /* Translate the track — CSS transition makes it slide */
         track.style.transform = 'translateX(-' + (index * 100) + '%)';
 
-        /* Update thumb highlighting */
         thumbs.forEach(function (t, i) {
           t.classList.toggle('is-active', i === index);
         });
@@ -408,21 +406,20 @@
         goTo(idx);
       });
 
-      /* Optional: arrow keys for accessibility */
       host.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowLeft')  goTo(currentIndex - 1);
         if (e.key === 'ArrowRight') goTo(currentIndex + 1);
       });
     }
-        /* ✅ Magnifier zoom — follows the cursor */
+
+    /* ✅ Magnifier zoom — follows the cursor */
     const detailImage = host.querySelector('.product-detail-image');
     if (detailImage) {
-      /* Ensure positioning context */
       detailImage.style.position = 'relative';
       detailImage.style.overflow = 'hidden';
 
       const slides = detailImage.querySelectorAll('.pd-slide');
-      const ZOOM = 2.2;   /* ← zoom strength (try 1.8 / 2.5 / 3) */
+      const ZOOM = 2.2;
 
       function onMove(e) {
         const rect = detailImage.getBoundingClientRect();
@@ -453,7 +450,6 @@
           img.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
           img.style.transform = 'scale(1)';
           img.style.transformOrigin = 'center center';
-          /* Clean up will-change after the transition */
           window.setTimeout(function () {
             img.style.willChange = '';
           }, 500);
@@ -464,13 +460,13 @@
       detailImage.addEventListener('mousemove', onMove);
       detailImage.addEventListener('mouseleave', onLeave);
 
-      /* On touch devices — skip the magnifier */
       if (window.matchMedia('(hover: none)').matches) {
         detailImage.removeEventListener('mouseenter', onEnter);
         detailImage.removeEventListener('mousemove', onMove);
         detailImage.removeEventListener('mouseleave', onLeave);
       }
     }
+
     console.info('[IT Zone] Product loaded:', item.brand, item.model,
                  '| Images:', imagesOf(item).length,
                  '| Related:', related.length);

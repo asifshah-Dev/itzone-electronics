@@ -140,3 +140,52 @@
 .btn-whatsapp .lucide,
 .btn-whatsapp svg { width: 1.15rem; height: 1.15rem; }
 .btn-whatsapp:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.4); }
+
+/* ── Warranty button (white with logo-green border) ──── */
+.btn-warranty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-base);
+  line-height: 1;
+  color: #000000 !important;
+  background: #ffffff;
+  border: 2px solid #6faa2e;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px -6px rgba(111, 170, 46, 0.35);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color     var(--dur-fast) var(--ease-out),
+    color            var(--dur-fast) var(--ease-out),
+    transform        var(--dur-fast) var(--ease-out),
+    box-shadow       var(--dur-base) var(--ease-out);
+}
+.btn-warranty:hover {
+  background: #f4fbe8;
+  border-color: #4a7a1e;
+  color: #000000 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -6px rgba(111, 170, 46, 0.5);
+}
+.btn-warranty:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 14px -6px rgba(111, 170, 46, 0.35);
+}
+.btn-warranty:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(111, 170, 46, 0.35);
+}
+.btn-warranty .lucide,
+.btn-warranty svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  color: #6faa2e !important;
+  stroke: #6faa2e !important;
+}

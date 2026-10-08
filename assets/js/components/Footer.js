@@ -2,7 +2,6 @@
 /* ─────────────────────────────────────────────────────────
    Site footer — enhanced.
    Columns: Brand + socials | Shop | Support | Contact + hours
-   Bottom bar: copyright + trust badges
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -13,11 +12,18 @@
   const PHONE_TEL     = 'tel:+923265974741';
   const WHATSAPP      = 'https://wa.me/923265974741?text=' + encodeURIComponent('Hi IT Zone!');
 
+  /* TikTok has no Lucide icon → inline SVG */
+  const TIKTOK_SVG =
+    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" ' +
+    'style="width:1em;height:1em;display:inline-block;vertical-align:middle;">' +
+      '<path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/>' +
+    '</svg>';
+
   const SOCIALS = [
-    { name: 'Facebook',  href: 'https://facebook.com/',      icon: 'facebook' },
-    { name: 'Instagram', href: 'https://instagram.com/',     icon: 'instagram' },
-    { name: 'WhatsApp',  href: 'https://wa.me/923265974741', icon: 'message-circle' },
-    { name: 'Twitter',   href: 'https://twitter.com/',       icon: 'twitter' },
+    { name: 'Facebook',  href: 'https://www.facebook.com/itzoneelectronics',      icon: 'facebook' },
+    { name: 'Instagram', href: 'https://www.instagram.com/itzoneelectronics',     icon: 'instagram' },
+    { name: 'YouTube',   href: 'https://www.youtube.com/@itzoneelectronics',      icon: 'youtube' },
+    { name: 'TikTok',    href: 'https://www.tiktok.com/@itzoneelectronics',       icon: null, svg: TIKTOK_SVG },
   ];
 
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
@@ -28,10 +34,15 @@
     return href;
   }
 
+  function socialIconMarkup(s) {
+    if (s.svg) return s.svg;
+    return '<i data-lucide="' + s.icon + '"></i>';
+  }
+
   function template() {
     const socialLinks = SOCIALS.map(s =>
       '<a href="' + s.href + '" class="footer-social" target="_blank" rel="noopener noreferrer" aria-label="' + s.name + '">' +
-        '<i data-lucide="' + s.icon + '"></i>' +
+        socialIconMarkup(s) +
       '</a>'
     ).join('');
 
@@ -43,7 +54,6 @@
 
           '<div class="footer-grid">' +
 
-            /* ── Brand column ──────────────────────────── */
             '<div class="footer-brand-col">' +
               '<a class="footer-brand" href="' + r('index.html') + '" aria-label="IT Zone Electronics — Home">' +
                 '<img src="' + r('assets/img/logo.svg') + '" alt="IT Zone Electronics" width="56" height="56" decoding="async">' +
@@ -55,7 +65,6 @@
               '<div class="footer-socials">' + socialLinks + '</div>' +
             '</div>' +
 
-            /* ── Shop column ───────────────────────────── */
             '<div class="footer-col">' +
               '<h3 class="footer-heading">Shop</h3>' +
               '<ul class="footer-list">' +
@@ -67,7 +76,6 @@
               '</ul>' +
             '</div>' +
 
-            /* ── Support column ────────────────────────── */
             '<div class="footer-col">' +
               '<h3 class="footer-heading">Support</h3>' +
               '<ul class="footer-list">' +
@@ -78,7 +86,6 @@
               '</ul>' +
             '</div>' +
 
-            /* ── Contact + hours column ────────────────── */
             '<div class="footer-col footer-contact-col">' +
               '<h3 class="footer-heading">Get in touch</h3>' +
               '<ul class="footer-list footer-contact">' +
@@ -92,18 +99,17 @@
                 '</li>' +
                 '<li>' +
                   '<i data-lucide="map-pin"></i>' +
-                  '<span>Karachi, Pakistan</span>' +
+                  '<span>Darogawala, Lahore, Pakistan</span>' +
                 '</li>' +
                 '<li>' +
                   '<i data-lucide="clock"></i>' +
-                  '<span>Mon\u2013Sat \u00b7 10 AM \u2013 9 PM</span>' +
+                  '<span>11 AM to 9 PM</span>' +
                 '</li>' +
               '</ul>' +
             '</div>' +
 
           '</div>' +
 
-          /* ── Bottom bar ──────────────────────────────── */
           '<div class="footer-bottom">' +
             '<div class="footer-trust">' +
               '<span class="footer-trust-item">' +

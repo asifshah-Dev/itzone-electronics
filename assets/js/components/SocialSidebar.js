@@ -13,28 +13,28 @@
   const PLATFORMS = [
     {
       name: 'Facebook',
-      href: 'https://facebook.com/',
+      href: 'https://www.facebook.com/itzoneelectronics',
       icon: 'facebook',
       bg: '#1877F2',
       label: 'Like on Facebook'
     },
     {
       name: 'Instagram',
-      href: 'https://instagram.com/',
+      href: 'https://www.instagram.com/itzoneelectronics',
       icon: 'instagram',
       bg: 'linear-gradient(45deg, #F58529 0%, #DD2A7B 40%, #8134AF 70%, #515BD4 100%)',
       label: 'Follow on Instagram'
     },
     {
       name: 'YouTube',
-      href: 'https://youtube.com/',
+      href: 'https://www.youtube.com/@itzoneelectronics',
       icon: 'youtube',
       bg: '#FF0000',
       label: 'Watch on YouTube'
     },
     {
       name: 'TikTok',
-      href: 'https://tiktok.com/',
+      href: 'https://www.tiktok.com/@itzoneelectronics',
       icon: 'tiktok',
       bg: '#000000',
       label: 'Follow on TikTok'
@@ -80,7 +80,6 @@
         ? 'style="--social-bg-image: ' + p.bg + ';"'
         : 'style="--social-bg-color: ' + p.bg + ';"';
 
-      /* NO data-cursor attribute — default cursor stays */
       return (
         '<a class="social-side-item' + (isGradient ? ' has-gradient' : '') + '"' +
         '   href="' + p.href + '"' +

@@ -505,8 +505,8 @@
   transform: scale(1);
   transform-origin: center;
   transition:
-    opacity 0.35s ease,
-    transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+    opacity 0.6s ease-in-out,
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .product-image img.is-fill { object-fit: cover; }
 
@@ -516,8 +516,8 @@
 /* Hover effects only on devices that really hover (no sticky/laggy touch zoom) */
 @media (hover: hover) {
   .product-card:hover .product-image img { transform: scale(1.04); }
-  .product-image.has-hover:hover .pi-primary { opacity: 0; }
-  .product-image.has-hover:hover .pi-hover   { opacity: 1; }
+  /* 2nd photo fades in ON TOP of the 1st (1st stays solid → no white flash) */
+  .product-image.has-hover:hover .pi-hover { opacity: 1; }
 }
 
 .product-image--placeholder {

@@ -241,6 +241,7 @@
     el.querySelectorAll('.product-image img').forEach(function (img) {
       if (img.complete) fit(img);
     });
+    if (document.readyState === 'complete') idle(warmAll);
     return el;
   }
 
@@ -252,6 +253,27 @@
       document.querySelectorAll('.product-image img').forEach(function (img) { fit(img, true); });
     }, 150);
   });
+
+  /* Pre-load + pre-decode the hover photo so it can fade in smoothly
+     (a lazy, undecoded image would pop in instantly on first hover). */
+  function warm(img) {
+    if (!img || img.dataset.warm) return;
+    img.dataset.warm = '1';
+    img.loading = 'eager';
+    if (img.decode) img.decode().catch(function () {});
+  }
+  function warmAll() {
+    document.querySelectorAll('.product-image .pi-hover').forEach(warm);
+  }
+  function idle(fn) {
+    if (window.requestIdleCallback) window.requestIdleCallback(fn, { timeout: 2000 });
+    else setTimeout(fn, 300);
+  }
+  window.addEventListener('load', function () { idle(warmAll); });
+  document.addEventListener('pointerover', function (e) {
+    const card = e.target.closest && e.target.closest('.product-card');
+    if (card) warm(card.querySelector('.pi-hover'));
+  }, { passive: true });
 
   document.addEventListener('click', function (e) {
     const link = e.target.closest && e.target.closest('.product-link');

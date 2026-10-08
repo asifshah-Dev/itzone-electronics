@@ -30,7 +30,7 @@ body.has-cursor [role="button"] {
   height: 32px;
   border-radius: 999px;
   pointer-events: none;
-  z-index: 99998;
+  z-index: 2147483646;
   background: rgba(13, 74, 38, 0.08);
   border: 1.5px solid rgba(13, 74, 38, 0.9);
   backdrop-filter: blur(2px) saturate(140%);
@@ -144,7 +144,7 @@ body.has-cursor [role="button"] {
   border-radius: 50%;
   background: var(--brand-primary);
   pointer-events: none;
-  z-index: 99999;
+  z-index: 2147483647;
   transform: translate3d(-50%, -50%, 0);
   transition:
     background-color 0.2s ease,
