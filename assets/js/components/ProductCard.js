@@ -2,14 +2,20 @@
 /* ─────────────────────────────────────────────────────────
    Product card — reads images[] array.
    Falls back to placeholder icon if no images.
-   No hardcoded width/height on <img> so high-DPI screens
-   render at full resolution (fixes card blur).
+   Equal-size cards: every image box has the same shape.
+   Photos whose shape is close to the box shape are shown with
+   object-fit: cover (no side white space); all others use
+   contain (never cropped). See .is-fill in _product-card.css.
    ───────────────────────────────────────────────────────── */
 
 (function () {
   'use strict';
 
   const NS = (window.ITZone = window.ITZone || {});
+
+  /* How close (as a ratio) the photo shape must be to the box shape
+     to use "cover". 0.15 = within 15%  →  crop is at most ~13%. */
+  const FILL_TOLERANCE = 0.15;
 
   function isInPagesDir() { return /\/pages\//.test(window.location.pathname); }
 
@@ -25,6 +31,51 @@
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* Typical photo shape: measured from the real images, so every card
+     image box (all the same size) matches most of your photos. */
+  const seen = {};              // src -> width/height
+  let boxRatio = 0;
+
+  function median(list) {
+    const a = list.slice().sort(function (x, y) { return x - y; });
+    const m = Math.floor(a.length / 2);
+    return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+  }
+
+  function updateBoxRatio() {
+    const list = Object.keys(seen).map(function (k) { return seen[k]; });
+    if (!list.length) return;
+    let m = median(list);
+    m = Math.min(1.6, Math.max(0.75, m));     // keep cards sensible
+    m = Math.round(m * 100) / 100;
+    if (Math.abs(m - boxRatio) < 0.02) return;
+    boxRatio = m;
+    document.documentElement.style.setProperty('--pi-ratio', String(m));
+    requestAnimationFrame(function () {
+      document.querySelectorAll('.product-image img').forEach(function (img) { fit(img, true); });
+    });
+  }
+
+  /* Decide cover vs contain for one <img> */
+  function fit(img, skipMeasure) {
+    try {
+      if (!img || !img.naturalWidth || !img.naturalHeight) return;
+      const box = img.parentNode;
+      if (!box) return;
+      const imgRatio = img.naturalWidth / img.naturalHeight;
+
+      if (!skipMeasure && img.classList.contains('pi-primary')) {
+        const key = img.currentSrc || img.src;
+        if (!(key in seen)) { seen[key] = imgRatio; updateBoxRatio(); }
+      }
+
+      const bw = box.clientWidth, bh = box.clientHeight;
+      if (!bw || !bh) return;
+      const diff = Math.abs(imgRatio / (bw / bh) - 1);
+      img.classList.toggle('is-fill', diff <= FILL_TOLERANCE);
+    } catch (e) { /* ignore */ }
   }
 
   function whatsappSvg(size) {
@@ -107,16 +158,16 @@
     const primary = imgs[0];
     const hover = imgs[1] || '';
 
-    /* 🔑 NO width/height attributes — allows browser to decode
-       at full resolution on high-DPI (retina) displays. */
+    const onload = 'onload="if(window.ITZone&amp;&amp;ITZone.ProductCard)ITZone.ProductCard.fit(this);" ';
+
     const primaryImg =
       '<img class="pi-primary" src="' + esc(primary) + '" alt="' + alt + '" ' +
-           'loading="lazy" decoding="async" ' +
+           'loading="lazy" decoding="async" ' + onload +
            'onerror="this.onerror=null;this.parentNode.classList.add(\'product-image--placeholder\');this.parentNode.innerHTML=\'<i data-lucide=&quot;' + icon + '&quot;></i>\';if(window.lucide)window.lucide.createIcons();">';
 
     const hoverImg = hover
       ? '<img class="pi-hover" src="' + esc(hover) + '" alt="" ' +
-             'loading="lazy" decoding="async" ' +
+             'loading="lazy" decoding="async" ' + onload +
              'onerror="this.style.display=\'none\';">'
       : '';
 
@@ -185,8 +236,22 @@
   function render(item) {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = template(item).trim();
-    return wrapper.firstElementChild;
+    const el = wrapper.firstElementChild;
+    /* Cached images may finish loading before onload is attached */
+    el.querySelectorAll('.product-image img').forEach(function (img) {
+      if (img.complete) fit(img);
+    });
+    return el;
   }
+
+  /* Re-check on resize (box size can change between breakpoints) */
+  let resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      document.querySelectorAll('.product-image img').forEach(function (img) { fit(img, true); });
+    }, 150);
+  });
 
   document.addEventListener('click', function (e) {
     const link = e.target.closest && e.target.closest('.product-link');
@@ -203,6 +268,7 @@
 
   NS.ProductCard = {
     render: render,
+    fit: fit,
     formatPKR: function (n) { return 'PKR ' + new Intl.NumberFormat('en-PK').format(n); }
   };
 })();

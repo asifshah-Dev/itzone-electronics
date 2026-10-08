@@ -447,12 +447,12 @@
   min-width: 0;
   max-width: 100%;
   transition:
-    transform var(--dur-base) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out);
+    transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
 }
 .product-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   box-shadow: var(--shadow-md);
   border-color: rgba(141, 198, 63, 0.5);
 }
@@ -471,46 +471,54 @@
 }
 .product-link:hover { color: inherit; }
 
-/* ═══════════════ PRODUCT CARD IMAGE (SHARP) ═══════════════
-   - object-fit: contain  → whole product visible, nothing stretched
-   - NO filter / image-rendering / will-change / permanent scale
-   - Hover = opacity cross-fade only (no blur-causing zoom)
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════ PRODUCT CARD IMAGE (SHARP, EQUAL SIZE) ═══════════════
+   - Every card image box has the SAME shape (--pi-ratio) → equal cards.
+     ProductCard.js measures your photos and sets --pi-ratio to their typical
+     shape, so side white space is minimal.
+   - Default: object-fit: contain → whole product, never cropped.
+   - ProductCard.js adds .is-fill on photos whose shape is within ~12%
+     of the box shape → they use cover, so no side white space, and the
+     crop is too small to touch the product.
+   - No filter / will-change / permanent transform → stays sharp.
+   ═══════════════════════════════════════════════════════════════ */
 .product-image {
-  --pi-bleed: 12%;           /* higher = closer. Lower it if edges clip. */
-  --pi-ratio: 1 / 1;         /* narrower box = no side white space. Try 5 / 4 or 4 / 3 if photos are wide. */
   position: relative;
   width: 100%;
-  aspect-ratio: var(--pi-ratio);
+  aspect-ratio: var(--pi-ratio, 1 / 1);   /* ProductCard.js sets --pi-ratio on <html> from your real photos */
   background: #ffffff;
   overflow: hidden;
   flex-shrink: 0;
+  contain: paint;                          /* keeps repaints inside the image box (less lag) */
 }
-.product-image.product-image--tiny    { aspect-ratio: 1 / 1; --pi-bleed: 12%; }
-.product-image.product-image--monitor { --pi-bleed: 8%; }
 
-/* The image box is made slightly bigger than the card (layout, not
-   transform), so the picture fills the card but stays perfectly sharp.
-   object-fit: contain means the product itself is never cropped. */
 .product-image img {
   position: absolute;
-  top: calc(var(--pi-bleed) * -1);
-  left: calc(var(--pi-bleed) * -1);
-  width: calc(100% + var(--pi-bleed) * 2);
-  height: calc(100% + var(--pi-bleed) * 2);
-  max-width: none !important;   /* global img { max-width:100% } was capping the width */
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none !important;
   max-height: none !important;
   display: block;
   object-fit: contain;
   object-position: center;
   background: #ffffff;
-  transition: opacity 0.5s ease;
+  transform: scale(1);
+  transform-origin: center;
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
+.product-image img.is-fill { object-fit: cover; }
+
 .product-image .pi-primary { z-index: 1; opacity: 1; }
 .product-image .pi-hover   { z-index: 2; opacity: 0; }
 
-.product-image.has-hover:hover .pi-primary { opacity: 0; }
-.product-image.has-hover:hover .pi-hover   { opacity: 1; }
+/* Hover effects only on devices that really hover (no sticky/laggy touch zoom) */
+@media (hover: hover) {
+  .product-card:hover .product-image img { transform: scale(1.04); }
+  .product-image.has-hover:hover .pi-primary { opacity: 0; }
+  .product-image.has-hover:hover .pi-hover   { opacity: 1; }
+}
 
 .product-image--placeholder {
   background: linear-gradient(135deg, var(--brand-primary-soft) 0%, #ffffff 100%);
@@ -725,7 +733,8 @@
 }
 .product-detail-image {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
+  max-height: 640px;
   width: 100%;
   background: #ffffff;
   border-radius: var(--radius-xl);
@@ -754,17 +763,25 @@
 }
 .pd-slide:active { cursor: zoom-out; }
 
-/* Magnifier zoom is applied by JS via transform on hover/touch only */
+/* Detail image: fills the frame (no side white space), never cropped,
+   sharp (layout size, not transform). Hover/touch zoom on top of it. */
 .pd-slide img {
   display: block;
-  width: 100%;
-  height: 100%;
+  flex: 0 0 auto;
+  width: calc(100% + 14%);
+  height: calc(100% + 8%);
+  max-width: none !important;
+  max-height: none !important;
   object-fit: contain;
   object-position: center;
   background: #ffffff;
   transform-origin: center center;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   user-select: none;
   -webkit-user-drag: none;
+}
+@media (hover: hover) {
+  .pd-slide:hover img { transform: scale(1.6); }
 }
 
 .product-detail-image > .lucide,
@@ -1076,7 +1093,8 @@
 @media (prefers-reduced-motion: reduce) {
   .product-card, .product-order-wa, .filter-btn,
   .sort-select, .view-btn, .pd-thumb, .pd-track,
-  .product-image img {
+  .product-image img,
+  .pd-slide img {
     transition: none !important;
   }
   .product-card:hover, .product-order-wa:hover { transform: none; }
