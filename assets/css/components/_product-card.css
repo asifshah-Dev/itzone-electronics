@@ -501,24 +501,18 @@
   height: 100%;
   display: block;
   background: #ffffff;
-  will-change: opacity, transform;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   transition:
     opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* All product types — contain + 1.09 scale, no hard crop */
 .product-image.product-image--laptop img,
 .product-image.product-image--desktop img,
 .product-image.product-image--tiny img,
 .product-image.product-image--monitor img {
-  object-fit: cover;
+  object-fit: contain;      /* use cover if you prefer filled cards */
   object-position: center;
   padding: 0;
-  
-  transform-origin: center center;
 }
 
 .product-image .pi-primary {
