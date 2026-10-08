@@ -720,7 +720,8 @@
 }
 @media (min-width: 768px) {
   .product-detail-grid {
-    grid-template-columns: 1fr 1fr;
+    --pd-image-width: 480px;           /* width of the image column. Smaller = narrower box. */
+    grid-template-columns: minmax(0, var(--pd-image-width)) minmax(0, 1fr);
     gap: var(--space-7);
     align-items: start;
   }
@@ -730,11 +731,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  width: 100%;
+  min-width: 0;
 }
 .product-detail-image {
   position: relative;
-  aspect-ratio: 1 / 1;
-  max-height: 640px;
+  /* no fixed ratio: the frame takes the shape of the photo itself */
   width: 100%;
   background: #ffffff;
   border-radius: var(--radius-xl);
@@ -743,16 +745,22 @@
   color: var(--brand-primary);
   box-shadow: var(--shadow-sm);
 }
-.pd-track {
+.product-detail-image {
+  aspect-ratio: auto !important;     /* frame follows the photo, not a fixed box */
+  height: auto !important;
+}
+.product-detail-image .pd-track {
   display: flex;
+  align-items: center;
   width: 100%;
-  height: 100%;
+  height: auto !important;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.pd-slide {
+.product-detail-image .pd-slide {
+  --pd-zoom-delay: 0.5s;             /* wait this long after hover before zooming */
   flex: 0 0 100%;
   width: 100%;
-  height: 100%;
+  height: auto !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -761,28 +769,37 @@
   overflow: hidden;
   cursor: zoom-in;
 }
-.pd-slide:active { cursor: zoom-out; }
+.product-detail-image .pd-slide:active { cursor: zoom-out; }
 
-/* Detail image: fills the frame (no side white space), never cropped,
-   sharp (layout size, not transform). Hover/touch zoom on top of it. */
-.pd-slide img {
+/* Detail image: the ACTUAL photo — full width, natural shape,
+   nothing cropped, no side white space, perfectly sharp. */
+.product-detail-image .pd-slide img {
   display: block;
-  flex: 0 0 auto;
-  width: calc(100% + 14%);
-  height: calc(100% + 8%);
-  max-width: none !important;
-  max-height: none !important;
-  object-fit: contain;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;       /* never shrink the photo → no side white space */
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
   object-position: center;
+  padding: 0 !important;
+  margin: 0 !important;
   background: #ffffff;
+  transform: scale(1);
   transform-origin: center center;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);   /* zoom OUT: instant start */
   user-select: none;
   -webkit-user-drag: none;
 }
 @media (hover: hover) {
-  .pd-slide:hover img { transform: scale(1.6); }
+  .product-detail-image .pd-slide:hover img {
+    transform: scale(1.6);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--pd-zoom-delay);  /* zoom IN: 0.5s delay */
+  }
 }
+
+/* No photo → show the placeholder icon in a normal-shaped frame */
+.product-detail-image:not(:has(.pd-slide)) { aspect-ratio: 4 / 3 !important; }
 
 .product-detail-image > .lucide,
 .product-detail-image > svg {

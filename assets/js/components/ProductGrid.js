@@ -29,7 +29,7 @@
     }
 
     return {
-      render: function (items) {
+      render: function (items, emptyMessage) {
         /* ── Guard: is ProductCard loaded? ─────────────── */
         if (!NS.ProductCard || typeof NS.ProductCard.render !== 'function') {
           console.error(
@@ -44,7 +44,7 @@
         }
 
         if (!items || items.length === 0) {
-          host.innerHTML = emptyState('No products match your filters.');
+          host.innerHTML = emptyState(emptyMessage || 'No products match your filters.');
           NS.renderIcons?.(host);
           return;
         }

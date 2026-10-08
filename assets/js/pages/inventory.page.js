@@ -43,6 +43,7 @@
     'desktops':     (i) => i._subtype === 'desktop',
     'tiny-pcs':     (i) => i._subtype === 'tiny',
     'monitors':     (i) => i._subtype === 'monitor',
+    'accessories':  () => false,
   };
 
   /* ═══════════════════════════════════════════════════════
@@ -169,13 +170,17 @@
     /* ── Brand filter (?brand=dell / hp / lenovo) ──── */
     if (state.brand) {
       const b = String(state.brand).toUpperCase();
-      items = items.filter(i => String(i.brand || '').toUpperCase() === b);
+      items = items.filter(i =>
+        i._type === 'laptop' && String(i.brand || '').toUpperCase() === b
+      );
     }
 
     /* ── Series filter (?series=latitude / thinkpad) ─ */
     if (state.series) {
       const want = slug(state.series);
-      items = items.filter(i => slug(seriesOf(i.model)) === want);
+      items = items.filter(i =>
+        i._type === 'laptop' && slug(seriesOf(i.model)) === want
+      );
     }
 
     /* ── Text search (?q=) ─────────────────────────── */
@@ -339,7 +344,10 @@
       const filtered = applyFilters(state);
       const sorted = applySort(filtered, state.sort);
 
-      grid.render(sorted);
+      grid.render(
+        sorted,
+        state.tag === 'accessories' ? 'Accessories are not available right now.' : undefined
+      );
       updateCount(sorted.length, allItems.length, state);
 
       gridHost.classList.toggle('is-list', state.view === 'list');

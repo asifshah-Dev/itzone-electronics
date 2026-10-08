@@ -176,7 +176,7 @@
       if (!byBrand.has(brandKey)) {
         byBrand.set(brandKey, {
           label: brandKey,
-          href: 'pages/inventory.html?brand=' + slug(brandKey),
+          href: 'pages/inventory.html?type=laptop&brand=' + slug(brandKey),
           seriesSet: new Set()
         });
       }
@@ -192,7 +192,7 @@
         .sort((a, b2) => a.localeCompare(b2))
         .map(name => ({
           label: name,
-          href: 'pages/inventory.html?brand=' + slug(b.label) + '&series=' + slug(name)
+          href: 'pages/inventory.html?type=laptop&brand=' + slug(b.label) + '&series=' + slug(name)
         }));
       delete b.seriesSet;
     });
