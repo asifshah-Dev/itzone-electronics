@@ -81,8 +81,7 @@
               '<ul class="footer-list">' +
                 '<li><a href="' + r('pages/contact.html') + '">Contact us</a></li>' +
                 '<li><a href="' + r('pages/warranty.html') + '">Warranty Policy</a></li>' +
-                '<li><a href="' + r('pages/contact.html') + '#delivery">Delivery</a></li>' +
-                '<li><a href="' + r('pages/contact.html') + '#returns">Returns</a></li>' +
+                
               '</ul>' +
             '</div>' +
 
