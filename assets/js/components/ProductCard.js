@@ -2,6 +2,8 @@
 /* ─────────────────────────────────────────────────────────
    Product card — reads images[] array.
    Falls back to placeholder icon if no images.
+   No hardcoded width/height on <img> so high-DPI screens
+   render at full resolution (fixes card blur).
    ───────────────────────────────────────────────────────── */
 
 (function () {
@@ -78,7 +80,6 @@
     return 'laptop';
   }
 
-  /* ✅ Get all images array (with fallback to single `image` field) */
   function imagesOf(item) {
     if (Array.isArray(item.images) && item.images.length) {
       return item.images.map(r);
@@ -92,8 +93,7 @@
     const icon = categoryIcon(item);
     const alt = esc(item.brand + ' ' + item.model);
 
-    /* Add a category class so CSS can pick different object-fit */
-    let subtypeClass = ' product-image--laptop';           /* default: laptops */
+    let subtypeClass = ' product-image--laptop';
     if (item._subtype === 'tiny')    subtypeClass = ' product-image--tiny';
     if (item._subtype === 'desktop') subtypeClass = ' product-image--desktop';
     if (item._subtype === 'monitor' || item.resolution) subtypeClass = ' product-image--monitor';
@@ -107,14 +107,16 @@
     const primary = imgs[0];
     const hover = imgs[1] || '';
 
+    /* 🔑 NO width/height attributes — allows browser to decode
+       at full resolution on high-DPI (retina) displays. */
     const primaryImg =
       '<img class="pi-primary" src="' + esc(primary) + '" alt="' + alt + '" ' +
-           'loading="lazy" decoding="async" width="400" height="300" ' +
+           'loading="lazy" decoding="async" ' +
            'onerror="this.onerror=null;this.parentNode.classList.add(\'product-image--placeholder\');this.parentNode.innerHTML=\'<i data-lucide=&quot;' + icon + '&quot;></i>\';if(window.lucide)window.lucide.createIcons();">';
 
     const hoverImg = hover
       ? '<img class="pi-hover" src="' + esc(hover) + '" alt="" ' +
-             'loading="lazy" decoding="async" width="400" height="300" ' +
+             'loading="lazy" decoding="async" ' +
              'onerror="this.style.display=\'none\';">'
       : '';
 

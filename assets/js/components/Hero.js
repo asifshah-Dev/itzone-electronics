@@ -97,7 +97,7 @@
           </div>
 
           <ul class="hero-trust">
-            <li><i data-lucide="shield-check"></i><span>1-year warranty</span></li>
+            
             <li><i data-lucide="truck"></i><span>Nationwide delivery</span></li>
             <li><i data-lucide="star"></i><span>4.9 &middot; 1.2k reviews</span></li>
           </ul>

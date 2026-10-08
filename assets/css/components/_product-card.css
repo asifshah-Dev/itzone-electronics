@@ -1,7 +1,8 @@
 /* assets/css/components/_product-card.css
    ─────────────────────────────────────────────────────────
    Product card + detail page.
-   - Cards: object-fit: cover on 4:3 images → fills box, no crop
+   - Cards: object-fit: contain + 1.09 scale → full image visible,
+     zoomed slightly to fill the box (no hard crop, no blur)
    - Detail page + thumbs: object-fit: contain → full image, never cropped
    - Price, brand pill, order button, feature badges: black text
    ───────────────────────────────────────────────────────── */
@@ -476,8 +477,9 @@
 /* ═══════════════════════════════════════════════════════
    PRODUCT CARD IMAGE
    ─────────────────────────────────────────────────────────
-   Source images are all 4:3 → cover fills the 4:3 box
-   exactly. No cropping, no letterbox.
+   contain + slight scale = 'between' cover and contain.
+   Full image visible, edges zoom in 9% to fill the box.
+   🔑 image-rendering: high-quality keeps it crisp at full res.
    ═══════════════════════════════════════════════════════ */
 .product-image {
   position: relative;
@@ -500,7 +502,6 @@
   display: block;
   background: #ffffff;
   will-change: opacity, transform;
-  transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transition:
@@ -508,25 +509,25 @@
     transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Cards — contain, no crop on any image type */
+/* All product types — contain + 1.09 scale, no hard crop */
 .product-image.product-image--laptop img,
 .product-image.product-image--desktop img,
 .product-image.product-image--tiny img,
 .product-image.product-image--monitor img {
   object-fit: cover;
   object-position: center;
-  padding: 4%;
+  padding: 0;
+  
+  transform-origin: center center;
 }
 
 .product-image .pi-primary {
   z-index: 1;
   opacity: 1;
-  transform: scale(1);
 }
 .product-image .pi-hover {
   z-index: 2;
   opacity: 0;
-  transform: scale(1);
 }
 
 .product-image::after {
@@ -542,16 +543,17 @@
   background: rgba(10, 15, 13, 0.18);
 }
 
+/* Hover zoom: base 1.09 + 0.05 = 1.14 */
 .product-image.has-hover:hover .pi-primary {
   opacity: 0;
-  transform: scale(1.06);
+  transform: scale(1.14);
 }
 .product-image.has-hover:hover .pi-hover {
   opacity: 1;
-  transform: scale(1.06);
+  transform: scale(1.14);
 }
 .product-image:not(.has-hover):hover .pi-primary {
-  transform: scale(1.06);
+  transform: scale(1.14);
 }
 
 .product-image--placeholder {
@@ -581,7 +583,7 @@
 }
 .product-card-head { margin-bottom: var(--space-3); min-width: 0; }
 
-/* ── Brand pill (DELL / HP / LENOVO / etc.) ────────── */
+/* Brand pill */
 .product-brand {
   display: inline-block;
   padding: 0.2rem 0.6rem;
@@ -662,7 +664,7 @@
   color: var(--text-muted);
 }
 
-/* ── Price value → BLACK ──────────────────────────── */
+/* Price value — BLACK */
 .product-price-value {
   font-size: var(--fs-lg);
   font-weight: var(--fw-black);
@@ -671,7 +673,7 @@
   white-space: nowrap;
 }
 
-/* ── Order button → BLACK text + BLACK icon ────────── */
+/* Order button — BLACK text + BLACK icon */
 .product-order-wa {
   display: inline-flex;
   align-items: center;
@@ -751,9 +753,6 @@
 
 /* ═══════════════════════════════════════════════════════
    PRODUCT DETAIL PAGE
-   ─────────────────────────────────────────────────────────
-   Detail main image + thumbnails use CONTAIN — the full
-   image is always visible, never cropped on the sides.
    ═══════════════════════════════════════════════════════ */
 .product-detail { padding-block: clamp(2rem, 4vw, 4rem); }
 
@@ -808,7 +807,6 @@
   box-sizing: border-box;
 }
 
-/* Detail main image — NO CROP */
 .pd-slide img {
   width: 100%;
   height: 100%;
@@ -853,8 +851,6 @@
     transform .14s ease,
     box-shadow .14s ease;
 }
-
-/* Thumbnails — full image, no crop */
 .pd-thumb img {
   width: 100%;
   height: 100%;
@@ -949,7 +945,6 @@
 .product-pill .lucide,
 .product-pill svg { width: 1rem; height: 1rem; color: var(--brand-primary); stroke-width: 2.5; }
 
-/* ── Feature badges ── */
 .product-features {
   margin-top: var(--space-2);
   padding-top: var(--space-4);
@@ -1406,7 +1401,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════
-   IMAGE SHARPNESS + RUNTIME ENHANCEMENT
+   IMAGE SHARPNESS
    ═══════════════════════════════════════════════════════ */
 .product-image img,
 .pd-slide img,
@@ -1417,7 +1412,6 @@
   image-rendering: high-quality;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  transform: translateZ(0);
   filter:
     contrast(1.03)
     saturate(1.04)
