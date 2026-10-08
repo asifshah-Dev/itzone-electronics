@@ -225,6 +225,14 @@
 }
 #product-grid > *, #pcs-grid > * { min-width: 0; max-width: 100%; }
 
+/* Narrower cards in grid view (list view stays full width) */
+#product-grid:not(.is-list) > .product-card,
+#pcs-grid:not(.is-list) > .product-card {
+  max-width: 300px;
+  width: 100%;
+  justify-self: center;
+}
+
 /* ═══════════════ LIST VIEW (product-grid / pcs-grid / home-grid) ═══════════════ */
 #product-grid.is-list,
 #pcs-grid.is-list { grid-template-columns: 1fr !important; }
@@ -470,9 +478,10 @@
    ═══════════════════════════════════════════════════════ */
 .product-image {
   --pi-bleed: 12%;           /* higher = closer. Lower it if edges clip. */
+  --pi-ratio: 1 / 1;         /* narrower box = no side white space. Try 5 / 4 or 4 / 3 if photos are wide. */
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: var(--pi-ratio);
   background: #ffffff;
   overflow: hidden;
   flex-shrink: 0;
