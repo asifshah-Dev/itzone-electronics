@@ -469,6 +469,7 @@
    - Hover = opacity cross-fade only (no blur-causing zoom)
    ═══════════════════════════════════════════════════════ */
 .product-image {
+  --pi-bleed: 12%;           /* higher = closer. Lower it if edges clip. */
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 3;
@@ -476,13 +477,20 @@
   overflow: hidden;
   flex-shrink: 0;
 }
-.product-image.product-image--tiny { aspect-ratio: 1 / 1; }
+.product-image.product-image--tiny    { aspect-ratio: 1 / 1; --pi-bleed: 12%; }
+.product-image.product-image--monitor { --pi-bleed: 8%; }
 
+/* The image box is made slightly bigger than the card (layout, not
+   transform), so the picture fills the card but stays perfectly sharp.
+   object-fit: contain means the product itself is never cropped. */
 .product-image img {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: calc(var(--pi-bleed) * -1);
+  left: calc(var(--pi-bleed) * -1);
+  width: calc(100% + var(--pi-bleed) * 2);
+  height: calc(100% + var(--pi-bleed) * 2);
+  max-width: none !important;   /* global img { max-width:100% } was capping the width */
+  max-height: none !important;
   display: block;
   object-fit: contain;
   object-position: center;
