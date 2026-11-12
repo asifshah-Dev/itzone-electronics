@@ -346,23 +346,46 @@
       sessionStorage.removeItem('itz.pendingProductAt');
     } catch (e) { /* ignore */ }
 
-    let laptops = [];
-    let pcs = {};
+    // Fast path — fetch the single product via API.
+    // Fall back to old behavior if the API can't find it.
+    let item = null;
     try {
-      const results = await Promise.all([
-        NS.Data.laptops().catch(function () { return []; }),
-        NS.Data.pcs().catch(function () { return {}; }),
-      ]);
-      laptops = results[0];
-      pcs = results[1];
+      item = await NS.Data.product(id);
     } catch (err) {
-      console.error('[IT Zone] Failed to load data:', err);
-      host.innerHTML = notFound();
-      NS.renderIcons?.(host);
-      return;
+      console.warn('[IT Zone] product() failed, falling back to list search.', err);
     }
 
-    const item = findItem(id, from, laptops, pcs);
+    // Legacy fallback: search laptops + pcs lists (matches old behavior exactly)
+    let laptops = [];
+    let pcs = {};
+    if (!item) {
+      try {
+        const results = await Promise.all([
+          NS.Data.laptops().catch(function () { return []; }),
+          NS.Data.pcs().catch(function () { return {}; }),
+        ]);
+        laptops = results[0];
+        pcs = results[1];
+        item = findItem(id, from, laptops, pcs);
+      } catch (err) {
+        console.error('[IT Zone] Failed to load data:', err);
+        host.innerHTML = notFound();
+        NS.renderIcons?.(host);
+        return;
+      }
+    } else {
+      // If we got the item from the API, still fetch the list for "related" products
+      try {
+        const results = await Promise.all([
+          NS.Data.laptops().catch(function () { return []; }),
+          NS.Data.pcs().catch(function () { return {}; }),
+        ]);
+        laptops = results[0];
+        pcs = results[1];
+      } catch (err) {
+        console.warn('[IT Zone] Could not load related products pool.', err);
+      }
+    }
 
     if (!item) {
       host.innerHTML = notFound();
